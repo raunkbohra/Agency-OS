@@ -1,6 +1,8 @@
 import { auth } from '@/lib/auth';
 import DeliverablesList from '@/components/DeliverablesList';
 import { redirect } from 'next/navigation';
+import { PageHeader } from '@/components/layout/page-header';
+import { PageTransition } from '@/components/motion/page-transition';
 
 export default async function DeliverablesPage() {
   const session = await auth();
@@ -10,13 +12,13 @@ export default async function DeliverablesPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Deliverables</h1>
-        <p className="text-gray-600 mt-1">Track all client deliverables</p>
-      </div>
+    <PageTransition>
+      <PageHeader
+        title="Deliverables"
+        description="Track all client deliverables and their status"
+      />
 
       <DeliverablesList />
-    </div>
+    </PageTransition>
   );
 }

@@ -8,6 +8,14 @@ import {
 } from '@/lib/db-queries';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { PageHeader } from '@/components/layout/page-header';
+import { PageTransition } from '@/components/motion/page-transition';
+import { StaggerChildren, StaggerItem } from '@/components/motion/stagger-children';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/shared/status-badge';
+import { EmptyState } from '@/components/shared/empty-state';
+import { FileText } from 'lucide-react';
 
 export default async function InvoicesPage() {
   const session = await auth();
@@ -48,90 +56,83 @@ export default async function InvoicesPage() {
     error = err instanceof Error ? err.message : 'Failed to load invoices';
   }
 
-  const statusColors: Record<string, string> = {
-    draft: 'bg-gray-100 text-gray-800',
-    sent: 'bg-blue-100 text-blue-800',
-    paid: 'bg-green-100 text-green-800',
-    overdue: 'bg-red-100 text-red-800',
-  };
-
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
-        <p className="text-gray-600 mt-1">Manage and track your invoices</p>
-      </div>
+    <PageTransition>
+      <PageHeader
+        title="Invoices"
+        description="Manage and track your invoices"
+      />
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-          {error}
-        </div>
-      )}
+      <StaggerChildren className="space-y-6">
+        {error && (
+          <StaggerItem>
+            <div className="p-4 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
+              {error}
+            </div>
+          </StaggerItem>
+        )}
 
-      {invoices.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-          <p className="text-gray-500 mb-4">
-            No invoices yet. Create a client and assign a plan to generate an invoice.
-          </p>
-          <Link
-            href="/dashboard/clients/new"
-            className="inline-block bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 transition-colors"
-          >
-            Add First Client
-          </Link>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {invoices.map((invoice) => (
-            <div
-              key={invoice.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Client</p>
-                      <p className="text-lg font-semibold text-gray-900">
-                        {invoice.client_name || 'Unknown Client'}
-                      </p>
+        {invoices.length === 0 ? (
+          <StaggerItem>
+            <Card>
+              <EmptyState
+                icon={FileText}
+                title="No invoices yet"
+                description="Create a client and assign a plan to generate an invoice"
+                actionLabel="Add Client"
+                actionHref="/dashboard/clients/new"
+              />
+            </Card>
+          </StaggerItem>
+        ) : (
+          <StaggerItem>
+            <div className="space-y-4">
+              {invoices.map((invoice) => (
+                <Card key={invoice.id} interactive>
+                  <div className="flex items-center justify-between p-5">
+                    <div className="flex-1 grid grid-cols-3 gap-8">
+                      <div>
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-1">
+                          Client
+                        </p>
+                        <p className="font-medium text-text-primary">
+                          {invoice.client_name || 'Unknown Client'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-1">
+                          Amount
+                        </p>
+                        <p className="font-medium text-text-primary">
+                          ₹{(invoice.amount ? Number(invoice.amount) : 0).toLocaleString(currencyLocale)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-1">
+                          Due Date
+                        </p>
+                        <p className="font-medium text-text-primary">
+                          {invoice.due_date
+                            ? new Date(invoice.due_date).toLocaleDateString('en-IN')
+                            : 'Not set'}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Amount</p>
-                      <p className="text-lg font-semibold text-gray-900">
-                        ₹{(invoice.amount ? Number(invoice.amount) : 0).toLocaleString(currencyLocale)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Due Date</p>
-                      <p className="text-lg font-semibold text-gray-900">
-                        {invoice.due_date
-                          ? new Date(invoice.due_date).toLocaleDateString('en-IN')
-                          : 'Not set'}
-                      </p>
+                    <div className="flex items-center gap-4 ml-8">
+                      <StatusBadge status={invoice.status} />
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/dashboard/invoices/${invoice.id}`}>
+                          View Details
+                        </Link>
+                      </Button>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      statusColors[invoice.status] || 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                  </span>
-                  <Link
-                    href={`/dashboard/invoices/${invoice.id}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </div>
+                </Card>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+          </StaggerItem>
+        )}
+      </StaggerChildren>
+    </PageTransition>
   );
 }

@@ -2,6 +2,13 @@ import { auth } from '@/lib/auth';
 import { getPlansByAgency, getAgenciesByOwnerId, createAgency } from '@/lib/db-queries';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { PageHeader } from '@/components/layout/page-header';
+import { PageTransition } from '@/components/motion/page-transition';
+import { StaggerChildren, StaggerItem } from '@/components/motion/stagger-children';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/shared/empty-state';
+import { Package } from 'lucide-react';
 
 export default async function PlansPage() {
   const session = await auth();
@@ -35,90 +42,90 @@ export default async function PlansPage() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Plans</h1>
-          <p className="text-gray-600 mt-1">Manage your service plans</p>
-        </div>
-        <Link
-          href="/dashboard/plans/new"
-          className="bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 transition-colors"
-        >
-          Create Plan
-        </Link>
-      </div>
+    <PageTransition>
+      <PageHeader
+        title="Plans"
+        description="Manage your service plans"
+        actions={
+          <Button variant="primary" asChild>
+            <Link href="/dashboard/plans/new">Create Plan</Link>
+          </Button>
+        }
+      />
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-          {error}
-        </div>
-      )}
+      <StaggerChildren className="space-y-6">
+        {error && (
+          <StaggerItem>
+            <div className="p-4 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
+              {error}
+            </div>
+          </StaggerItem>
+        )}
 
-      {plans.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-          <p className="text-gray-500 mb-4">No plans yet. Create your first plan to get started.</p>
-          <Link
-            href="/dashboard/plans/new"
-            className="inline-block bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 transition-colors"
-          >
-            Create First Plan
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                  Plan Name
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                  Price (NPR)
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                  Billing Cycle
-                </th>
-                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {plans.map((plan) => (
-                <tr key={plan.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {plan.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {Number(plan.price).toLocaleString('en-US', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 capitalize">
-                    {plan.billing_cycle}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-right space-x-3">
-                    <Link
-                      href={`/dashboard/plans/${plan.id}`}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      View
-                    </Link>
-                    <button
-                      className="text-gray-600 hover:text-gray-700 font-medium"
-                      disabled
-                    >
-                      Archive
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+        {plans.length === 0 ? (
+          <StaggerItem>
+            <Card>
+              <EmptyState
+                icon={Package}
+                title="No plans yet"
+                description="Create your first service plan to start managing client deliverables"
+                actionLabel="Create Plan"
+                actionHref="/dashboard/plans/new"
+              />
+            </Card>
+          </StaggerItem>
+        ) : (
+          <StaggerItem>
+            <Card>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border-default">
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                        Plan Name
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                        Price
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                        Billing Cycle
+                      </th>
+                      <th className="px-6 py-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border-default">
+                    {plans.map((plan) => (
+                      <tr key={plan.id} className="hover:bg-bg-hover transition-colors duration-fast">
+                        <td className="px-6 py-4 text-sm font-medium text-text-primary">
+                          {plan.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">
+                          NPR {Number(plan.price).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-text-secondary capitalize">
+                          {plan.billing_cycle}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-right">
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/dashboard/plans/${plan.id}`}>
+                              View
+                            </Link>
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </StaggerItem>
+        )}
+      </StaggerChildren>
+    </PageTransition>
   );
 }
