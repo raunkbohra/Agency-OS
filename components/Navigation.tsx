@@ -1,7 +1,8 @@
-import { auth, signOut } from '@/lib/auth';
+import { signOut } from '@/lib/auth';
+import Link from 'next/link';
+import { Session } from 'next-auth';
 
-export default async function Navigation() {
-  const session = await auth();
+export default async function Navigation({ session }: { session: Session | null }) {
 
   async function handleSignOut() {
     'use server';
@@ -15,30 +16,30 @@ export default async function Navigation() {
           <div className="flex items-center gap-8">
             <h1 className="text-xl font-semibold text-gray-900">Agency OS</h1>
             <div className="flex gap-6">
-              <a
+              <Link
                 href="/dashboard"
                 className="text-sm text-gray-700 hover:text-gray-900 font-medium"
               >
                 Dashboard
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/dashboard/plans"
                 className="text-sm text-gray-700 hover:text-gray-900 font-medium"
               >
                 Plans
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/dashboard/clients"
                 className="text-sm text-gray-700 hover:text-gray-900 font-medium"
               >
                 Clients
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/dashboard/invoices"
                 className="text-sm text-gray-700 hover:text-gray-900 font-medium"
               >
                 Invoices
-              </a>
+              </Link>
             </div>
           </div>
 

@@ -1,15 +1,12 @@
-import { auth } from '@/lib/auth';
 import Link from 'next/link';
 
 export default async function DashboardPage() {
-  const session = await auth();
-
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back, {session?.user?.email?.split('@')[0]}!
+          Welcome back!
         </h1>
         <p className="mt-2 text-gray-600">
           Manage your agency from one place
