@@ -45,7 +45,7 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2.5 mb-4 group w-fit">
               <div
                 className="h-8 w-8 rounded-xl flex items-center justify-center shadow-lg"
-                style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)' }}
+                style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}
               >
                 <span className="text-white font-bold text-[11px] tracking-tight">A</span>
               </div>

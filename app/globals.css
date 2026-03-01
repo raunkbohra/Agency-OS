@@ -7,8 +7,8 @@
 
 /* ===== Tailwind v4 Theme ===== */
 @theme {
-  --color-accent-blue: #0070f3;
-  --color-accent-purple: #7c3aed;
+  --color-accent-blue: #6b7e93;
+  --color-accent-purple: #8fa0b0;
   --color-accent-green: #00c853;
   --color-accent-amber: #ffb300;
   --color-accent-red: #ff4444;
@@ -51,8 +51,8 @@
   --border-active: #fafafa;
 
   /* Colors - Accents */
-  --accent-blue: #0070f3;
-  --accent-purple: #7c3aed;
+  --accent-blue: #6b7e93;
+  --accent-purple: #8fa0b0;
   --accent-green: #00c853;
   --accent-amber: #ffb300;
   --accent-red: #ff4444;
@@ -100,8 +100,8 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 112, 243, 0.04), transparent),
-    radial-gradient(ellipse 80% 50% at 0% 100%, rgba(124, 58, 237, 0.03), transparent),
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(107, 126, 147, 0.04), transparent),
+    radial-gradient(ellipse 80% 50% at 0% 100%, rgba(143, 160, 176, 0.03), transparent),
     radial-gradient(ellipse 80% 50% at 100% 100%, rgba(0, 200, 83, 0.03), transparent);
   pointer-events: none;
   z-index: -1;
@@ -180,7 +180,7 @@ body::before {
   }
 
   .gradient-text {
-    background: linear-gradient(90deg, #0070f3, #7c3aed, #00c853);
+    background: linear-gradient(90deg, #6b7e93, #8fa0b0, #00c853);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -247,11 +247,11 @@ body::before {
   .btn-primary {
     background: var(--accent-blue);
     color: white;
-    box-shadow: 0 10px 15px -3px rgba(0, 112, 243, 0.25);
+    box-shadow: 0 10px 15px -3px rgba(107, 126, 147, 0.25);
   }
 
   .btn-primary:hover:not(:disabled) {
-    box-shadow: 0 20px 25px -5px rgba(0, 112, 243, 0.35);
+    box-shadow: 0 20px 25px -5px rgba(107, 126, 147, 0.35);
     transform: translateY(-2px);
   }
 
@@ -313,7 +313,7 @@ body::before {
   .input:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.1);
+    box-shadow: 0 0 0 3px rgba(107, 126, 147, 0.1);
   }
 
   /* Labels */
@@ -358,8 +358,8 @@ body::before {
   }
 
   .badge-info {
-    background-color: rgba(0, 112, 243, 0.1);
-    color: #0070f3;
+    background-color: rgba(107, 126, 147, 0.1);
+    color: #6b7e93;
   }
 
   /* Navigation */
@@ -469,8 +469,8 @@ body::before {
 
   .bg-aurora {
     background:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 112, 243, 0.06), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(124, 58, 237, 0.04), transparent 70%);
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(107, 126, 147, 0.06), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(143, 160, 176, 0.04), transparent 70%);
   }
 
   /* Animated Border */
@@ -488,7 +488,7 @@ body::before {
     background: conic-gradient(
       from var(--border-angle, 0deg),
       transparent 60%,
-      rgba(0, 112, 243, 0.3) 80%,
+      rgba(107, 126, 147, 0.3) 80%,
       transparent 100%
     );
     z-index: -1;
@@ -506,7 +506,7 @@ body::before {
     position: absolute;
     width: 200px;
     height: 200px;
-    background: radial-gradient(circle, rgba(0, 112, 243, 0.1), transparent 70%);
+    background: radial-gradient(circle, rgba(107, 126, 147, 0.1), transparent 70%);
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
@@ -522,10 +522,10 @@ body::before {
 /* ===== Animations ===== */
 @keyframes glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 112, 243, 0.3);
+    box-shadow: 0 0 20px rgba(107, 126, 147, 0.3);
   }
   50% {
-    box-shadow: 0 0 30px rgba(0, 112, 243, 0.5);
+    box-shadow: 0 0 30px rgba(107, 126, 147, 0.5);
   }
 }
 
@@ -558,6 +558,11 @@ body::before {
   }
 }
 
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.2); }
+  50%       { opacity: 1; transform: scale(1); }
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -565,6 +570,39 @@ body::before {
   100% {
     background-position: 200% 0;
   }
+}
+
+@keyframes chrome-shine {
+  0% { background-position: -300% center; }
+  100% { background-position: 300% center; }
+}
+
+/* Sparkly chrome button */
+.btn-chrome {
+  position: relative;
+  background: linear-gradient(
+    105deg,
+    #3a4a5a 0%,
+    #6a8499 20%,
+    #c8dce8 42%,
+    #ffffff 50%,
+    #c0d4e0 58%,
+    #6a8499 78%,
+    #3a4a5a 100%
+  );
+  background-size: 300% 100%;
+  animation: chrome-shine 3s linear infinite;
+  box-shadow:
+    0 0 24px rgba(200, 220, 232, 0.35),
+    0 0 8px rgba(255, 255, 255, 0.2),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+.btn-chrome:hover {
+  animation-duration: 1.5s;
+  box-shadow:
+    0 0 36px rgba(200, 220, 232, 0.55),
+    0 0 14px rgba(255, 255, 255, 0.35),
+    0 6px 28px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes border-rotate {
@@ -625,7 +663,7 @@ body::before {
 
 /* ===== Selection ===== */
 ::selection {
-  background-color: rgba(0, 112, 243, 0.2);
+  background-color: rgba(107, 126, 147, 0.2);
   color: #fafafa;
 }
 

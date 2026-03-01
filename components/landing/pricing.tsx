@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Check, Minus } from 'lucide-react';
 import { ScrollStagger, ScrollStaggerItem } from '@/components/motion/scroll-stagger';
+import { SparkleButton } from '@/components/ui/sparkle-button';
 
 interface PlanFeature {
   text: string;
@@ -105,12 +106,12 @@ export function Pricing() {
               <div
                 className="relative flex flex-col h-full rounded-2xl p-7 transition-all duration-300"
                 style={{
-                  background: tier.featured ? 'rgba(0, 112, 243, 0.06)' : 'rgba(12, 12, 20, 0.8)',
+                  background: tier.featured ? 'rgba(107, 126, 147, 0.06)' : 'rgba(12, 12, 20, 0.8)',
                   border: tier.featured
-                    ? '1px solid rgba(0, 112, 243, 0.35)'
+                    ? '1px solid rgba(107, 126, 147, 0.35)'
                     : '1px solid rgba(255,255,255,0.07)',
                   boxShadow: tier.featured
-                    ? '0 0 60px rgba(0, 112, 243, 0.08), inset 0 1px 0 rgba(255,255,255,0.06)'
+                    ? '0 0 60px rgba(107, 126, 147, 0.08), inset 0 1px 0 rgba(255,255,255,0.06)'
                     : 'none',
                 }}
               >
@@ -119,7 +120,7 @@ export function Pricing() {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span
                       className="px-3 py-1 text-[11px] font-semibold text-white rounded-full"
-                      style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)' }}
+                      style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}
                     >
                       {tier.badge}
                     </span>
@@ -130,7 +131,7 @@ export function Pricing() {
                 <div className="mb-6">
                   <h3
                     className="text-base font-bold mb-1"
-                    style={{ color: tier.featured ? '#60a5fa' : '#9ca3af' }}
+                    style={{ color: tier.featured ? '#b0bec8' : '#9ca3af' }}
                   >
                     {tier.name}
                   </h3>
@@ -180,25 +181,23 @@ export function Pricing() {
                 </ul>
 
                 {/* CTA */}
-                <Link
-                  href={tier.ctaHref}
-                  className="block text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
-                  style={
-                    tier.featured
-                      ? {
-                          background: 'linear-gradient(135deg, #0070f3, #7c3aed)',
-                          color: 'white',
-                          boxShadow: '0 4px 20px rgba(0, 112, 243, 0.3)',
-                        }
-                      : {
-                          background: 'rgba(255,255,255,0.06)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          color: '#d1d5db',
-                        }
-                  }
-                >
-                  {tier.cta}
-                </Link>
+                {tier.featured ? (
+                  <SparkleButton href={tier.ctaHref} className="w-full justify-center">
+                    {tier.cta}
+                  </SparkleButton>
+                ) : (
+                  <Link
+                    href={tier.ctaHref}
+                    className="block text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5"
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      color: '#d1d5db',
+                    }}
+                  >
+                    {tier.cta}
+                  </Link>
+                )}
               </div>
             </ScrollStaggerItem>
           ))}

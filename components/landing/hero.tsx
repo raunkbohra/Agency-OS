@@ -13,6 +13,7 @@ import {
   TrendingUp,
   ArrowRight,
 } from 'lucide-react';
+import { SparkleButton } from '@/components/ui/sparkle-button';
 
 const sidebarNav = [
   { icon: LayoutDashboard, label: 'Dashboard', active: false },
@@ -86,7 +87,7 @@ function DashboardMockup() {
             <div className="flex items-center gap-2 px-2 py-2.5 mb-2">
               <div
                 className="w-6 h-6 rounded-lg flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)' }}
+                style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}
               >
                 <span className="text-white text-[9px] font-bold">A</span>
               </div>
@@ -97,9 +98,9 @@ function DashboardMockup() {
                 key={item.label}
                 className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer"
                 style={{
-                  background: item.active ? 'rgba(0, 112, 243, 0.12)' : 'transparent',
-                  color: item.active ? '#60a5fa' : '#6b7280',
-                  border: item.active ? '1px solid rgba(0, 112, 243, 0.2)' : '1px solid transparent',
+                  background: item.active ? 'rgba(160, 175, 190, 0.1)' : 'transparent',
+                  color: item.active ? '#c4d0d8' : '#6b7280',
+                  border: item.active ? '1px solid rgba(160, 175, 190, 0.2)' : '1px solid transparent',
                 }}
               >
                 <item.icon size={12} />
@@ -119,11 +120,11 @@ function DashboardMockup() {
               <div
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer"
                 style={{
-                  background: 'rgba(0, 112, 243, 0.15)',
-                  border: '1px solid rgba(0, 112, 243, 0.3)',
+                  background: 'rgba(107, 126, 147, 0.15)',
+                  border: '1px solid rgba(107, 126, 147, 0.3)',
                 }}
               >
-                <span className="text-[11px] font-semibold" style={{ color: '#60a5fa' }}>+ New Invoice</span>
+                <span className="text-[11px] font-semibold" style={{ color: '#b0bec8' }}>+ New Invoice</span>
               </div>
             </div>
 
@@ -231,7 +232,7 @@ function DashboardMockup() {
       {/* Bottom glow */}
       <div
         className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-3/4 h-32 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(0,112,243,0.12), rgba(124,58,237,0.08), transparent)', filter: 'blur(40px)' }}
+        style={{ background: 'radial-gradient(ellipse, rgba(160,175,190,0.08), rgba(196,208,216,0.05), transparent)', filter: 'blur(40px)' }}
       />
     </div>
   );
@@ -252,7 +253,7 @@ export function Hero() {
           transform: 'translateX(-50%)',
           width: '800px',
           height: '500px',
-          background: 'radial-gradient(ellipse, rgba(0,112,243,0.08) 0%, rgba(124,58,237,0.04) 50%, transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(107,126,147,0.08) 0%, rgba(143,160,176,0.04) 50%, transparent 70%)',
           filter: 'blur(60px)',
         }}
       />
@@ -263,7 +264,7 @@ export function Hero() {
           left: '-10%',
           width: '400px',
           height: '400px',
-          background: 'radial-gradient(ellipse, rgba(124,58,237,0.06), transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(143,160,176,0.06), transparent 70%)',
           filter: 'blur(80px)',
         }}
       />
@@ -296,7 +297,7 @@ export function Hero() {
             className="text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em]"
             style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #818cf8 100%)',
+              background: 'linear-gradient(135deg, #8fa4b8 0%, #dde6ed 50%, #a8bbc8 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -324,17 +325,10 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.45 }}
         >
-          <Link
-            href="/auth/signin"
-            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #0070f3, #7c3aed)',
-              boxShadow: '0 0 30px rgba(0, 112, 243, 0.3), 0 4px 20px rgba(0,0,0,0.4)',
-            }}
-          >
+          <SparkleButton href="/auth/signin">
             Get Started Free
             <ArrowRight size={15} />
-          </Link>
+          </SparkleButton>
           <Link
             href="#features"
             className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:-translate-y-0.5"

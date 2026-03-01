@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { SparkleButtonSm } from '@/components/ui/sparkle-button';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
@@ -33,7 +34,7 @@ export function Navbar() {
         <Link href="/" className="flex items-center gap-2.5 group">
           <div
             className="h-8 w-8 rounded-xl flex items-center justify-center shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)' }}
+            style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}
           >
             <span className="text-white font-bold text-[11px] tracking-tight">A</span>
           </div>
@@ -61,16 +62,9 @@ export function Navbar() {
           >
             Sign in
           </Link>
-          <Link
-            href="/auth/signin"
-            className="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:opacity-90 hover:scale-[0.98] active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #0070f3, #7c3aed)',
-              boxShadow: '0 0 20px rgba(0, 112, 243, 0.3)',
-            }}
-          >
+          <SparkleButtonSm href="/auth/signin">
             Get Started
-          </Link>
+          </SparkleButtonSm>
         </div>
       </div>
     </nav>

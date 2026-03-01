@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
+import { SparkleButton } from '@/components/ui/sparkle-button';
 
 export function CtaSection() {
   return (
@@ -11,7 +12,7 @@ export function CtaSection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,112,243,0.07) 0%, rgba(124,58,237,0.04) 40%, transparent 70%)',
+          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(107,126,147,0.07) 0%, rgba(143,160,176,0.04) 40%, transparent 70%)',
         }}
       />
       <div
@@ -29,12 +30,12 @@ export function CtaSection() {
           <div
             className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-8 mx-auto"
             style={{
-              background: 'rgba(0, 112, 243, 0.1)',
-              border: '1px solid rgba(0, 112, 243, 0.25)',
-              boxShadow: '0 0 30px rgba(0, 112, 243, 0.15)',
+              background: 'rgba(107, 126, 147, 0.1)',
+              border: '1px solid rgba(107, 126, 147, 0.25)',
+              boxShadow: '0 0 30px rgba(107, 126, 147, 0.15)',
             }}
           >
-            <Sparkles size={22} style={{ color: '#60a5fa' }} />
+            <Sparkles size={22} style={{ color: '#b0bec8' }} />
           </div>
 
           {/* Headline */}
@@ -46,7 +47,7 @@ export function CtaSection() {
             <br />
             <span
               style={{
-                background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
+                background: 'linear-gradient(135deg, #b0bec8, #c4d0d8)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -64,17 +65,10 @@ export function CtaSection() {
 
           {/* CTAs */}
           <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
-            <Link
-              href="/auth/signin"
-              className="inline-flex items-center gap-2.5 px-8 py-4 text-base font-semibold text-white rounded-2xl transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 active:scale-95"
-              style={{
-                background: 'linear-gradient(135deg, #0070f3, #7c3aed)',
-                boxShadow: '0 0 40px rgba(0, 112, 243, 0.35), 0 8px 30px rgba(0,0,0,0.4)',
-              }}
-            >
+            <SparkleButton href="/auth/signin" large>
               Get Started Free
               <ArrowRight size={17} />
-            </Link>
+            </SparkleButton>
 
             <Link
               href="#features"

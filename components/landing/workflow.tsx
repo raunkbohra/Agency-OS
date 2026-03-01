@@ -7,25 +7,25 @@ const steps = [
     number: '01',
     title: 'Create a Plan',
     description: 'Define your services, set pricing, and configure billing cycles for your offerings. Launch in minutes.',
-    accent: '#0070f3',
-    accentBg: 'rgba(0, 112, 243, 0.08)',
-    accentBorder: 'rgba(0, 112, 243, 0.2)',
+    accent: '#6b7e93',
+    accentBg: 'rgba(107, 126, 147, 0.08)',
+    accentBorder: 'rgba(107, 126, 147, 0.2)',
   },
   {
     number: '02',
     title: 'Add Clients',
     description: 'Onboard clients in seconds. Assign plans, auto-generate invoices, and start tracking deliverables.',
-    accent: '#7c3aed',
-    accentBg: 'rgba(124, 58, 237, 0.08)',
-    accentBorder: 'rgba(124, 58, 237, 0.2)',
+    accent: '#8fa0b0',
+    accentBg: 'rgba(143, 160, 176, 0.08)',
+    accentBorder: 'rgba(143, 160, 176, 0.2)',
   },
   {
     number: '03',
     title: 'Get Paid',
     description: "Clients receive invoices with payment options. Track collections and manage your agency's cash flow.",
-    accent: '#00c853',
-    accentBg: 'rgba(0, 200, 83, 0.08)',
-    accentBorder: 'rgba(0, 200, 83, 0.2)',
+    accent: '#c4d0d8',
+    accentBg: 'rgba(196, 208, 216, 0.08)',
+    accentBorder: 'rgba(196, 208, 216, 0.2)',
   },
 ];
 
@@ -42,7 +42,7 @@ export function Workflow() {
         style={{
           width: '600px',
           height: '300px',
-          background: 'radial-gradient(ellipse, rgba(124,58,237,0.04), transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(143,160,176,0.04), transparent 70%)',
           filter: 'blur(60px)',
         }}
       />
@@ -73,7 +73,7 @@ export function Workflow() {
           <div
             className="hidden md:block absolute top-[52px] left-[calc(16.67%+24px)] right-[calc(16.67%+24px)] h-px pointer-events-none"
             style={{
-              background: 'linear-gradient(90deg, rgba(0,112,243,0.3), rgba(124,58,237,0.3), rgba(0,200,83,0.3))',
+              background: 'linear-gradient(90deg, rgba(107,126,147,0.3), rgba(160,180,196,0.3), rgba(196,208,216,0.3))',
             }}
           />
 

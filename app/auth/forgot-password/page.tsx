@@ -41,8 +41,8 @@ export default function ForgotPasswordPage() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{ background: '#060609' }}
     >
-      <div className="absolute pointer-events-none" style={{ top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(0,112,243,0.06), transparent 70%)', filter: 'blur(80px)' }} />
-      <div className="absolute pointer-events-none" style={{ bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(124,58,237,0.05), transparent 70%)', filter: 'blur(80px)' }} />
+      <div className="absolute pointer-events-none" style={{ top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(107,126,147,0.06), transparent 70%)', filter: 'blur(80px)' }} />
+      <div className="absolute pointer-events-none" style={{ bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(143,160,176,0.05), transparent 70%)', filter: 'blur(80px)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
       >
         {/* Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-8">
-          <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)' }}>
+          <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}>
             <span className="text-white font-bold text-sm">A</span>
           </div>
           <span className="text-lg font-semibold tracking-tight text-white">Agency OS</span>
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)', boxShadow: '0 4px 20px rgba(0,112,243,0.25)' }}
+                    style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)', boxShadow: '0 4px 20px rgba(107,126,147,0.25)' }}
                   >
                     {loading ? 'Sending…' : 'Send reset link'}
                   </button>
@@ -100,8 +100,8 @@ export default function ForgotPasswordPage() {
               </motion.div>
             ) : (
               <motion.div key="sent" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-4">
-                <div className="flex items-center justify-center w-14 h-14 rounded-2xl mx-auto mb-5" style={{ background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.25)' }}>
-                  <Mail size={22} style={{ color: '#60a5fa' }} />
+                <div className="flex items-center justify-center w-14 h-14 rounded-2xl mx-auto mb-5" style={{ background: 'rgba(107,126,147,0.1)', border: '1px solid rgba(107,126,147,0.25)' }}>
+                  <Mail size={22} style={{ color: '#b0bec8' }} />
                 </div>
                 <h2 className="text-base font-semibold text-white mb-2">Check your email</h2>
                 <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
@@ -109,7 +109,7 @@ export default function ForgotPasswordPage() {
                 </p>
                 <p className="text-xs mt-4" style={{ color: '#3b3b4f' }}>
                   Didn't receive it? Check spam or{' '}
-                  <button onClick={() => setSent(false)} className="underline hover:text-white transition-colors" style={{ color: '#60a5fa' }}>
+                  <button onClick={() => setSent(false)} className="underline hover:text-white transition-colors" style={{ color: '#b0bec8' }}>
                     try again
                   </button>
                 </p>

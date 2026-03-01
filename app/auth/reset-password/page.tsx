@@ -56,7 +56,7 @@ function ResetPasswordForm() {
     return (
       <div className="text-center py-4">
         <p className="text-sm" style={{ color: '#f87171' }}>Invalid reset link. Please request a new one.</p>
-        <Link href="/auth/forgot-password" className="text-sm mt-3 inline-block hover:text-white transition-colors" style={{ color: '#60a5fa' }}>
+        <Link href="/auth/forgot-password" className="text-sm mt-3 inline-block hover:text-white transition-colors" style={{ color: '#b0bec8' }}>
           Request new link
         </Link>
       </div>
@@ -112,7 +112,7 @@ function ResetPasswordForm() {
               type="submit"
               disabled={loading}
               className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)', boxShadow: '0 4px 20px rgba(0,112,243,0.25)' }}
+              style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)', boxShadow: '0 4px 20px rgba(107,126,147,0.25)' }}
             >
               {loading ? 'Saving…' : 'Reset password'}
             </button>
@@ -137,8 +137,8 @@ export default function ResetPasswordPage() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{ background: '#060609' }}
     >
-      <div className="absolute pointer-events-none" style={{ top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(0,112,243,0.06), transparent 70%)', filter: 'blur(80px)' }} />
-      <div className="absolute pointer-events-none" style={{ bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(124,58,237,0.05), transparent 70%)', filter: 'blur(80px)' }} />
+      <div className="absolute pointer-events-none" style={{ top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(107,126,147,0.06), transparent 70%)', filter: 'blur(80px)' }} />
+      <div className="absolute pointer-events-none" style={{ bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(143,160,176,0.05), transparent 70%)', filter: 'blur(80px)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -147,7 +147,7 @@ export default function ResetPasswordPage() {
         className="relative z-10 w-full max-w-sm px-4"
       >
         <div className="flex items-center justify-center gap-2.5 mb-8">
-          <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)' }}>
+          <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}>
             <span className="text-white font-bold text-sm">A</span>
           </div>
           <span className="text-lg font-semibold tracking-tight text-white">Agency OS</span>

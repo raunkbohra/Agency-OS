@@ -9,28 +9,28 @@ const metrics = [
     label: 'Automated',
     description: 'Every invoice, reminder, and follow-up handled automatically.',
     icon: Zap,
-    accent: '#0070f3',
+    accent: '#6b7e93',
   },
   {
     value: '5 min',
     label: 'Setup Time',
     description: "Get your agency on Agency OS in under five minutes. No onboarding calls.",
     icon: TrendingUp,
-    accent: '#7c3aed',
+    accent: '#8fa0b0',
   },
   {
     value: '∞',
     label: 'Clients',
     description: 'No limits on clients, plans, or deliverables on the Pro plan.',
     icon: Users,
-    accent: '#00c853',
+    accent: '#a0b4c4',
   },
   {
     value: '$0',
     label: 'To Start',
     description: 'Start free with up to 3 clients. Upgrade only when you need to.',
     icon: DollarSign,
-    accent: '#f59e0b',
+    accent: '#c4d0d8',
   },
 ];
 
@@ -55,7 +55,7 @@ export function MetricsShowcase() {
                 transform: 'translateY(-50%)',
                 width: '300px',
                 height: '300px',
-                background: 'radial-gradient(circle, rgba(0,112,243,0.06), transparent 70%)',
+                background: 'radial-gradient(circle, rgba(107,126,147,0.06), transparent 70%)',
                 filter: 'blur(60px)',
               }}
             />
@@ -67,7 +67,7 @@ export function MetricsShowcase() {
                 transform: 'translateY(-50%)',
                 width: '300px',
                 height: '300px',
-                background: 'radial-gradient(circle, rgba(124,58,237,0.06), transparent 70%)',
+                background: 'radial-gradient(circle, rgba(143,160,176,0.06), transparent 70%)',
                 filter: 'blur(60px)',
               }}
             />
@@ -97,8 +97,8 @@ export function MetricsShowcase() {
                     <div
                       className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-4"
                       style={{
-                        background: `rgba(${metric.accent === '#0070f3' ? '0,112,243' : metric.accent === '#7c3aed' ? '124,58,237' : metric.accent === '#00c853' ? '0,200,83' : '245,158,11'}, 0.1)`,
-                        border: `1px solid rgba(${metric.accent === '#0070f3' ? '0,112,243' : metric.accent === '#7c3aed' ? '124,58,237' : metric.accent === '#00c853' ? '0,200,83' : '245,158,11'}, 0.2)`,
+                        background: 'rgba(160, 175, 190, 0.08)',
+                        border: '1px solid rgba(160, 175, 190, 0.18)',
                       }}
                     >
                       <metric.icon size={16} style={{ color: metric.accent }} />
