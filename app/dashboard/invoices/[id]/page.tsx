@@ -6,6 +6,7 @@ import {
   updateInvoiceStatus,
   getAgenciesByOwnerId,
   createAgency,
+  getAgencyById,
   Invoice,
   InvoiceItem,
   Client,
@@ -13,6 +14,14 @@ import {
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+
+// Server action to mark invoice as paid
+async function markInvoiceAsPaid(invoiceId: string, agencyId: string) {
+  'use server';
+  await updateInvoiceStatus(invoiceId, agencyId, 'paid');
+  revalidatePath(`/dashboard/invoices/${invoiceId}`);
+  revalidatePath('/dashboard/invoices');
+}
 
 export default async function InvoiceDetailPage({
   params,
@@ -32,6 +41,7 @@ export default async function InvoiceDetailPage({
   let items: InvoiceItem[] = [];
   let agencyId: string | null = null;
   let error: string | null = null;
+  let currencyLocale = 'en-IN'; // default to INR
 
   try {
     // Get user's agencies
@@ -52,6 +62,12 @@ export default async function InvoiceDetailPage({
       throw new Error('Agency not found');
     }
 
+    // Get agency details for currency setting
+    const agency = await getAgencyById(agencyId);
+    if (agency?.currency === 'NPR') {
+      currencyLocale = 'ne-NP';
+    }
+
     // Get invoice with multi-tenant isolation
     invoice = await getInvoiceById(id, agencyId);
 
@@ -67,6 +83,11 @@ export default async function InvoiceDetailPage({
           </Link>
         </div>
       );
+    }
+
+    // Validate invoice ID before using it
+    if (!invoice.id) {
+      throw new Error('Invalid invoice');
     }
 
     // Get client details
@@ -113,18 +134,13 @@ export default async function InvoiceDetailPage({
           </div>
           <div className="flex gap-3">
             <a
-              href={`/api/invoices/generate?invoiceId=${invoice.id}`}
+              href={`/api/invoices/generate?invoiceId=${encodeURIComponent(invoice.id)}`}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Download PDF
             </a>
             {invoice.status !== 'paid' && (
-              <form action={async () => {
-                'use server';
-                await updateInvoiceStatus(invoice.id, agencyId, 'paid');
-                revalidatePath(`/dashboard/invoices/${invoice.id}`);
-                revalidatePath('/dashboard/invoices');
-              }}>
+              <form action={() => markInvoiceAsPaid(invoice.id, agencyId || '')}>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
@@ -148,7 +164,7 @@ export default async function InvoiceDetailPage({
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <p className="text-sm text-gray-600 mb-2">Amount</p>
           <p className="text-lg font-semibold text-gray-900">
-            ₹{totalAmount.toLocaleString('en-IN')}
+            ₹{(totalAmount || 0).toLocaleString(currencyLocale)}
           </p>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -238,11 +254,11 @@ export default async function InvoiceDetailPage({
                   {item.quantity}
                 </td>
                 <td className="px-6 py-4 text-sm text-right text-gray-900">
-                  ₹{Number(item.rate).toLocaleString('en-IN')}
+                  ₹{(item.rate ? Number(item.rate) : 0).toLocaleString(currencyLocale)}
                 </td>
                 <td className="px-6 py-4 text-sm text-right font-semibold text-gray-900">
                   ₹
-                  {(Number(item.rate) * item.quantity).toLocaleString('en-IN')}
+                  {((item.rate ? Number(item.rate) : 0) * item.quantity).toLocaleString(currencyLocale)}
                 </td>
               </tr>
             ))}
@@ -256,13 +272,13 @@ export default async function InvoiceDetailPage({
               <div className="flex justify-between mb-2">
                 <span className="text-gray-600">Subtotal:</span>
                 <span className="text-gray-900">
-                  ₹{totalAmount.toLocaleString('en-IN')}
+                  ₹{(totalAmount || 0).toLocaleString(currencyLocale)}
                 </span>
               </div>
               <div className="flex justify-between text-lg font-semibold border-t border-gray-200 pt-4">
                 <span className="text-gray-900">Total:</span>
                 <span className="text-gray-900">
-                  ₹{totalAmount.toLocaleString('en-IN')}
+                  ₹{(totalAmount || 0).toLocaleString(currencyLocale)}
                 </span>
               </div>
             </div>

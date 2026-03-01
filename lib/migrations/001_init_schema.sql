@@ -76,7 +76,9 @@ CREATE TABLE invoices (
   status TEXT DEFAULT 'draft',
   due_date TIMESTAMP,
   paid_date TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW()
+  pdf_url TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Create invoice_items table

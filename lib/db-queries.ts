@@ -486,7 +486,11 @@ export interface Invoice {
   status: string;
   due_date: string | null;
   paid_date: string | null;
+  pdf_url?: string | null;
   created_at: string;
+  updated_at?: string;
+  // Only populated by getInvoicesByAgency() which JOINs with clients table
+  client_name?: string;
 }
 
 export interface InvoiceItem {
@@ -531,7 +535,7 @@ export async function getInvoiceById(id: string, agencyId: string): Promise<Invo
 export async function getInvoicesByAgency(agencyId: string): Promise<Invoice[]> {
   try {
     const result = await db.query(
-      'SELECT * FROM invoices WHERE agency_id = $1 ORDER BY created_at DESC',
+      'SELECT i.*, c.name as client_name FROM invoices i JOIN clients c ON i.client_id = c.id WHERE i.agency_id = $1 ORDER BY i.created_at DESC',
       [agencyId]
     );
     return result.rows;

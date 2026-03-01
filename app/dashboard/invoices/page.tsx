@@ -3,6 +3,7 @@ import {
   getInvoicesByAgency,
   getAgenciesByOwnerId,
   createAgency,
+  getAgencyById,
   Invoice,
 } from '@/lib/db-queries';
 import Link from 'next/link';
@@ -18,6 +19,7 @@ export default async function InvoicesPage() {
   let agencyId: string | null = null;
   let invoices: Invoice[] = [];
   let error: string | null = null;
+  let currencyLocale = 'en-IN'; // default to INR
 
   try {
     // Get user's agencies
@@ -34,8 +36,12 @@ export default async function InvoicesPage() {
       agencyId = agencies[0].id;
     }
 
-    // Now get invoices for this agency
+    // Get agency details for currency setting
     if (agencyId) {
+      const agency = await getAgencyById(agencyId);
+      if (agency?.currency === 'NPR') {
+        currencyLocale = 'ne-NP';
+      }
       invoices = await getInvoicesByAgency(agencyId);
     }
   } catch (err) {
@@ -85,15 +91,15 @@ export default async function InvoicesPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-4">
                     <div>
-                      <p className="text-sm text-gray-600">Invoice</p>
+                      <p className="text-sm text-gray-600">Client</p>
                       <p className="text-lg font-semibold text-gray-900">
-                        {invoice.id.substring(0, 8).toUpperCase()}
+                        {invoice.client_name || 'Unknown Client'}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Amount</p>
                       <p className="text-lg font-semibold text-gray-900">
-                        ₹{Number(invoice.amount).toLocaleString('en-IN')}
+                        ₹{(invoice.amount ? Number(invoice.amount) : 0).toLocaleString(currencyLocale)}
                       </p>
                     </div>
                     <div>
