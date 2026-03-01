@@ -6,6 +6,7 @@ export interface Agency {
   name: string;
   owner_id: string;
   currency: string;
+  email?: string;
   created_at: string;
 }
 
@@ -75,8 +76,18 @@ export async function createAgency(
   }
 }
 
-export async function getAgencyById(id: string): Promise<Agency | null> {
+export async function getAgencyById(id: string, requestingAgencyId?: string): Promise<Agency | null> {
   try {
+    // If requestingAgencyId is provided, verify multi-tenant isolation
+    if (requestingAgencyId) {
+      const result = await db.query(
+        'SELECT * FROM agencies WHERE id = $1 AND id = $2',
+        [id, requestingAgencyId]
+      );
+      return result.rows[0] || null;
+    }
+
+    // Otherwise, return agency without isolation check
     const result = await db.query('SELECT * FROM agencies WHERE id = $1', [id]);
     return result.rows[0] || null;
   } catch (err) {
@@ -381,7 +392,7 @@ export async function updateClient(
       values.push(companyName);
     }
 
-    if (fields.length === 0) return getClientById(id);
+    if (fields.length === 0) return getClientById(id, agencyId);
 
     values.push(id);
     values.push(agencyId);
@@ -483,7 +494,8 @@ export interface InvoiceItem {
   invoice_id: string;
   description: string;
   quantity: number;
-  rate: string;
+  rate: string | number;
+  amount?: string | number;
   created_at: string;
 }
 
@@ -560,11 +572,11 @@ export async function addInvoiceItem(
   }
 }
 
-export async function getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
+export async function getInvoiceItems(invoiceId: string, agencyId: string): Promise<InvoiceItem[]> {
   try {
     const result = await db.query(
-      'SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY created_at DESC',
-      [invoiceId]
+      'SELECT ii.* FROM invoice_items ii JOIN invoices i ON ii.invoice_id = i.id WHERE ii.invoice_id = $1 AND i.agency_id = $2 ORDER BY ii.created_at DESC',
+      [invoiceId, agencyId]
     );
     return result.rows;
   } catch (err) {
@@ -580,12 +592,21 @@ export async function updateInvoiceStatus(
   pdfUrl?: string
 ): Promise<Invoice | null> {
   try {
-    const result = await db.query(
-      pdfUrl
-        ? 'UPDATE invoices SET status = $1, pdf_url = $2, updated_at = NOW() WHERE id = $3 AND agency_id = $4 RETURNING *'
-        : 'UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2 AND agency_id = $3 RETURNING *',
-      pdfUrl ? [status, pdfUrl, invoiceId, agencyId] : [status, invoiceId, agencyId]
-    );
+    let query: string;
+    let params: (string | null)[];
+
+    if (pdfUrl) {
+      query = 'UPDATE invoices SET status = $1, pdf_url = $2, updated_at = NOW() WHERE id = $3 AND agency_id = $4 RETURNING *';
+      params = [status, pdfUrl, invoiceId, agencyId];
+    } else if (status === 'paid') {
+      query = 'UPDATE invoices SET status = $1, paid_date = NOW(), updated_at = NOW() WHERE id = $2 AND agency_id = $3 RETURNING *';
+      params = [status, invoiceId, agencyId];
+    } else {
+      query = 'UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2 AND agency_id = $3 RETURNING *';
+      params = [status, invoiceId, agencyId];
+    }
+
+    const result = await db.query(query, params);
     return result.rows[0] || null;
   } catch (err) {
     console.error('Failed to update invoice status:', err);
