@@ -1,113 +1,122 @@
 import Link from 'next/link';
+import { PageHeader } from '@/components/layout/page-header';
+import { PageTransition } from '@/components/motion/page-transition';
+import { StaggerChildren, StaggerItem } from '@/components/motion/stagger-children';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { MetricCard } from '@/components/shared/metric-card';
+import { GlassCard } from '@/components/shared/glass-card';
+import { EmptyState } from '@/components/shared/empty-state';
+import { Plus, Users, FileText, BarChart3 } from 'lucide-react';
 
 export default async function DashboardPage() {
   return (
-    <div className="space-y-8">
-      {/* Welcome Section */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back!
-        </h1>
-        <p className="mt-2 text-gray-600">
-          Manage your agency from one place
-        </p>
-      </div>
+    <PageTransition>
+      <PageHeader
+        title="Welcome back"
+        description="Manage your agency from one place"
+      />
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm font-medium text-gray-500">Monthly Revenue</div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <div className="text-3xl font-bold text-gray-900">$0</div>
-            <div className="text-sm text-gray-600">MRR</div>
+      <StaggerChildren className="space-y-8">
+        {/* Metrics Row */}
+        <StaggerItem>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <MetricCard
+              label="Monthly Revenue"
+              value={0}
+              format="currency"
+              prefix="$"
+              trend={{ value: 0, direction: 'up' }}
+            />
+            <MetricCard
+              label="Total Clients"
+              value={0}
+              format="integer"
+            />
+            <MetricCard
+              label="Deliverables"
+              value={0}
+              format="integer"
+            />
+            <MetricCard
+              label="Active Plans"
+              value={0}
+              format="integer"
+            />
           </div>
-          <p className="mt-2 text-xs text-gray-500">
-            From active clients
-          </p>
-        </div>
+        </StaggerItem>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm font-medium text-gray-500">Total Clients</div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <div className="text-3xl font-bold text-gray-900">0</div>
-            <div className="text-sm text-gray-600">clients</div>
+        {/* Quick Actions */}
+        <StaggerItem>
+          <div>
+            <h3 className="text-sm font-semibold text-text-primary mb-4 uppercase tracking-wide">Quick Actions</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <GlassCard className="p-6 hover:border-border-hover transition-all duration-fast cursor-pointer">
+                <Link href="/dashboard/plans/new" className="block h-full">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-accent-blue/10">
+                      <Plus className="h-5 w-5 text-accent-blue" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-text-primary">Create Plan</p>
+                      <p className="text-sm text-text-secondary mt-1">Set up a new service plan</p>
+                    </div>
+                  </div>
+                </Link>
+              </GlassCard>
+
+              <GlassCard className="p-6 hover:border-border-hover transition-all duration-fast cursor-pointer">
+                <Link href="/dashboard/clients" className="block h-full">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-accent-green/10">
+                      <Users className="h-5 w-5 text-accent-green" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-text-primary">Add Client</p>
+                      <p className="text-sm text-text-secondary mt-1">Onboard a new client</p>
+                    </div>
+                  </div>
+                </Link>
+              </GlassCard>
+
+              <GlassCard className="p-6 hover:border-border-hover transition-all duration-fast cursor-pointer">
+                <Link href="/dashboard/invoices" className="block h-full">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-accent-amber/10">
+                      <FileText className="h-5 w-5 text-accent-amber" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-text-primary">View Invoices</p>
+                      <p className="text-sm text-text-secondary mt-1">Check invoice status</p>
+                    </div>
+                  </div>
+                </Link>
+              </GlassCard>
+            </div>
           </div>
-          <p className="mt-2 text-xs text-gray-500">
-            Active contracts
-          </p>
-        </div>
+        </StaggerItem>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm font-medium text-gray-500">Deliverables</div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <div className="text-3xl font-bold text-gray-900">0</div>
-            <div className="text-sm text-gray-600">pending</div>
+        {/* Plans Section */}
+        <StaggerItem>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Your Plans</h3>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/plans">View all</Link>
+              </Button>
+            </div>
+            <Card>
+              <EmptyState
+                icon={BarChart3}
+                title="No plans yet"
+                description="Create your first service plan to get started"
+                actionLabel="Create Plan"
+                actionHref="/dashboard/plans/new"
+              />
+            </Card>
           </div>
-          <p className="mt-2 text-xs text-gray-500">
-            This month
-          </p>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            href="/dashboard/plans/new"
-            className="block p-6 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-          >
-            <div className="text-sm font-medium text-blue-900">Create Plan</div>
-            <p className="mt-1 text-sm text-blue-700">
-              Set up a new service plan
-            </p>
-          </Link>
-
-          <Link
-            href="/dashboard/clients"
-            className="block p-6 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
-          >
-            <div className="text-sm font-medium text-green-900">Add Client</div>
-            <p className="mt-1 text-sm text-green-700">
-              Onboard a new client
-            </p>
-          </Link>
-
-          <Link
-            href="/dashboard/invoices"
-            className="block p-6 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
-          >
-            <div className="text-sm font-medium text-purple-900">View Invoices</div>
-            <p className="mt-1 text-sm text-purple-700">
-              Check invoice status
-            </p>
-          </Link>
-        </div>
-      </div>
-
-      {/* Plans Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Your Plans</h2>
-          <Link
-            href="/dashboard/plans"
-            className="text-sm text-blue-600 hover:text-blue-700"
-          >
-            View all
-          </Link>
-        </div>
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-8 text-center">
-            <p className="text-gray-500">No plans created yet</p>
-            <Link
-              href="/dashboard/plans/new"
-              className="mt-3 inline-block text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Create your first plan
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+        </StaggerItem>
+      </StaggerChildren>
+    </PageTransition>
   );
 }
