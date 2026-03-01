@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import { getPool } from './db';
 import { createHash } from 'crypto';
 import type { DefaultSession } from 'next-auth';
@@ -67,16 +68,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return null;
       },
     }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
   ],
   pages: {
     signIn: '/auth/signin',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.agencyId = user.agencyId;
+      }
+      // Handle Google sign-in: populate id + agencyId from DB
+      if (account?.provider === 'google' && token.email) {
+        const userId = generateIdFromEmail(token.email as string);
+        token.id = userId;
+        try {
+          const pool = getPool();
+          const result = await pool.query(
+            'SELECT id FROM agencies WHERE owner_id = $1 LIMIT 1',
+            [userId]
+          );
+          token.agencyId = result.rows[0]?.id;
+        } catch (err) {
+          // If database lookup fails, token.agencyId remains undefined
+        }
       }
       return token;
     },
