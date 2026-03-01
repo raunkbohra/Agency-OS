@@ -641,12 +641,13 @@ export async function createPayment(
     amount: number;
     provider?: string;
     referenceId?: string;
+    receiptUrl?: string;
     meta?: Record<string, any>;
   }
 ): Promise<Payment> {
   try {
     const result = await db.query(
-      'INSERT INTO payments (invoice_id, agency_id, amount, provider, status, reference_id, meta_json) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      'INSERT INTO payments (invoice_id, agency_id, amount, provider, status, reference_id, receipt_url, meta_json) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
       [
         invoiceId,
         agencyId,
@@ -654,6 +655,7 @@ export async function createPayment(
         paymentData.provider || 'bank_transfer',
         'pending',
         paymentData.referenceId || '',
+        paymentData.receiptUrl || null,
         JSON.stringify(paymentData.meta || {}),
       ]
     );

@@ -23,6 +23,16 @@ async function markInvoiceAsPaid(invoiceId: string, agencyId: string) {
   revalidatePath('/dashboard/invoices');
 }
 
+// Wrapper for form action - accepts FormData
+async function handleMarkAsPaid(formData: FormData) {
+  'use server';
+  const invoiceId = formData.get('invoiceId') as string;
+  const agencyId = formData.get('agencyId') as string;
+  if (invoiceId && agencyId) {
+    await markInvoiceAsPaid(invoiceId, agencyId);
+  }
+}
+
 export default async function InvoiceDetailPage({
   params,
 }: {
@@ -167,7 +177,9 @@ export default async function InvoiceDetailPage({
             )}
             {/* Show Mark as Paid button for unpaid invoices (except payment_pending) */}
             {invoice.status !== 'paid' && invoice.status !== 'payment_pending' && (
-              <form action={() => markInvoiceAsPaid(invoice.id, agencyId)}>
+              <form action={handleMarkAsPaid}>
+                <input type="hidden" name="invoiceId" value={invoice.id} />
+                <input type="hidden" name="agencyId" value={agencyId} />
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"

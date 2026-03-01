@@ -20,12 +20,12 @@ CREATE INDEX idx_payments_invoice_id ON payments(invoice_id);
 CREATE INDEX idx_payments_agency_id ON payments(agency_id);
 CREATE INDEX idx_payments_status ON payments(status);
 
--- Note: RLS is disabled for MVP (enforcing at application level via NextAuth)
--- When migrating to Supabase, enable RLS with proper auth.uid() context
--- ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
--- CREATE POLICY "users_see_own_payments" ON payments
---   USING (
---     invoice_id IN (
---       SELECT id FROM invoices WHERE agency_id = (SELECT agency_id FROM users WHERE id = auth.uid())
---     )
---   );
+-- Enable RLS for database-level security
+-- Enforced at application level via NextAuth as additional layer
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "users_see_own_payments" ON payments
+  USING (
+    invoice_id IN (
+      SELECT id FROM invoices WHERE agency_id = (SELECT agency_id FROM users WHERE id = auth.uid())
+    )
+  );

@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function PaymentPage({ params }: { params: { id: string } }) {
+export default function PaymentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const invoiceId = params.id;
+  const params = useParams();
+  const invoiceId = (params.id as string) || '';
   const amount = searchParams.get('amount') || '0';
 
   const [referenceId, setReferenceId] = useState('');
@@ -28,7 +29,16 @@ export default function PaymentPage({ params }: { params: { id: string } }) {
         return;
       }
 
-      // Create payment record
+      let receiptUrl: string | undefined;
+
+      // If receipt file selected, prepare for upload
+      if (receipt) {
+        // TODO: Upload to S3 or Vercel Blob
+        // For now, create a placeholder URL
+        receiptUrl = `receipts/${invoiceId}/${receipt.name}`;
+      }
+
+      // Create payment record with receipt URL
       const response = await fetch('/api/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,8 +47,11 @@ export default function PaymentPage({ params }: { params: { id: string } }) {
           amount: parseFloat(amount),
           referenceId: referenceId.trim(),
           provider: 'bank_transfer',
+          receiptUrl,
           meta: {
             hasReceipt: !!receipt,
+            receiptFileName: receipt?.name,
+            receiptSize: receipt?.size,
           },
         }),
       });

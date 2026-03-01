@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { invoiceId, amount, referenceId, provider, meta } = await req.json();
+    const { invoiceId, amount, referenceId, provider, receiptUrl, meta } = await req.json();
 
     if (!invoiceId || !referenceId) {
       return NextResponse.json(
@@ -30,19 +30,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid payment amount' }, { status: 400 });
     }
 
-    // Create payment record
+    // Create payment record with receipt URL if provided
     const payment = await createPayment(invoiceId, session.user.agencyId, {
       amount: paymentAmount,
       provider: provider || 'bank_transfer',
       referenceId,
+      receiptUrl,
       meta,
     });
 
     // Update invoice status to pending verification
     await updateInvoiceStatus(invoiceId, session.user.agencyId, 'payment_pending');
 
+    // TODO: Implement file upload to S3/Vercel Blob when receipt file is provided
     // TODO: Send email notification to agency owner for verification
-    // TODO: Implement receipt storage (file upload handling)
 
     return NextResponse.json({
       success: true,

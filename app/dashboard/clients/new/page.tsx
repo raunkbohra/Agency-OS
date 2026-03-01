@@ -12,21 +12,22 @@ import {
   addInvoiceItem,
   Plan,
 } from '@/lib/db-queries';
-import { ClientForm } from '@/components/ClientForm';
+import { SimpleClientForm } from '@/components/SimpleClientForm';
 import { redirect } from 'next/navigation';
 
-async function handleCreateClient(formData: {
-  name: string;
-  email: string;
-  companyName?: string;
-  planId: string;
-}) {
+async function handleCreateClient(formData: FormData) {
+  'use server';
 
   const session = await auth();
 
   if (!session?.user?.id) {
     throw new Error('Not authenticated');
   }
+
+  const name = formData.get('name') as string;
+  const email = formData.get('email') as string;
+  const companyName = formData.get('companyName') as string;
+  const planId = formData.get('planId') as string;
 
   try {
     // Get or create agency
@@ -43,17 +44,17 @@ async function handleCreateClient(formData: {
     // Create the client
     const client = await createClient(
       agencyId,
-      formData.name,
-      formData.email,
+      name,
+      email,
       undefined,
-      formData.companyName
+      companyName
     );
 
     // Assign plan to client
-    await createClientPlan(client.id, formData.planId, new Date());
+    await createClientPlan(client.id, planId, new Date());
 
     // Get the plan to use its price for the invoice
-    const plan = await getPlanById(formData.planId, agencyId);
+    const plan = await getPlanById(planId, agencyId);
     if (!plan) {
       throw new Error('Plan not found');
     }
@@ -139,7 +140,7 @@ export default async function NewClientPage() {
         </div>
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <ClientForm onSubmit={handleCreateClient} plans={plans} />
+          <SimpleClientForm action={handleCreateClient} plans={plans} />
         </div>
       )}
     </div>
