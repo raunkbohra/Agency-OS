@@ -117,6 +117,17 @@ export default async function InvoiceDetailPage({
     );
   }
 
+  // Fix Issue 1: Validate invoice.amount before URL construction
+  const validAmount = (invoice.amount ? Number(invoice.amount) : 0).toString();
+  if (isNaN(parseFloat(validAmount))) {
+    console.error('Invalid invoice amount:', invoice.amount);
+  }
+
+  // Fix Issue 2: Explicit null check for agencyId (already validated above, but explicitly use it)
+  if (!agencyId) {
+    return <div className="p-8"><p className="text-red-600">Not authorized</p></div>;
+  }
+
   const totalAmount = items.reduce((sum, item) => {
     return sum + (Number(item.rate) * item.quantity);
   }, 0);
@@ -139,16 +150,24 @@ export default async function InvoiceDetailPage({
             >
               Download PDF
             </a>
-            {invoice.status !== 'paid' && invoice.status !== 'payment_pending' && (
+            {/* Fix Issue 3: Show Pay Now for draft and sent invoices */}
+            {(invoice.status === 'draft' || invoice.status === 'sent') && (
               <Link
-                href={`/dashboard/invoices/${id}/pay?amount=${invoice.amount}`}
+                href={`/dashboard/invoices/${id}/pay?amount=${encodeURIComponent(validAmount)}`}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors inline-block"
               >
                 Pay Now
               </Link>
             )}
-            {invoice.status !== 'paid' && (
-              <form action={() => markInvoiceAsPaid(invoice.id, agencyId || '')}>
+            {/* Payment pending shows verification message instead of buttons */}
+            {invoice.status === 'payment_pending' && (
+              <div className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg font-medium">
+                Payment submitted for verification
+              </div>
+            )}
+            {/* Show Mark as Paid button for unpaid invoices (except payment_pending) */}
+            {invoice.status !== 'paid' && invoice.status !== 'payment_pending' && (
+              <form action={() => markInvoiceAsPaid(invoice.id, agencyId)}>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
