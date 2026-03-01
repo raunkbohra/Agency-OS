@@ -2,6 +2,8 @@ import { auth } from '@/lib/auth';
 import { getAgenciesByOwnerId, getAgencyPaymentMethods } from '@/lib/db-queries';
 import PaymentMethodsManager from '@/components/PaymentMethodsManager';
 import { redirect } from 'next/navigation';
+import { PageHeader } from '@/components/layout/page-header';
+import { PageTransition } from '@/components/motion/page-transition';
 
 export default async function PaymentSettingsPage() {
   const session = await auth();
@@ -13,13 +15,13 @@ export default async function PaymentSettingsPage() {
   const paymentMethods = await getAgencyPaymentMethods(session.user.agencyId);
 
   return (
-    <div className="p-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Payment Methods</h1>
-        <p className="text-gray-600 mt-1">Configure your payment providers</p>
-      </div>
+    <PageTransition>
+      <PageHeader
+        title="Payment Methods"
+        description="Configure your payment providers and settings"
+      />
 
       <PaymentMethodsManager initialMethods={paymentMethods} />
-    </div>
+    </PageTransition>
   );
 }

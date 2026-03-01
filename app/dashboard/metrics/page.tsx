@@ -2,6 +2,8 @@ import { auth } from '@/lib/auth';
 import { getAgenciesByOwnerId } from '@/lib/db-queries';
 import MetricsDashboard from '@/components/MetricsDashboard';
 import { redirect } from 'next/navigation';
+import { PageHeader } from '@/components/layout/page-header';
+import { PageTransition } from '@/components/motion/page-transition';
 
 export default async function MetricsPage() {
   const session = await auth();
@@ -14,15 +16,21 @@ export default async function MetricsPage() {
   const agencyId = agencies[0]?.id;
 
   if (!agencyId) {
-    return <div className="p-8">No agency found</div>;
+    return (
+      <div className="py-12 text-center">
+        <p className="text-text-secondary">No agency found</p>
+      </div>
+    );
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-2">Business Metrics</h1>
-      <p className="text-gray-600 mb-6">Track your agency's financial and operational performance</p>
+    <PageTransition>
+      <PageHeader
+        title="Business Metrics"
+        description="Track your agency's financial and operational performance"
+      />
 
       <MetricsDashboard agencyId={agencyId} />
-    </div>
+    </PageTransition>
   );
 }
