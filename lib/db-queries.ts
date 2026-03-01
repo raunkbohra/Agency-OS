@@ -719,3 +719,149 @@ export async function getPaymentById(paymentId: string, agencyId: string): Promi
     throw new Error(`Failed to fetch payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+// Deliverable type definitions
+export interface Deliverable {
+  id: string;
+  agency_id: string;
+  client_id: string;
+  plan_id: string;
+  title: string;
+  description?: string;
+  status: 'draft' | 'in_review' | 'approved' | 'changes_requested' | 'done';
+  month_year: string;
+  due_date?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DeliverableFile {
+  id: string;
+  deliverable_id: string;
+  file_name: string;
+  file_size?: number;
+  file_type?: string;
+  file_url: string;
+  uploaded_by: string;
+  version: number;
+  created_at: Date;
+}
+
+export interface DeliverableComment {
+  id: string;
+  deliverable_id: string;
+  user_id: string;
+  comment: string;
+  is_revision_request: boolean;
+  created_at: Date;
+}
+
+// ============================================================
+// Deliverable queries
+// ============================================================
+
+export async function createDeliverable(data: {
+  agencyId: string;
+  clientId: string;
+  planId: string;
+  title: string;
+  description?: string;
+  monthYear: string;
+  dueDate?: Date;
+}): Promise<Deliverable> {
+  const result = await db.query(
+    `INSERT INTO deliverables
+     (agency_id, client_id, plan_id, title, description, month_year, due_date, status)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
+     RETURNING *`,
+    [data.agencyId, data.clientId, data.planId, data.title, data.description ?? null, data.monthYear, data.dueDate ?? null]
+  );
+  return result.rows[0];
+}
+
+export async function getDeliverablesByClient(clientId: string, agencyId: string): Promise<Deliverable[]> {
+  const result = await db.query(
+    `SELECT * FROM deliverables WHERE client_id = $1 AND agency_id = $2 ORDER BY due_date ASC`,
+    [clientId, agencyId]
+  );
+  return result.rows;
+}
+
+export async function getDeliverablesByAgency(agencyId: string): Promise<Deliverable[]> {
+  const result = await db.query(
+    `SELECT d.*, c.name as client_name FROM deliverables d
+     JOIN clients c ON d.client_id = c.id
+     WHERE d.agency_id = $1
+     ORDER BY d.due_date ASC`,
+    [agencyId]
+  );
+  return result.rows;
+}
+
+export async function getDeliverableById(id: string, agencyId: string): Promise<Deliverable | null> {
+  const result = await db.query(
+    `SELECT * FROM deliverables WHERE id = $1 AND agency_id = $2`,
+    [id, agencyId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function updateDeliverableStatus(
+  id: string,
+  agencyId: string,
+  status: string
+): Promise<Deliverable> {
+  const result = await db.query(
+    `UPDATE deliverables SET status = $1, updated_at = NOW() WHERE id = $2 AND agency_id = $3 RETURNING *`,
+    [status, id, agencyId]
+  );
+  return result.rows[0];
+}
+
+export async function addDeliverableFile(data: {
+  deliverableId: string;
+  fileName: string;
+  fileSize?: number;
+  fileType?: string;
+  fileUrl: string;
+  uploadedBy: string;
+}): Promise<DeliverableFile> {
+  const result = await db.query(
+    `INSERT INTO deliverable_files (deliverable_id, file_name, file_size, file_type, file_url, uploaded_by)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING *`,
+    [data.deliverableId, data.fileName, data.fileSize ?? null, data.fileType ?? null, data.fileUrl, data.uploadedBy]
+  );
+  return result.rows[0];
+}
+
+export async function getDeliverableFiles(deliverableId: string): Promise<DeliverableFile[]> {
+  const result = await db.query(
+    `SELECT * FROM deliverable_files WHERE deliverable_id = $1 ORDER BY created_at DESC`,
+    [deliverableId]
+  );
+  return result.rows;
+}
+
+export async function addDeliverableComment(data: {
+  deliverableId: string;
+  userId: string;
+  comment: string;
+  isRevisionRequest?: boolean;
+}): Promise<DeliverableComment> {
+  const result = await db.query(
+    `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request)
+     VALUES ($1, $2, $3, $4)
+     RETURNING *`,
+    [data.deliverableId, data.userId, data.comment, data.isRevisionRequest ?? false]
+  );
+  return result.rows[0];
+}
+
+export async function getDeliverableComments(deliverableId: string): Promise<DeliverableComment[]> {
+  const result = await db.query(
+    `SELECT * FROM deliverable_comments WHERE deliverable_id = $1 ORDER BY created_at DESC`,
+    [deliverableId]
+  );
+  return result.rows;
+}
