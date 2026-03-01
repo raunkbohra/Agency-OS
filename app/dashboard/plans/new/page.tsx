@@ -30,11 +30,12 @@ async function handleCreatePlan(formData: {
     }
 
     await createPlan(agencyId, formData.name, formData.price, formData.billingCycle, formData.description);
-    redirect('/dashboard/plans');
   } catch (error) {
     console.error('Failed to create plan:', error);
     throw new Error(error instanceof Error ? error.message : 'Failed to create plan');
   }
+
+  redirect('/dashboard/plans');
 }
 
 export default async function NewPlanPage() {

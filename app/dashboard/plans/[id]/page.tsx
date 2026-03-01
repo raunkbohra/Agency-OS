@@ -24,7 +24,7 @@ export default async function PlanDetailPage({ params }: PlanDetailPageProps) {
   let error = null;
 
   try {
-    plan = await getPlanById(id);
+    plan = await getPlanById(id, session.user.agencyId!);
     if (!plan) {
       notFound();
     }

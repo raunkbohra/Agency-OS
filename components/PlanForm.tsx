@@ -46,6 +46,7 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
       setIsSubmitting(false);
     }
   }

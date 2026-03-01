@@ -170,9 +170,12 @@ export async function createPlan(
   }
 }
 
-export async function getPlanById(id: string): Promise<Plan | null> {
+export async function getPlanById(id: string, agencyId: string): Promise<Plan | null> {
   try {
-    const result = await db.query('SELECT * FROM plans WHERE id = $1', [id]);
+    const result = await db.query(
+      'SELECT * FROM plans WHERE id = $1 AND agency_id = $2',
+      [id, agencyId]
+    );
     return result.rows[0] || null;
   } catch (err) {
     console.error('Failed to get plan by ID:', err);
