@@ -5,7 +5,8 @@ export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
   // Verify Vercel Cron secret
-  if (request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -26,27 +27,32 @@ export async function GET(request: Request) {
     let created = 0;
 
     for (const clientPlan of clientPlans) {
-      // Check if deliverables already exist for this month
-      const existing = await db.query(
-        `SELECT id FROM deliverables WHERE client_id = $1 AND month_year = $2`,
-        [clientPlan.client_id, monthYear]
-      );
+      try {
+        // Check if deliverables already exist for this month
+        const existing = await db.query(
+          `SELECT id FROM deliverables WHERE client_id = $1 AND month_year = $2`,
+          [clientPlan.client_id, monthYear]
+        );
 
-      if (existing.rows.length === 0) {
-        const planItems = await getPlanItems(clientPlan.plan_id);
-        const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 0); // End of month
+        if (existing.rows.length === 0) {
+          const planItems = await getPlanItems(clientPlan.plan_id);
+          const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        for (const item of planItems) {
-          await createDeliverable({
-            agencyId: clientPlan.agency_id,
-            clientId: clientPlan.client_id,
-            planId: clientPlan.plan_id,
-            title: item.deliverable_type,
-            monthYear,
-            dueDate,
-          });
-          created++;
+          for (const item of planItems) {
+            await createDeliverable({
+              agencyId: clientPlan.agency_id,
+              clientId: clientPlan.client_id,
+              planId: clientPlan.plan_id,
+              title: item.deliverable_type,
+              monthYear,
+              dueDate,
+            });
+            created++;
+          }
         }
+      } catch (planError) {
+        console.error(`Failed to generate deliverables for client ${clientPlan.client_id}:`, planError);
+        // Continue with next client plan
       }
     }
 
