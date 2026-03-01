@@ -5,14 +5,19 @@ import {
   getPlanById,
   getPlanItemsByPlan,
   getInvoicesByClient,
+  Client,
+  ClientPlan,
+  Plan,
+  PlanItem,
+  Invoice,
 } from '@/lib/db-queries';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 interface ClientDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function ClientDetailPage({ params }: ClientDetailPageProps) {
@@ -23,13 +28,13 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
   }
 
   const agencyId = session.user.agencyId;
-  const clientId = params.id;
+  const { id: clientId } = await params;
 
-  let client: any = null;
-  let clientPlan: any = null;
-  let plan: any = null;
-  let planItems: any[] = [];
-  let invoices: any[] = [];
+  let client: Client | null = null;
+  let clientPlan: ClientPlan | null = null;
+  let plan: Plan | null = null;
+  let planItems: PlanItem[] = [];
+  let invoices: Invoice[] = [];
   let error: string | null = null;
 
   try {
@@ -58,7 +63,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
     }
 
     // Get client's invoices
-    invoices = await getInvoicesByClient(clientId);
+    invoices = await getInvoicesByClient(clientId, agencyId);
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load client details';
   }

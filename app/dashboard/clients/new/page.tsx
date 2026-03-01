@@ -1,3 +1,5 @@
+'use server';
+
 import { auth } from '@/lib/auth';
 import {
   createClient,
@@ -8,6 +10,7 @@ import {
   createAgency,
   createInvoice,
   addInvoiceItem,
+  Plan,
 } from '@/lib/db-queries';
 import { ClientForm } from '@/components/ClientForm';
 import { redirect } from 'next/navigation';
@@ -18,7 +21,6 @@ async function handleCreateClient(formData: {
   companyName?: string;
   planId: string;
 }) {
-  'use server';
 
   const session = await auth();
 
@@ -90,7 +92,7 @@ export default async function NewClientPage() {
   }
 
   let agencyId: string | null = null;
-  let plans: any[] = [];
+  let plans: Plan[] = [];
   let error: string | null = null;
 
   try {

@@ -10,7 +10,7 @@ interface ClientFormProps {
     companyName?: string;
     planId: string;
   }) => Promise<void>;
-  initialData?: Partial<Client>;
+  initialData?: Partial<Client & { planId?: string }>;
   isLoading?: boolean;
   plans: Plan[];
 }
@@ -24,7 +24,7 @@ export function ClientForm({
   const [name, setName] = useState(initialData?.name || '');
   const [email, setEmail] = useState(initialData?.email || '');
   const [companyName, setCompanyName] = useState(initialData?.company_name || '');
-  const [planId, setPlanId] = useState('');
+  const [planId, setPlanId] = useState(initialData?.planId || '');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -149,7 +149,7 @@ export function ClientForm({
         disabled={isSubmitting || isLoading || plans.length === 0}
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-        {isSubmitting || isLoading ? 'Creating Client...' : 'Create Client'}
+        {isSubmitting || isLoading ? (initialData ? 'Saving...' : 'Creating Client...') : (initialData ? 'Save Client' : 'Create Client')}
       </button>
     </form>
   );

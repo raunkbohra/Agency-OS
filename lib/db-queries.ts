@@ -229,7 +229,8 @@ export async function updatePlan(
     if (fields.length === 0) return getPlanById(id, agencyId);
 
     values.push(id);
-    const query = `UPDATE plans SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+    values.push(agencyId);
+    const query = `UPDATE plans SET ${fields.join(', ')} WHERE id = $${paramCount} AND agency_id = $${paramCount + 1} RETURNING *`;
     const result = await db.query(query, values);
     return result.rows[0] || null;
   } catch (err) {
@@ -238,9 +239,9 @@ export async function updatePlan(
   }
 }
 
-export async function deletePlan(id: string): Promise<boolean> {
+export async function deletePlan(id: string, agencyId: string): Promise<boolean> {
   try {
-    const result = await db.query('DELETE FROM plans WHERE id = $1', [id]);
+    const result = await db.query('DELETE FROM plans WHERE id = $1 AND agency_id = $2', [id, agencyId]);
     return result.rowCount! > 0;
   } catch (err) {
     console.error('Failed to delete plan:', err);
@@ -323,8 +324,32 @@ export async function getClientsByAgency(agencyId: string): Promise<Client[]> {
   }
 }
 
+export async function getClientsWithPlans(agencyId: string): Promise<(Client & { planName?: string })[]> {
+  try {
+    const result = await db.query(`
+      SELECT
+        c.id, c.agency_id, c.name, c.email, c.company_name, c.phone, c.created_at,
+        p.name as plan_name
+      FROM clients c
+      LEFT JOIN client_plans cp ON c.id = cp.client_id
+      LEFT JOIN plans p ON cp.plan_id = p.id
+      WHERE c.agency_id = $1
+      ORDER BY c.created_at DESC
+    `, [agencyId]);
+
+    return result.rows.map(row => ({
+      ...row,
+      planName: row.plan_name || 'No plan'
+    }));
+  } catch (err) {
+    console.error('Failed to get clients with plans:', err);
+    throw new Error(`Failed to fetch clients: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 export async function updateClient(
   id: string,
+  agencyId: string,
   name?: string,
   email?: string,
   phone?: string,
@@ -355,7 +380,8 @@ export async function updateClient(
     if (fields.length === 0) return getClientById(id);
 
     values.push(id);
-    const query = `UPDATE clients SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+    values.push(agencyId);
+    const query = `UPDATE clients SET ${fields.join(', ')} WHERE id = $${paramCount} AND agency_id = $${paramCount + 1} RETURNING *`;
     const result = await db.query(query, values);
     return result.rows[0] || null;
   } catch (err) {
@@ -408,12 +434,13 @@ export async function getClientPlansByClient(clientId: string): Promise<ClientPl
 
 export async function updateClientPlanStatus(
   id: string,
+  agencyId: string,
   status: string
 ): Promise<ClientPlan | null> {
   try {
     const result = await db.query(
-      'UPDATE client_plans SET status = $1 WHERE id = $2 RETURNING *',
-      [status, id]
+      'UPDATE client_plans SET status = $1 WHERE id = $2 AND client_id IN (SELECT id FROM clients WHERE agency_id = $3) RETURNING *',
+      [status, id, agencyId]
     );
     return result.rows[0] || null;
   } catch (err) {
@@ -422,9 +449,12 @@ export async function updateClientPlanStatus(
   }
 }
 
-export async function deleteClientPlan(id: string): Promise<boolean> {
+export async function deleteClientPlan(id: string, agencyId: string): Promise<boolean> {
   try {
-    const result = await db.query('DELETE FROM client_plans WHERE id = $1', [id]);
+    const result = await db.query(
+      'DELETE FROM client_plans WHERE id = $1 AND client_id IN (SELECT id FROM clients WHERE agency_id = $2)',
+      [id, agencyId]
+    );
     return result.rowCount! > 0;
   } catch (err) {
     console.error('Failed to delete client plan:', err);
@@ -472,9 +502,9 @@ export async function createInvoice(
   }
 }
 
-export async function getInvoiceById(id: string): Promise<Invoice | null> {
+export async function getInvoiceById(id: string, agencyId: string): Promise<Invoice | null> {
   try {
-    const result = await db.query('SELECT * FROM invoices WHERE id = $1', [id]);
+    const result = await db.query('SELECT * FROM invoices WHERE id = $1 AND agency_id = $2', [id, agencyId]);
     return result.rows[0] || null;
   } catch (err) {
     console.error('Failed to get invoice by ID:', err);
@@ -495,11 +525,11 @@ export async function getInvoicesByAgency(agencyId: string): Promise<Invoice[]> 
   }
 }
 
-export async function getInvoicesByClient(clientId: string): Promise<Invoice[]> {
+export async function getInvoicesByClient(clientId: string, agencyId: string): Promise<Invoice[]> {
   try {
     const result = await db.query(
-      'SELECT * FROM invoices WHERE client_id = $1 ORDER BY created_at DESC',
-      [clientId]
+      'SELECT * FROM invoices WHERE client_id = $1 AND agency_id = $2 ORDER BY created_at DESC',
+      [clientId, agencyId]
     );
     return result.rows;
   } catch (err) {

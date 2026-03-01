@@ -1,10 +1,9 @@
 import { auth } from '@/lib/auth';
 import {
-  getClientsByAgency,
-  getClientPlansByClient,
-  getPlanById,
+  getClientsWithPlans,
   getAgenciesByOwnerId,
   createAgency,
+  Client,
 } from '@/lib/db-queries';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -17,7 +16,7 @@ export default async function ClientsPage() {
   }
 
   let agencyId: string | null = null;
-  let clients: any[] = [];
+  let clients: (Client & { planName?: string })[] = [];
   let error: string | null = null;
 
   try {
@@ -35,22 +34,9 @@ export default async function ClientsPage() {
       agencyId = agencies[0].id;
     }
 
-    // Now get clients for this agency
+    // Now get clients for this agency with their plan information
     if (agencyId) {
-      const rawClients = await getClientsByAgency(agencyId);
-
-      // Enrich clients with their plan information
-      clients = await Promise.all(
-        rawClients.map(async (client) => {
-          const clientPlans = await getClientPlansByClient(client.id);
-          const planName = clientPlans.length > 0 ? await getPlanById(clientPlans[0].plan_id, agencyId!) : null;
-
-          return {
-            ...client,
-            planName: planName?.name || 'No plan',
-          };
-        })
-      );
+      clients = await getClientsWithPlans(agencyId);
     }
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load clients';
