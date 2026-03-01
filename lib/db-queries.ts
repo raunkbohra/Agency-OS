@@ -59,6 +59,32 @@ export interface ClientPlan {
   created_at: string;
 }
 
+export interface PaymentTransaction {
+  id: string;
+  invoice_id: string;
+  agency_id: string;
+  provider_id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  transaction_id?: string;
+  reference_id?: string;
+  webhook_payload?: Record<string, any>;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface AgencyPaymentMethod {
+  id: string;
+  agency_id: string;
+  provider_id: string;
+  credentials: Record<string, string>;
+  enabled: boolean;
+  test_mode: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
 // Agency queries
 export async function createAgency(
   name: string,
@@ -884,4 +910,124 @@ export async function getClientByToken(token: string): Promise<Client | null> {
     [token]
   );
   return result.rows[0] || null;
+}
+
+// ============================================================
+// Payment Transaction queries
+// ============================================================
+
+export async function createPaymentTransaction(data: {
+  invoiceId: string;
+  agencyId: string;
+  providerId: string;
+  amount: number;
+  currency?: string;
+  transactionId?: string;
+  referenceId?: string;
+  webhookPayload?: Record<string, any>;
+}): Promise<PaymentTransaction> {
+  const result = await db.query(
+    `INSERT INTO payment_transactions
+     (invoice_id, agency_id, provider_id, amount, currency, status, transaction_id, reference_id, webhook_payload)
+     VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8)
+     RETURNING *`,
+    [
+      data.invoiceId,
+      data.agencyId,
+      data.providerId,
+      data.amount,
+      data.currency || 'NPR',
+      data.transactionId ?? null,
+      data.referenceId ?? null,
+      data.webhookPayload ? JSON.stringify(data.webhookPayload) : null,
+    ]
+  );
+  return result.rows[0];
+}
+
+export async function updatePaymentTransactionStatus(
+  id: string,
+  agencyId: string,
+  status: string
+): Promise<PaymentTransaction> {
+  const result = await db.query(
+    `UPDATE payment_transactions
+     SET status = $1, updated_at = NOW()
+     WHERE id = $2 AND agency_id = $3
+     RETURNING *`,
+    [status, id, agencyId]
+  );
+  return result.rows[0];
+}
+
+export async function getPaymentTransactionsByInvoice(
+  invoiceId: string,
+  agencyId: string
+): Promise<PaymentTransaction[]> {
+  const result = await db.query(
+    `SELECT * FROM payment_transactions
+     WHERE invoice_id = $1 AND agency_id = $2
+     ORDER BY created_at DESC`,
+    [invoiceId, agencyId]
+  );
+  return result.rows;
+}
+
+// ============================================================
+// Agency Payment Method queries
+// ============================================================
+
+export async function addAgencyPaymentMethod(data: {
+  agencyId: string;
+  providerId: string;
+  credentials: Record<string, string>;
+  testMode?: boolean;
+}): Promise<AgencyPaymentMethod> {
+  const result = await db.query(
+    `INSERT INTO agency_payment_methods
+     (agency_id, provider_id, credentials, enabled, test_mode)
+     VALUES ($1, $2, $3, true, $4)
+     RETURNING *`,
+    [data.agencyId, data.providerId, JSON.stringify(data.credentials), data.testMode || false]
+  );
+  return result.rows[0];
+}
+
+export async function getAgencyPaymentMethods(agencyId: string): Promise<AgencyPaymentMethod[]> {
+  const result = await db.query(
+    `SELECT * FROM agency_payment_methods WHERE agency_id = $1 AND enabled = true`,
+    [agencyId]
+  );
+  return result.rows;
+}
+
+export async function updateAgencyPaymentMethod(
+  id: string,
+  agencyId: string,
+  data: { credentials?: Record<string, string>; enabled?: boolean }
+): Promise<AgencyPaymentMethod> {
+  const updates = [];
+  const values: any[] = [id, agencyId];
+  let paramCount = 2;
+
+  if (data.credentials) {
+    updates.push(`credentials = $${++paramCount}`);
+    values.push(JSON.stringify(data.credentials));
+  }
+
+  if (data.enabled !== undefined) {
+    updates.push(`enabled = $${++paramCount}`);
+    values.push(data.enabled);
+  }
+
+  updates.push(`updated_at = NOW()`);
+
+  const result = await db.query(
+    `UPDATE agency_payment_methods
+     SET ${updates.join(', ')}
+     WHERE id = $1 AND agency_id = $2
+     RETURNING *`,
+    values
+  );
+  return result.rows[0];
 }
