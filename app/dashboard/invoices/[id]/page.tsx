@@ -12,12 +12,7 @@ import {
 } from '@/lib/db-queries';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-
-async function markAsPaid(invoiceId: string, agencyId: string) {
-  'use server';
-  await updateInvoiceStatus(invoiceId, agencyId, 'paid');
-  // Note: In a real app, you might want to redirect or revalidate the page
-}
+import { revalidatePath } from 'next/cache';
 
 export default async function InvoiceDetailPage({
   params,
@@ -126,8 +121,9 @@ export default async function InvoiceDetailPage({
             {invoice.status !== 'paid' && (
               <form action={async () => {
                 'use server';
-                await markAsPaid(invoice.id, agencyId);
-                redirect('/dashboard/invoices');
+                await updateInvoiceStatus(invoice.id, agencyId, 'paid');
+                revalidatePath(`/dashboard/invoices/${invoice.id}`);
+                revalidatePath('/dashboard/invoices');
               }}>
                 <button
                   type="submit"
