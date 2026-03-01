@@ -63,24 +63,39 @@ export async function createAgency(
   ownerId: string,
   currency: string = 'NPR'
 ): Promise<Agency> {
-  const result = await db.query(
-    'INSERT INTO agencies (name, owner_id, currency) VALUES ($1, $2, $3) RETURNING *',
-    [name, ownerId, currency]
-  );
-  return result.rows[0];
+  try {
+    const result = await db.query(
+      'INSERT INTO agencies (name, owner_id, currency) VALUES ($1, $2, $3) RETURNING *',
+      [name, ownerId, currency]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to create agency:', err);
+    throw new Error(`Failed to create agency: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getAgencyById(id: string): Promise<Agency | null> {
-  const result = await db.query('SELECT * FROM agencies WHERE id = $1', [id]);
-  return result.rows[0] || null;
+  try {
+    const result = await db.query('SELECT * FROM agencies WHERE id = $1', [id]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get agency by ID:', err);
+    throw new Error(`Failed to fetch agency: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getAgenciesByOwnerId(ownerId: string): Promise<Agency[]> {
-  const result = await db.query(
-    'SELECT * FROM agencies WHERE owner_id = $1 ORDER BY created_at DESC',
-    [ownerId]
-  );
-  return result.rows;
+  try {
+    const result = await db.query(
+      'SELECT * FROM agencies WHERE owner_id = $1 ORDER BY created_at DESC',
+      [ownerId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get agencies by owner ID:', err);
+    throw new Error(`Failed to fetch agencies: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 // User queries
@@ -90,29 +105,49 @@ export async function createUser(
   name: string,
   role: string = 'member'
 ): Promise<User> {
-  const result = await db.query(
-    'INSERT INTO users (agency_id, email, name, role) VALUES ($1, $2, $3, $4) RETURNING *',
-    [agencyId, email, name, role]
-  );
-  return result.rows[0];
+  try {
+    const result = await db.query(
+      'INSERT INTO users (agency_id, email, name, role) VALUES ($1, $2, $3, $4) RETURNING *',
+      [agencyId, email, name, role]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to create user:', err);
+    throw new Error(`Failed to create user: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
-  const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-  return result.rows[0] || null;
+  try {
+    const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get user by email:', err);
+    throw new Error(`Failed to fetch user: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  const result = await db.query('SELECT * FROM users WHERE id = $1', [id]);
-  return result.rows[0] || null;
+  try {
+    const result = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get user by ID:', err);
+    throw new Error(`Failed to fetch user: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getUsersByAgency(agencyId: string): Promise<User[]> {
-  const result = await db.query(
-    'SELECT * FROM users WHERE agency_id = $1 ORDER BY created_at DESC',
-    [agencyId]
-  );
-  return result.rows;
+  try {
+    const result = await db.query(
+      'SELECT * FROM users WHERE agency_id = $1 ORDER BY created_at DESC',
+      [agencyId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get users by agency:', err);
+    throw new Error(`Failed to fetch users: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 // Plan queries
@@ -123,24 +158,39 @@ export async function createPlan(
   billingCycle: string = 'monthly',
   description?: string
 ): Promise<Plan> {
-  const result = await db.query(
-    'INSERT INTO plans (agency_id, name, price, billing_cycle, description) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [agencyId, name, price, billingCycle, description || null]
-  );
-  return result.rows[0];
+  try {
+    const result = await db.query(
+      'INSERT INTO plans (agency_id, name, price, billing_cycle, description) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [agencyId, name, price, billingCycle, description || null]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to create plan:', err);
+    throw new Error(`Failed to create plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getPlanById(id: string): Promise<Plan | null> {
-  const result = await db.query('SELECT * FROM plans WHERE id = $1', [id]);
-  return result.rows[0] || null;
+  try {
+    const result = await db.query('SELECT * FROM plans WHERE id = $1', [id]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get plan by ID:', err);
+    throw new Error(`Failed to fetch plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getPlansByAgency(agencyId: string): Promise<Plan[]> {
-  const result = await db.query(
-    'SELECT * FROM plans WHERE agency_id = $1 ORDER BY created_at DESC',
-    [agencyId]
-  );
-  return result.rows;
+  try {
+    const result = await db.query(
+      'SELECT * FROM plans WHERE agency_id = $1 ORDER BY created_at DESC',
+      [agencyId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get plans by agency:', err);
+    throw new Error(`Failed to fetch plans: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function updatePlan(
@@ -150,38 +200,48 @@ export async function updatePlan(
   billingCycle?: string,
   description?: string
 ): Promise<Plan | null> {
-  const fields: string[] = [];
-  const values: any[] = [];
-  let paramCount = 1;
+  try {
+    const fields: string[] = [];
+    const values: (string | number | boolean | null | undefined)[] = [];
+    let paramCount = 1;
 
-  if (name !== undefined) {
-    fields.push(`name = $${paramCount++}`);
-    values.push(name);
-  }
-  if (price !== undefined) {
-    fields.push(`price = $${paramCount++}`);
-    values.push(price);
-  }
-  if (billingCycle !== undefined) {
-    fields.push(`billing_cycle = $${paramCount++}`);
-    values.push(billingCycle);
-  }
-  if (description !== undefined) {
-    fields.push(`description = $${paramCount++}`);
-    values.push(description);
-  }
+    if (name !== undefined) {
+      fields.push(`name = $${paramCount++}`);
+      values.push(name);
+    }
+    if (price !== undefined) {
+      fields.push(`price = $${paramCount++}`);
+      values.push(price);
+    }
+    if (billingCycle !== undefined) {
+      fields.push(`billing_cycle = $${paramCount++}`);
+      values.push(billingCycle);
+    }
+    if (description !== undefined) {
+      fields.push(`description = $${paramCount++}`);
+      values.push(description);
+    }
 
-  if (fields.length === 0) return getPlanById(id);
+    if (fields.length === 0) return getPlanById(id);
 
-  values.push(id);
-  const query = `UPDATE plans SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
-  const result = await db.query(query, values);
-  return result.rows[0] || null;
+    values.push(id);
+    const query = `UPDATE plans SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+    const result = await db.query(query, values);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to update plan:', err);
+    throw new Error(`Failed to update plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function deletePlan(id: string): Promise<boolean> {
-  const result = await db.query('DELETE FROM plans WHERE id = $1', [id]);
-  return result.rowCount! > 0;
+  try {
+    const result = await db.query('DELETE FROM plans WHERE id = $1', [id]);
+    return result.rowCount! > 0;
+  } catch (err) {
+    console.error('Failed to delete plan:', err);
+    throw new Error(`Failed to delete plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 // Plan items queries
@@ -191,19 +251,29 @@ export async function createPlanItem(
   qty: number = 1,
   recurrence: string = 'monthly'
 ): Promise<PlanItem> {
-  const result = await db.query(
-    'INSERT INTO plan_items (plan_id, deliverable_type, qty, recurrence) VALUES ($1, $2, $3, $4) RETURNING *',
-    [planId, deliverableType, qty, recurrence]
-  );
-  return result.rows[0];
+  try {
+    const result = await db.query(
+      'INSERT INTO plan_items (plan_id, deliverable_type, qty, recurrence) VALUES ($1, $2, $3, $4) RETURNING *',
+      [planId, deliverableType, qty, recurrence]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to create plan item:', err);
+    throw new Error(`Failed to create plan item: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getPlanItemsByPlan(planId: string): Promise<PlanItem[]> {
-  const result = await db.query(
-    'SELECT * FROM plan_items WHERE plan_id = $1 ORDER BY created_at DESC',
-    [planId]
-  );
-  return result.rows;
+  try {
+    const result = await db.query(
+      'SELECT * FROM plan_items WHERE plan_id = $1 ORDER BY created_at DESC',
+      [planId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get plan items by plan:', err);
+    throw new Error(`Failed to fetch plan items: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 // Client queries
@@ -214,24 +284,39 @@ export async function createClient(
   phone?: string,
   companyName?: string
 ): Promise<Client> {
-  const result = await db.query(
-    'INSERT INTO clients (agency_id, name, email, phone, company_name) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [agencyId, name, email, phone || null, companyName || null]
-  );
-  return result.rows[0];
+  try {
+    const result = await db.query(
+      'INSERT INTO clients (agency_id, name, email, phone, company_name) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [agencyId, name, email, phone || null, companyName || null]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to create client:', err);
+    throw new Error(`Failed to create client: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getClientById(id: string): Promise<Client | null> {
-  const result = await db.query('SELECT * FROM clients WHERE id = $1', [id]);
-  return result.rows[0] || null;
+  try {
+    const result = await db.query('SELECT * FROM clients WHERE id = $1', [id]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get client by ID:', err);
+    throw new Error(`Failed to fetch client: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getClientsByAgency(agencyId: string): Promise<Client[]> {
-  const result = await db.query(
-    'SELECT * FROM clients WHERE agency_id = $1 ORDER BY created_at DESC',
-    [agencyId]
-  );
-  return result.rows;
+  try {
+    const result = await db.query(
+      'SELECT * FROM clients WHERE agency_id = $1 ORDER BY created_at DESC',
+      [agencyId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get clients by agency:', err);
+    throw new Error(`Failed to fetch clients: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function updateClient(
@@ -241,33 +326,38 @@ export async function updateClient(
   phone?: string,
   companyName?: string
 ): Promise<Client | null> {
-  const fields: string[] = [];
-  const values: any[] = [];
-  let paramCount = 1;
+  try {
+    const fields: string[] = [];
+    const values: (string | number | boolean | null | undefined)[] = [];
+    let paramCount = 1;
 
-  if (name !== undefined) {
-    fields.push(`name = $${paramCount++}`);
-    values.push(name);
-  }
-  if (email !== undefined) {
-    fields.push(`email = $${paramCount++}`);
-    values.push(email);
-  }
-  if (phone !== undefined) {
-    fields.push(`phone = $${paramCount++}`);
-    values.push(phone);
-  }
-  if (companyName !== undefined) {
-    fields.push(`company_name = $${paramCount++}`);
-    values.push(companyName);
-  }
+    if (name !== undefined) {
+      fields.push(`name = $${paramCount++}`);
+      values.push(name);
+    }
+    if (email !== undefined) {
+      fields.push(`email = $${paramCount++}`);
+      values.push(email);
+    }
+    if (phone !== undefined) {
+      fields.push(`phone = $${paramCount++}`);
+      values.push(phone);
+    }
+    if (companyName !== undefined) {
+      fields.push(`company_name = $${paramCount++}`);
+      values.push(companyName);
+    }
 
-  if (fields.length === 0) return getClientById(id);
+    if (fields.length === 0) return getClientById(id);
 
-  values.push(id);
-  const query = `UPDATE clients SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
-  const result = await db.query(query, values);
-  return result.rows[0] || null;
+    values.push(id);
+    const query = `UPDATE clients SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+    const result = await db.query(query, values);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to update client:', err);
+    throw new Error(`Failed to update client: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 // Client plans (subscriptions) queries
@@ -276,38 +366,63 @@ export async function createClientPlan(
   planId: string,
   status: string = 'active'
 ): Promise<ClientPlan> {
-  const result = await db.query(
-    'INSERT INTO client_plans (client_id, plan_id, status) VALUES ($1, $2, $3) RETURNING *',
-    [clientId, planId, status]
-  );
-  return result.rows[0];
+  try {
+    const result = await db.query(
+      'INSERT INTO client_plans (client_id, plan_id, status) VALUES ($1, $2, $3) RETURNING *',
+      [clientId, planId, status]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to create client plan:', err);
+    throw new Error(`Failed to create client plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getClientPlanById(id: string): Promise<ClientPlan | null> {
-  const result = await db.query('SELECT * FROM client_plans WHERE id = $1', [id]);
-  return result.rows[0] || null;
+  try {
+    const result = await db.query('SELECT * FROM client_plans WHERE id = $1', [id]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get client plan by ID:', err);
+    throw new Error(`Failed to fetch client plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function getClientPlansByClient(clientId: string): Promise<ClientPlan[]> {
-  const result = await db.query(
-    'SELECT * FROM client_plans WHERE client_id = $1 ORDER BY created_at DESC',
-    [clientId]
-  );
-  return result.rows;
+  try {
+    const result = await db.query(
+      'SELECT * FROM client_plans WHERE client_id = $1 ORDER BY created_at DESC',
+      [clientId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get client plans by client:', err);
+    throw new Error(`Failed to fetch client plans: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function updateClientPlanStatus(
   id: string,
   status: string
 ): Promise<ClientPlan | null> {
-  const result = await db.query(
-    'UPDATE client_plans SET status = $1 WHERE id = $2 RETURNING *',
-    [status, id]
-  );
-  return result.rows[0] || null;
+  try {
+    const result = await db.query(
+      'UPDATE client_plans SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to update client plan status:', err);
+    throw new Error(`Failed to update client plan status: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }
 
 export async function deleteClientPlan(id: string): Promise<boolean> {
-  const result = await db.query('DELETE FROM client_plans WHERE id = $1', [id]);
-  return result.rowCount! > 0;
+  try {
+    const result = await db.query('DELETE FROM client_plans WHERE id = $1', [id]);
+    return result.rowCount! > 0;
+  } catch (err) {
+    console.error('Failed to delete client plan:', err);
+    throw new Error(`Failed to delete client plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
 }

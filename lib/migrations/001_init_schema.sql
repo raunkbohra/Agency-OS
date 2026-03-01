@@ -14,7 +14,7 @@ CREATE TABLE agencies (
 -- Create users table with RLS
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agency_id UUID NOT NULL REFERENCES agencies(id),
+  agency_id UUID NOT NULL REFERENCES agencies(id) ON DELETE CASCADE,
   email TEXT NOT NULL UNIQUE,
   name TEXT,
   role TEXT DEFAULT 'member',
@@ -28,7 +28,7 @@ CREATE TABLE users (
 -- Create plans table
 CREATE TABLE plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agency_id UUID NOT NULL REFERENCES agencies(id),
+  agency_id UUID NOT NULL REFERENCES agencies(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   price DECIMAL(10, 2) NOT NULL,
   billing_cycle TEXT DEFAULT 'monthly',
@@ -39,7 +39,7 @@ CREATE TABLE plans (
 -- Create plan_items table
 CREATE TABLE plan_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  plan_id UUID NOT NULL REFERENCES plans(id),
+  plan_id UUID NOT NULL REFERENCES plans(id) ON DELETE CASCADE,
   deliverable_type TEXT NOT NULL,
   qty INT DEFAULT 1,
   recurrence TEXT DEFAULT 'monthly',
@@ -49,7 +49,7 @@ CREATE TABLE plan_items (
 -- Create clients table
 CREATE TABLE clients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agency_id UUID NOT NULL REFERENCES agencies(id),
+  agency_id UUID NOT NULL REFERENCES agencies(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT,
@@ -60,8 +60,8 @@ CREATE TABLE clients (
 -- Create client_plans (subscriptions) table
 CREATE TABLE client_plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  client_id UUID NOT NULL REFERENCES clients(id),
-  plan_id UUID NOT NULL REFERENCES plans(id),
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  plan_id UUID NOT NULL REFERENCES plans(id) ON DELETE CASCADE,
   start_date TIMESTAMP DEFAULT NOW(),
   status TEXT DEFAULT 'active',
   created_at TIMESTAMP DEFAULT NOW()
