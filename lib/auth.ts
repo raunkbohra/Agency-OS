@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { getDbClient } from './db';
+import { getPool } from './db';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -33,7 +33,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.agencyId = user.agencyId;
       }
       return token;
     },
@@ -41,7 +40,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
-        session.user.agencyId = token.agencyId as string;
       }
       return session;
     },

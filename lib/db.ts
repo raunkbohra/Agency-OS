@@ -1,31 +1,36 @@
-import { Client } from 'pg';
+import { Pool } from 'pg';
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://raunakbohra@localhost/agency_os';
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is not set. Set it in .env.local');
+}
 
-// Create a singleton client instance
-let client: Client | null = null;
+let pool: Pool | null = null;
 
-export async function getDbClient() {
-  if (!client) {
-    client = new Client({
-      connectionString,
+export function getPool() {
+  if (!pool) {
+    pool = new Pool({ connectionString });
+    pool.on('error', (err) => {
+      console.error('Unexpected error on idle client', err);
+      pool = null;
     });
-    try {
-      await client.connect();
-      console.log('Database connected successfully');
-    } catch (error) {
-      console.error('Database connection error:', error);
-      throw error;
-    }
   }
-  return client;
+  return pool;
 }
 
 export async function closeDb() {
-  if (client) {
-    await client.end();
-    client = null;
+  if (pool) {
+    await pool.end();
+    pool = null;
   }
 }
 
-export default getDbClient;
+// Export convenience object for direct queries
+export const db = {
+  query: (text: string, params?: any[]) => {
+    const p = getPool();
+    return p.query(text, params);
+  },
+};
+
+export default getPool;
