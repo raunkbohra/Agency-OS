@@ -1,5 +1,3 @@
-'use server';
-
 import { auth } from '@/lib/auth';
 import { createPlan, getAgenciesByOwnerId, createAgency } from '@/lib/db-queries';
 import { PlanForm } from '@/components/PlanForm';
