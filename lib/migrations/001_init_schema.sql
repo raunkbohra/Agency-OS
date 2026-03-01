@@ -67,6 +67,28 @@ CREATE TABLE client_plans (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Create invoices table
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agency_id UUID NOT NULL REFERENCES agencies(id) ON DELETE CASCADE,
+  client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+  amount DECIMAL(10, 2) NOT NULL,
+  status TEXT DEFAULT 'draft',
+  due_date TIMESTAMP,
+  paid_date TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Create invoice_items table
+CREATE TABLE invoice_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  invoice_id UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+  description TEXT NOT NULL,
+  quantity INT DEFAULT 1,
+  rate DECIMAL(10, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Create indexes for common queries
 CREATE INDEX idx_agencies_owner_id ON agencies(owner_id);
 CREATE INDEX idx_users_agency_id ON users(agency_id);
@@ -74,3 +96,6 @@ CREATE INDEX idx_plans_agency_id ON plans(agency_id);
 CREATE INDEX idx_clients_agency_id ON clients(agency_id);
 CREATE INDEX idx_client_plans_client_id ON client_plans(client_id);
 CREATE INDEX idx_client_plans_plan_id ON client_plans(plan_id);
+CREATE INDEX idx_invoices_agency_id ON invoices(agency_id);
+CREATE INDEX idx_invoices_client_id ON invoices(client_id);
+CREATE INDEX idx_invoice_items_invoice_id ON invoice_items(invoice_id);

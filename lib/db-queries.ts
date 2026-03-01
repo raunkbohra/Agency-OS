@@ -430,3 +430,110 @@ export async function deleteClientPlan(id: string): Promise<boolean> {
     throw new Error(`Failed to delete client plan: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 }
+
+// Invoice types
+export interface Invoice {
+  id: string;
+  agency_id: string;
+  client_id: string;
+  amount: string;
+  status: string;
+  due_date: string | null;
+  paid_date: string | null;
+  created_at: string;
+}
+
+export interface InvoiceItem {
+  id: string;
+  invoice_id: string;
+  description: string;
+  quantity: number;
+  rate: string;
+  created_at: string;
+}
+
+// Invoice queries
+export async function createInvoice(
+  agencyId: string,
+  clientId: string,
+  amount: number,
+  dueDate?: string
+): Promise<Invoice> {
+  try {
+    const result = await db.query(
+      'INSERT INTO invoices (agency_id, client_id, amount, due_date) VALUES ($1, $2, $3, $4) RETURNING *',
+      [agencyId, clientId, amount, dueDate || null]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to create invoice:', err);
+    throw new Error(`Failed to create invoice: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getInvoiceById(id: string): Promise<Invoice | null> {
+  try {
+    const result = await db.query('SELECT * FROM invoices WHERE id = $1', [id]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get invoice by ID:', err);
+    throw new Error(`Failed to fetch invoice: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getInvoicesByAgency(agencyId: string): Promise<Invoice[]> {
+  try {
+    const result = await db.query(
+      'SELECT * FROM invoices WHERE agency_id = $1 ORDER BY created_at DESC',
+      [agencyId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get invoices by agency:', err);
+    throw new Error(`Failed to fetch invoices: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getInvoicesByClient(clientId: string): Promise<Invoice[]> {
+  try {
+    const result = await db.query(
+      'SELECT * FROM invoices WHERE client_id = $1 ORDER BY created_at DESC',
+      [clientId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get invoices by client:', err);
+    throw new Error(`Failed to fetch invoices: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function addInvoiceItem(
+  invoiceId: string,
+  description: string,
+  quantity: number = 1,
+  rate: number
+): Promise<InvoiceItem> {
+  try {
+    const result = await db.query(
+      'INSERT INTO invoice_items (invoice_id, description, quantity, rate) VALUES ($1, $2, $3, $4) RETURNING *',
+      [invoiceId, description, quantity, rate]
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error('Failed to add invoice item:', err);
+    throw new Error(`Failed to add invoice item: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
+  try {
+    const result = await db.query(
+      'SELECT * FROM invoice_items WHERE invoice_id = $1 ORDER BY created_at DESC',
+      [invoiceId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get invoice items:', err);
+    throw new Error(`Failed to fetch invoice items: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
