@@ -48,7 +48,7 @@ async function handleCreateClient(formData: {
     );
 
     // Assign plan to client
-    await createClientPlan(client.id, formData.planId);
+    await createClientPlan(client.id, formData.planId, new Date());
 
     // Get the plan to use its price for the invoice
     const plan = await getPlanById(formData.planId, agencyId);

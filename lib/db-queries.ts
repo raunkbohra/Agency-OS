@@ -368,12 +368,13 @@ export async function updateClient(
 export async function createClientPlan(
   clientId: string,
   planId: string,
+  startDate: Date = new Date(),
   status: string = 'active'
 ): Promise<ClientPlan> {
   try {
     const result = await db.query(
-      'INSERT INTO client_plans (client_id, plan_id, status) VALUES ($1, $2, $3) RETURNING *',
-      [clientId, planId, status]
+      'INSERT INTO client_plans (client_id, plan_id, start_date, status) VALUES ($1, $2, $3, $4) RETURNING *',
+      [clientId, planId, startDate.toISOString(), status]
     );
     return result.rows[0];
   } catch (err) {

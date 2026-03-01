@@ -44,7 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             // Try to fetch the agency for this user
             const pool = getPool();
             const result = await pool.query(
-              'SELECT id FROM agencies WHERE user_id = $1 LIMIT 1',
+              'SELECT id FROM agencies WHERE owner_id = $1 LIMIT 1',
               [userId]
             );
             const agencyId = result.rows[0]?.id;
