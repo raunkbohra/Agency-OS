@@ -1,28 +1,133 @@
 'use client';
 
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
+import { TrendingUp, Zap, Users, DollarSign } from 'lucide-react';
 
 const metrics = [
-  { value: '100%', label: 'Automated' },
-  { value: '5 min', label: 'Setup Time' },
-  { value: '\u221E', label: 'Clients' },
-  { value: '$0', label: 'To Start' },
+  {
+    value: '100%',
+    label: 'Automated',
+    description: 'Every invoice, reminder, and follow-up handled automatically.',
+    icon: Zap,
+    accent: '#0070f3',
+  },
+  {
+    value: '5 min',
+    label: 'Setup Time',
+    description: "Get your agency on Agency OS in under five minutes. No onboarding calls.",
+    icon: TrendingUp,
+    accent: '#7c3aed',
+  },
+  {
+    value: '∞',
+    label: 'Clients',
+    description: 'No limits on clients, plans, or deliverables on the Pro plan.',
+    icon: Users,
+    accent: '#00c853',
+  },
+  {
+    value: '$0',
+    label: 'To Start',
+    description: 'Start free with up to 3 clients. Upgrade only when you need to.',
+    icon: DollarSign,
+    accent: '#f59e0b',
+  },
 ];
 
 export function MetricsShowcase() {
   return (
-    <section className="py-24 px-6">
+    <section className="py-28 px-6" style={{ background: '#060609' }}>
       <div className="mx-auto max-w-6xl">
         <ScrollReveal>
-          <div className="relative rounded-2xl border border-glass-border bg-glass-bg backdrop-blur-xl p-12 md:p-16 overflow-hidden">
-            <div className="absolute inset-0 bg-aurora pointer-events-none" />
-            <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              {metrics.map((metric) => (
-                <div key={metric.label} className="text-center">
-                  <div className="text-4xl md:text-5xl font-bold tracking-tight text-text-primary">{metric.value}</div>
-                  <div className="mt-2 text-xs font-medium uppercase tracking-wide text-text-tertiary">{metric.label}</div>
-                </div>
-              ))}
+          <div
+            className="relative rounded-3xl overflow-hidden"
+            style={{
+              background: 'rgba(10, 10, 18, 0.95)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            {/* Background glows */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: '50%',
+                left: '20%',
+                transform: 'translateY(-50%)',
+                width: '300px',
+                height: '300px',
+                background: 'radial-gradient(circle, rgba(0,112,243,0.06), transparent 70%)',
+                filter: 'blur(60px)',
+              }}
+            />
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: '50%',
+                right: '20%',
+                transform: 'translateY(-50%)',
+                width: '300px',
+                height: '300px',
+                background: 'radial-gradient(circle, rgba(124,58,237,0.06), transparent 70%)',
+                filter: 'blur(60px)',
+              }}
+            />
+
+            <div className="relative z-10 p-10 md:p-16">
+              {/* Header */}
+              <div className="text-center mb-14">
+                <p
+                  className="text-sm font-semibold uppercase tracking-widest mb-3"
+                  style={{ color: '#6b7280' }}
+                >
+                  By the numbers
+                </p>
+                <h2
+                  className="text-3xl md:text-4xl font-black tracking-[-0.03em] text-white"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                >
+                  Built to move fast
+                </h2>
+              </div>
+
+              {/* Metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                {metrics.map((metric, i) => (
+                  <div key={metric.label} className="text-center group">
+                    {/* Icon */}
+                    <div
+                      className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-4"
+                      style={{
+                        background: `rgba(${metric.accent === '#0070f3' ? '0,112,243' : metric.accent === '#7c3aed' ? '124,58,237' : metric.accent === '#00c853' ? '0,200,83' : '245,158,11'}, 0.1)`,
+                        border: `1px solid rgba(${metric.accent === '#0070f3' ? '0,112,243' : metric.accent === '#7c3aed' ? '124,58,237' : metric.accent === '#00c853' ? '0,200,83' : '245,158,11'}, 0.2)`,
+                      }}
+                    >
+                      <metric.icon size={16} style={{ color: metric.accent }} />
+                    </div>
+
+                    {/* Value */}
+                    <div
+                      className="text-5xl md:text-6xl font-black tracking-tight leading-none mb-2"
+                      style={{
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        background: `linear-gradient(135deg, ${metric.accent}, ${metric.accent}99)`,
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                      }}
+                    >
+                      {metric.value}
+                    </div>
+
+                    {/* Label */}
+                    <div className="text-sm font-semibold text-white mb-2">{metric.label}</div>
+
+                    {/* Description */}
+                    <p className="text-xs leading-relaxed" style={{ color: '#555565' }}>
+                      {metric.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </ScrollReveal>

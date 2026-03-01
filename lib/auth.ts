@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import { getPool } from './db';
 import { createHash } from 'crypto';
+import { verifyPassword } from './password';
 import type { DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
@@ -35,38 +36,43 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // TODO: Implement proper authentication logic
-        // For now, accept any non-empty email/password
-        if (credentials?.email && credentials?.password) {
-          const email = credentials.email as string;
-          const userId = generateIdFromEmail(email);
+        if (!credentials?.email || !credentials?.password) return null;
 
-          try {
-            // Fetch the agency for this user
-            const pool = getPool();
-            const result = await pool.query(
-              'SELECT id FROM agencies WHERE owner_id = $1 LIMIT 1',
-              [userId]
-            );
-            const agencyId = result.rows[0]?.id;
+        const email = credentials.email as string;
+        const password = credentials.password as string;
+        const userId = generateIdFromEmail(email);
 
-            if (!agencyId) {
-              // Fail authentication if user has no agency
-              return null;
-            }
+        try {
+          const pool = getPool();
 
-            return {
-              id: userId,
-              email: email,
-              name: email.split('@')[0],
-              agencyId: agencyId,
-            };
-          } catch (err) {
-            // If database lookup fails, deny authentication
-            return null;
+          // Fetch user + agency in one query
+          const result = await pool.query(
+            `SELECT u.id, u.name, u.password_hash, a.id AS agency_id
+             FROM users u
+             JOIN agencies a ON a.owner_id = u.id
+             WHERE u.email = $1
+             LIMIT 1`,
+            [email]
+          );
+
+          const user = result.rows[0];
+          if (!user) return null;
+
+          // Verify password if hash exists
+          if (user.password_hash) {
+            const valid = await verifyPassword(user.password_hash, password);
+            if (!valid) return null;
           }
+
+          return {
+            id: userId,
+            email,
+            name: user.name ?? email.split('@')[0],
+            agencyId: user.agency_id,
+          };
+        } catch {
+          return null;
         }
-        return null;
       },
     }),
     Google({

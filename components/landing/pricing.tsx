@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Check, Minus } from 'lucide-react';
 import { ScrollStagger, ScrollStaggerItem } from '@/components/motion/scroll-stagger';
 
 interface PlanFeature {
@@ -19,13 +18,14 @@ interface PricingTier {
   cta: string;
   ctaHref: string;
   featured: boolean;
+  badge?: string;
 }
 
 const tiers: PricingTier[] = [
   {
     name: 'Free',
     price: '$0',
-    period: '/mo',
+    period: '/month',
     description: 'For freelancers getting started.',
     features: [
       { text: 'Up to 3 clients', included: true },
@@ -35,15 +35,15 @@ const tiers: PricingTier[] = [
       { text: 'Deliverables tracking', included: false },
       { text: 'Metrics dashboard', included: false },
     ],
-    cta: 'Get Started',
+    cta: 'Get Started Free',
     ctaHref: '/auth/signin',
     featured: false,
   },
   {
     name: 'Pro',
     price: '$29',
-    period: '/mo',
-    description: 'For growing agencies.',
+    period: '/month',
+    description: 'For growing agencies that ship.',
     features: [
       { text: 'Unlimited clients', included: true },
       { text: 'Unlimited plans', included: true },
@@ -52,15 +52,16 @@ const tiers: PricingTier[] = [
       { text: 'Deliverables tracking', included: true },
       { text: 'Metrics dashboard', included: true },
     ],
-    cta: 'Get Started',
+    cta: 'Start Pro',
     ctaHref: '/auth/signin',
     featured: true,
+    badge: 'Most Popular',
   },
   {
     name: 'Enterprise',
     price: 'Custom',
     period: '',
-    description: 'For established agencies.',
+    description: 'For established agencies at scale.',
     features: [
       { text: 'Everything in Pro', included: true },
       { text: 'Priority support', included: true },
@@ -77,68 +78,127 @@ const tiers: PricingTier[] = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-24 px-6">
+    <section id="pricing" className="py-28 px-6" style={{ background: 'linear-gradient(180deg, #060609 0%, #08080f 100%)' }}>
       <div className="mx-auto max-w-6xl">
+        {/* Section header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold tracking-tight text-text-primary">
-            Simple pricing
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest mb-5"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
+          >
+            Pricing
+          </div>
+          <h2
+            className="text-4xl md:text-5xl font-black tracking-[-0.03em] text-white"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          >
+            Simple, honest pricing
           </h2>
-          <p className="mt-4 text-lg text-text-secondary">
-            Start free. Upgrade when you need to.
+          <p className="mt-4 text-lg" style={{ color: '#6b7280' }}>
+            Start free. Upgrade when you need to. No surprises.
           </p>
         </div>
 
-        <ScrollStagger className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <ScrollStagger className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {tiers.map((tier) => (
             <ScrollStaggerItem key={tier.name}>
               <div
-                className={`relative rounded-xl p-8 h-full flex flex-col ${
-                  tier.featured
-                    ? 'border-2 border-accent-blue/30 bg-bg-secondary animated-border'
-                    : 'border border-border-default bg-bg-secondary'
-                }`}
+                className="relative flex flex-col h-full rounded-2xl p-7 transition-all duration-300"
+                style={{
+                  background: tier.featured ? 'rgba(0, 112, 243, 0.06)' : 'rgba(12, 12, 20, 0.8)',
+                  border: tier.featured
+                    ? '1px solid rgba(0, 112, 243, 0.35)'
+                    : '1px solid rgba(255,255,255,0.07)',
+                  boxShadow: tier.featured
+                    ? '0 0 60px rgba(0, 112, 243, 0.08), inset 0 1px 0 rgba(255,255,255,0.06)'
+                    : 'none',
+                }}
               >
-                {tier.featured && (
+                {/* Badge */}
+                {tier.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="rounded-full bg-accent-blue px-3 py-1 text-xs font-medium text-white">
-                      Most Popular
+                    <span
+                      className="px-3 py-1 text-[11px] font-semibold text-white rounded-full"
+                      style={{ background: 'linear-gradient(135deg, #0070f3, #7c3aed)' }}
+                    >
+                      {tier.badge}
                     </span>
                   </div>
                 )}
 
+                {/* Plan name & description */}
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-text-primary">{tier.name}</h3>
-                  <p className="text-sm text-text-secondary mt-1">{tier.description}</p>
+                  <h3
+                    className="text-base font-bold mb-1"
+                    style={{ color: tier.featured ? '#60a5fa' : '#9ca3af' }}
+                  >
+                    {tier.name}
+                  </h3>
+                  <p className="text-sm" style={{ color: '#555565' }}>{tier.description}</p>
                 </div>
 
-                <div className="mb-8">
-                  <span className="text-4xl font-bold tracking-tight text-text-primary">{tier.price}</span>
-                  <span className="text-text-tertiary">{tier.period}</span>
+                {/* Price */}
+                <div className="mb-7 flex items-end gap-1">
+                  <span
+                    className="text-5xl font-black tracking-tight text-white"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  >
+                    {tier.price}
+                  </span>
+                  {tier.period && (
+                    <span className="text-sm mb-1.5" style={{ color: '#555565' }}>{tier.period}</span>
+                  )}
                 </div>
 
+                {/* Features */}
                 <ul className="space-y-3 mb-8 flex-1">
                   {tier.features.map((feature) => (
-                    <li key={feature.text} className="flex items-center gap-2">
+                    <li key={feature.text} className="flex items-center gap-2.5">
                       {feature.included ? (
-                        <Check className="h-4 w-4 text-accent-green flex-shrink-0" />
+                        <div
+                          className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
+                          style={{ background: 'rgba(0, 200, 83, 0.15)', border: '1px solid rgba(0,200,83,0.3)' }}
+                        >
+                          <Check size={9} style={{ color: '#00c853' }} />
+                        </div>
                       ) : (
-                        <X className="h-4 w-4 text-text-quaternary flex-shrink-0" />
+                        <div
+                          className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
+                          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+                        >
+                          <Minus size={9} style={{ color: '#444455' }} />
+                        </div>
                       )}
-                      <span className={feature.included ? 'text-sm text-text-secondary' : 'text-sm text-text-quaternary line-through'}>
+                      <span
+                        className="text-sm"
+                        style={{ color: feature.included ? '#d1d5db' : '#444455' }}
+                      >
                         {feature.text}
                       </span>
                     </li>
                   ))}
                 </ul>
 
-                <Button
-                  variant={tier.featured ? 'primary' : 'secondary'}
-                  size="lg"
-                  className="w-full"
-                  asChild
+                {/* CTA */}
+                <Link
+                  href={tier.ctaHref}
+                  className="block text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
+                  style={
+                    tier.featured
+                      ? {
+                          background: 'linear-gradient(135deg, #0070f3, #7c3aed)',
+                          color: 'white',
+                          boxShadow: '0 4px 20px rgba(0, 112, 243, 0.3)',
+                        }
+                      : {
+                          background: 'rgba(255,255,255,0.06)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          color: '#d1d5db',
+                        }
+                  }
                 >
-                  <Link href={tier.ctaHref}>{tier.cta}</Link>
-                </Button>
+                  {tier.cta}
+                </Link>
               </div>
             </ScrollStaggerItem>
           ))}
