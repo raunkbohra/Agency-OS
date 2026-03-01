@@ -1031,3 +1031,95 @@ export async function updateAgencyPaymentMethod(
   );
   return result.rows[0];
 }
+
+// Contract interfaces and queries
+export interface Contract {
+  id: string;
+  agency_id: string;
+  client_id: string;
+  client_plan_id: string;
+  file_name: string;
+  file_url: string;
+  file_size?: number;
+  signed: boolean;
+  signed_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface ContractSignature {
+  id: string;
+  contract_id: string;
+  signer_name: string;
+  signed_date: Date;
+  ip_address?: string;
+  user_agent?: string;
+  created_at: Date;
+}
+
+export async function uploadContract(data: {
+  agencyId: string;
+  clientId: string;
+  clientPlanId: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize?: number;
+}): Promise<Contract> {
+  const result = await db.query(
+    `INSERT INTO contracts (agency_id, client_id, client_plan_id, file_name, file_url, file_size)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING *`,
+    [data.agencyId, data.clientId, data.clientPlanId, data.fileName, data.fileUrl, data.fileSize]
+  );
+  return result.rows[0];
+}
+
+export async function signContract(
+  id: string,
+  agencyId: string,
+  data: {
+    signerName: string;
+    ipAddress?: string;
+    userAgent?: string;
+  }
+): Promise<Contract> {
+  const signedDate = new Date();
+
+  // Create signature record
+  await db.query(
+    `INSERT INTO contract_signatures (contract_id, signer_name, signed_date, ip_address, user_agent)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [id, data.signerName, signedDate, data.ipAddress, data.userAgent]
+  );
+
+  // Update contract as signed
+  const result = await db.query(
+    `UPDATE contracts SET signed = true, signed_at = NOW() WHERE id = $1 AND agency_id = $2 RETURNING *`,
+    [id, agencyId]
+  );
+  return result.rows[0];
+}
+
+export async function getContractsByClient(clientId: string, agencyId: string): Promise<Contract[]> {
+  const result = await db.query(
+    `SELECT * FROM contracts WHERE client_id = $1 AND agency_id = $2 ORDER BY created_at DESC`,
+    [clientId, agencyId]
+  );
+  return result.rows;
+}
+
+export async function getContractById(id: string, agencyId: string): Promise<Contract | null> {
+  const result = await db.query(
+    `SELECT * FROM contracts WHERE id = $1 AND agency_id = $2`,
+    [id, agencyId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function getContractSignatures(contractId: string): Promise<ContractSignature[]> {
+  const result = await db.query(
+    `SELECT * FROM contract_signatures WHERE contract_id = $1 ORDER BY created_at DESC`,
+    [contractId]
+  );
+  return result.rows;
+}
