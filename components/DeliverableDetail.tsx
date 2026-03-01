@@ -139,7 +139,7 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
           {comments.map((comment) => (
             <div key={comment.id} className="border rounded p-4 bg-gray-50">
               <div className="flex justify-between mb-2">
-                <p className="font-semibold">{comment.user_id}</p>
+                <p className="font-semibold">{comment.user_name || 'Unknown User'}</p>
                 <span className="text-xs text-gray-600">
                   {new Date(comment.created_at).toLocaleDateString()}
                 </span>

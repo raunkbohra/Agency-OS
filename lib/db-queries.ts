@@ -751,6 +751,7 @@ export interface DeliverableComment {
   id: string;
   deliverable_id: string;
   user_id: string;
+  user_name?: string;
   comment: string;
   is_revision_request: boolean;
   created_at: Date;
@@ -860,7 +861,9 @@ export async function addDeliverableComment(data: {
 
 export async function getDeliverableComments(deliverableId: string): Promise<DeliverableComment[]> {
   const result = await db.query(
-    `SELECT * FROM deliverable_comments WHERE deliverable_id = $1 ORDER BY created_at DESC`,
+    `SELECT dc.*, u.name as user_name FROM deliverable_comments dc
+     LEFT JOIN users u ON dc.user_id = u.id
+     WHERE dc.deliverable_id = $1 ORDER BY dc.created_at DESC`,
     [deliverableId]
   );
   return result.rows;
