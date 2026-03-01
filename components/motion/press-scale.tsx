@@ -12,8 +12,9 @@ interface PressScaleProps {
 export function PressScale({ children, className, scale = 0.98 }: PressScaleProps) {
   return (
     <motion.div
+      whileHover={{ scale: 1.02 }}
       whileTap={{ scale }}
-      transition={{ duration: 0.1 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       className={className}
     >
       {children}

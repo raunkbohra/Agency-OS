@@ -10,9 +10,9 @@ export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
     <div className="flex items-start justify-between mb-8">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-text-primary">{title}</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-text-primary" style={{ textWrap: 'balance' }}>{title}</h1>
         {description && (
-          <p className="mt-1 text-sm text-text-secondary">{description}</p>
+          <p className="mt-1 text-sm text-text-tertiary">{description}</p>
         )}
       </div>
       {actions && <div className="flex items-center gap-3">{actions}</div>}

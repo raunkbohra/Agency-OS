@@ -15,6 +15,9 @@ import {
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { PageTransition } from '@/components/motion/page-transition';
+import { PageHeader } from '@/components/layout/page-header';
+import { ScrollReveal } from '@/components/motion/scroll-reveal';
 
 // Server action to mark invoice as paid
 async function markInvoiceAsPaid(invoiceId: string, agencyId: string) {
@@ -90,10 +93,10 @@ export default async function InvoiceDetailPage({
       error = 'Invoice not found';
       return (
         <div className="p-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded">
             {error}
           </div>
-          <Link href="/dashboard/invoices" className="mt-4 text-blue-600 hover:text-blue-700">
+          <Link href="/dashboard/invoices" className="mt-4 text-accent-blue hover:text-accent-blue/90">
             Back to Invoices
           </Link>
         </div>
@@ -117,7 +120,7 @@ export default async function InvoiceDetailPage({
   if (error && !invoice) {
     return (
       <div className="p-8">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded">
           {error}
         </div>
       </div>
@@ -127,7 +130,7 @@ export default async function InvoiceDetailPage({
   if (!invoice || !client || !agencyId) {
     return (
       <div className="p-8">
-        <p className="text-red-600">Failed to load invoice</p>
+        <p className="text-accent-red">Failed to load invoice</p>
       </div>
     );
   }
@@ -140,7 +143,7 @@ export default async function InvoiceDetailPage({
 
   // Fix Issue 2: Explicit null check for agencyId (already validated above, but explicitly use it)
   if (!agencyId) {
-    return <div className="p-8"><p className="text-red-600">Not authorized</p></div>;
+    return <div className="p-8"><p className="text-accent-red">Not authorized</p></div>;
   }
 
   const totalAmount = items.reduce((sum, item) => {
@@ -148,20 +151,16 @@ export default async function InvoiceDetailPage({
   }, 0);
 
   return (
-    <div>
+    <PageTransition>
       <div className="mb-8">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <Link href="/dashboard/invoices" className="text-blue-600 hover:text-blue-700 mb-4 inline-block">
-              ← Back to Invoices
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Invoice Details</h1>
-            <p className="text-gray-600 mt-1">Invoice for {client.name}</p>
-          </div>
-          <div className="flex gap-3">
+        <PageHeader
+          title="Invoice Details"
+          description={`Invoice for ${client.name}`}
+          actions={
+            <div className="flex gap-3">
             <a
               href={`/api/invoices/generate?invoiceId=${encodeURIComponent(invoice.id)}`}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-accent-blue text-white rounded-lg font-medium hover:bg-accent-blue/90 transition-colors"
             >
               Download PDF
             </a>
@@ -169,14 +168,14 @@ export default async function InvoiceDetailPage({
             {(invoice.status === 'draft' || invoice.status === 'sent') && (
               <Link
                 href={`/dashboard/invoices/${id}/pay?amount=${encodeURIComponent(validAmount)}`}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors inline-block"
+                className="px-4 py-2 bg-accent-green text-white rounded-lg font-medium hover:bg-accent-green/90 transition-colors inline-block"
               >
                 Pay Now
               </Link>
             )}
             {/* Payment pending shows verification message instead of buttons */}
             {invoice.status === 'payment_pending' && (
-              <div className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg font-medium">
+              <div className="px-4 py-2 bg-accent-amber/10 text-accent-amber rounded-lg font-medium">
                 Payment submitted for verification
               </div>
             )}
@@ -187,39 +186,43 @@ export default async function InvoiceDetailPage({
                 <input type="hidden" name="agencyId" value={agencyId} />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-accent-blue text-white rounded-lg font-medium hover:bg-accent-blue/90 transition-colors"
                 >
                   Mark as Paid
                 </button>
               </form>
             )}
           </div>
-        </div>
+          }
+        />
+        <Link href="/dashboard/invoices" className="text-accent-blue hover:text-accent-blue/90 text-sm font-medium">
+          ← Back to Invoices
+        </Link>
       </div>
 
       {/* Invoice Summary Cards */}
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="text-sm text-gray-600 mb-2">Invoice ID</p>
-          <p className="text-lg font-semibold text-gray-900">
+        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+          <p className="text-sm text-text-secondary mb-2">Invoice ID</p>
+          <p className="text-lg font-semibold text-text-primary">
             {invoice.id.substring(0, 12).toUpperCase()}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="text-sm text-gray-600 mb-2">Amount</p>
-          <p className="text-lg font-semibold text-gray-900">
+        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+          <p className="text-sm text-text-secondary mb-2">Amount</p>
+          <p className="text-lg font-semibold text-text-primary">
             ₹{(totalAmount || 0).toLocaleString(currencyLocale)}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="text-sm text-gray-600 mb-2">Status</p>
-          <p className="text-lg font-semibold text-gray-900 capitalize">
+        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+          <p className="text-sm text-text-secondary mb-2">Status</p>
+          <p className="text-lg font-semibold text-text-primary capitalize">
             {invoice.status}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="text-sm text-gray-600 mb-2">Due Date</p>
-          <p className="text-lg font-semibold text-gray-900">
+        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+          <p className="text-sm text-text-secondary mb-2">Due Date</p>
+          <p className="text-lg font-semibold text-text-primary">
             {invoice.due_date
               ? new Date(invoice.due_date).toLocaleDateString('en-IN')
               : 'Not set'}
@@ -228,39 +231,39 @@ export default async function InvoiceDetailPage({
       </div>
 
       {/* Invoice Details */}
-      <div className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
+      <ScrollReveal><div className="bg-bg-secondary border border-border-default rounded-lg p-8 mb-8">
         <div className="grid grid-cols-2 gap-12">
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-4">
               Bill To
             </h3>
-            <p className="font-semibold text-gray-900">{client.name}</p>
-            <p className="text-gray-600">{client.email}</p>
-            {client.phone && <p className="text-gray-600">{client.phone}</p>}
+            <p className="font-semibold text-text-primary">{client.name}</p>
+            <p className="text-text-secondary">{client.email}</p>
+            {client.phone && <p className="text-text-secondary">{client.phone}</p>}
             {client.company_name && (
-              <p className="text-gray-600 mt-2">{client.company_name}</p>
+              <p className="text-text-secondary mt-2">{client.company_name}</p>
             )}
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-4">
               Invoice Information
             </h3>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-600">Invoice ID:</span>
-                <span className="text-gray-900 font-medium">
+                <span className="text-text-secondary">Invoice ID:</span>
+                <span className="text-text-primary font-medium">
                   {invoice.id.substring(0, 8).toUpperCase()}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Date:</span>
-                <span className="text-gray-900 font-medium">
+                <span className="text-text-secondary">Date:</span>
+                <span className="text-text-primary font-medium">
                   {new Date(invoice.created_at).toLocaleDateString('en-IN')}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Due Date:</span>
-                <span className="text-gray-900 font-medium">
+                <span className="text-text-secondary">Due Date:</span>
+                <span className="text-text-primary font-medium">
                   {invoice.due_date
                     ? new Date(invoice.due_date).toLocaleDateString('en-IN')
                     : 'Not set'}
@@ -269,38 +272,38 @@ export default async function InvoiceDetailPage({
             </div>
           </div>
         </div>
-      </div>
+      </div></ScrollReveal>
 
       {/* Line Items Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <ScrollReveal delay={0.1}><div className="bg-bg-secondary border border-border-default rounded-lg overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-bg-tertiary border-b border-border-default">
             <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+              <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
                 Description
               </th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">
+              <th className="px-6 py-3 text-right text-sm font-semibold text-text-primary">
                 Qty
               </th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">
+              <th className="px-6 py-3 text-right text-sm font-semibold text-text-primary">
                 Rate
               </th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">
+              <th className="px-6 py-3 text-right text-sm font-semibold text-text-primary">
                 Amount
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-border-default">
             {items.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-900">{item.description}</td>
-                <td className="px-6 py-4 text-sm text-right text-gray-900">
+              <tr key={item.id} className="hover:bg-bg-hover">
+                <td className="px-6 py-4 text-sm text-text-primary">{item.description}</td>
+                <td className="px-6 py-4 text-sm text-right text-text-primary">
                   {item.quantity}
                 </td>
-                <td className="px-6 py-4 text-sm text-right text-gray-900">
+                <td className="px-6 py-4 text-sm text-right text-text-primary">
                   ₹{(item.rate ? Number(item.rate) : 0).toLocaleString(currencyLocale)}
                 </td>
-                <td className="px-6 py-4 text-sm text-right font-semibold text-gray-900">
+                <td className="px-6 py-4 text-sm text-right font-semibold text-text-primary">
                   ₹
                   {((item.rate ? Number(item.rate) : 0) * item.quantity).toLocaleString(currencyLocale)}
                 </td>
@@ -310,37 +313,37 @@ export default async function InvoiceDetailPage({
         </table>
 
         {/* Summary Section */}
-        <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
+        <div className="border-t border-border-default bg-bg-tertiary px-6 py-4">
           <div className="flex justify-end">
             <div className="w-64">
               <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="text-gray-900">
+                <span className="text-text-secondary">Subtotal:</span>
+                <span className="text-text-primary">
                   ₹{(totalAmount || 0).toLocaleString(currencyLocale)}
                 </span>
               </div>
-              <div className="flex justify-between text-lg font-semibold border-t border-gray-200 pt-4">
-                <span className="text-gray-900">Total:</span>
-                <span className="text-gray-900">
+              <div className="flex justify-between text-lg font-semibold border-t border-border-default pt-4">
+                <span className="text-text-primary">Total:</span>
+                <span className="text-text-primary">
                   ₹{(totalAmount || 0).toLocaleString(currencyLocale)}
                 </span>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </div></ScrollReveal>
 
       {/* Payment Status */}
-      <div className="mt-8 bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Status</h3>
+      <ScrollReveal delay={0.15}><div className="mt-8 bg-bg-secondary border border-border-default rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Payment Status</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Status:</span>
+            <span className="text-text-secondary">Status:</span>
             <span
               className={`px-3 py-1 rounded-full text-sm font-semibold ${
                 invoice.status === 'paid'
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-blue-100 text-blue-800'
+                  ? 'bg-accent-green/10 text-accent-green'
+                  : 'bg-accent-blue/10 text-accent-blue'
               }`}
             >
               {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
@@ -348,29 +351,29 @@ export default async function InvoiceDetailPage({
           </div>
           {invoice.paid_date && (
             <div className="flex items-center justify-between">
-              <span className="text-gray-600">Paid Date:</span>
-              <span className="text-gray-900">
+              <span className="text-text-secondary">Paid Date:</span>
+              <span className="text-text-primary">
                 {new Date(invoice.paid_date).toLocaleDateString('en-IN')}
               </span>
             </div>
           )}
         </div>
-      </div>
+      </div></ScrollReveal>
 
       {/* Payment Methods Section */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h2 className="text-lg font-bold text-blue-900 mb-4">Available Payment Methods</h2>
+      <ScrollReveal delay={0.2}><div className="mt-8 bg-accent-blue/10 border border-accent-blue/20 rounded-lg p-6">
+        <h2 className="text-lg font-bold text-accent-blue mb-4">Available Payment Methods</h2>
 
         {paymentMethods && paymentMethods.length > 0 ? (
           <div className="space-y-2">
             {paymentMethods.map(method => (
               <div key={method.id} className="flex items-center justify-between pb-3 border-b last:border-b-0">
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-text-secondary">
                   {method.provider_id.charAt(0).toUpperCase() + method.provider_id.slice(1).replace('_', ' ')}
                 </span>
                 <Link
                   href={`/dashboard/invoices/${id}/pay?method=${method.provider_id}`}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                  className="px-4 py-2 bg-accent-blue text-white rounded hover:bg-accent-blue/90 text-sm"
                 >
                   Pay Now
                 </Link>
@@ -378,14 +381,14 @@ export default async function InvoiceDetailPage({
             ))}
           </div>
         ) : (
-          <p className="text-gray-700">
+          <p className="text-text-secondary">
             No payment methods configured.
-            <Link href="/dashboard/settings/payments" className="text-blue-600 hover:underline ml-2">
+            <Link href="/dashboard/settings/payments" className="text-accent-blue hover:underline ml-2">
               Configure payment methods
             </Link>
           </p>
         )}
-      </div>
-    </div>
+      </div></ScrollReveal>
+    </PageTransition>
   );
 }

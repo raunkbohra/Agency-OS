@@ -87,14 +87,14 @@ export default function PaymentMethodsManager({
         const existing = methods.find(m => m.provider_id === provider.id);
 
         return (
-          <div key={provider.id} className="bg-white rounded-lg p-6 border">
+          <div key={provider.id} className="bg-bg-secondary rounded-lg p-6 border border-border-default">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">{provider.name}</h3>
+              <h3 className="text-lg font-bold text-text-primary">{provider.name}</h3>
               {existing && (
                 <button
                   onClick={() => handleToggle(existing.id, existing.enabled)}
                   className={`px-4 py-2 rounded text-white ${
-                    existing.enabled ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 hover:bg-gray-500'
+                    existing.enabled ? 'bg-accent-green hover:bg-accent-green/90' : 'bg-text-tertiary hover:bg-text-secondary'
                   }`}
                 >
                   {existing.enabled ? 'Enabled' : 'Disabled'}
@@ -108,7 +108,7 @@ export default function PaymentMethodsManager({
                   <div className="space-y-4">
                     {CREDENTIAL_FIELDS[provider.id]?.map(field => (
                       <div key={field.key}>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium text-text-secondary mb-1">
                           {field.label}
                         </label>
                         <input
@@ -120,7 +120,7 @@ export default function PaymentMethodsManager({
                               [field.key]: e.target.value,
                             })
                           }
-                          className="w-full border rounded p-2"
+                          className="w-full border border-border-default rounded p-2 bg-bg-tertiary text-text-primary"
                         />
                       </div>
                     ))}
@@ -128,13 +128,13 @@ export default function PaymentMethodsManager({
                       <button
                         onClick={() => handleAddProvider(provider.id)}
                         disabled={loading}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                        className="px-4 py-2 bg-accent-blue text-white rounded hover:bg-accent-blue/90 disabled:opacity-50"
                       >
                         {loading ? 'Saving...' : 'Save'}
                       </button>
                       <button
                         onClick={() => setShowForm(null)}
-                        className="px-4 py-2 border rounded hover:bg-gray-50"
+                        className="px-4 py-2 border border-border-default rounded hover:bg-bg-hover text-text-primary"
                       >
                         Cancel
                       </button>
@@ -143,7 +143,7 @@ export default function PaymentMethodsManager({
                 ) : (
                   <button
                     onClick={() => setShowForm(provider.id)}
-                    className="text-blue-600 hover:underline"
+                    className="text-accent-blue hover:underline"
                   >
                     Configure →
                   </button>
@@ -152,7 +152,7 @@ export default function PaymentMethodsManager({
             )}
 
             {existing && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 Configured on {
                   existing.created_at instanceof Date
                     ? existing.created_at.toLocaleDateString()

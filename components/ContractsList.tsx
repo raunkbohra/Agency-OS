@@ -29,34 +29,34 @@ export default function ContractsList({ agencyId }: { agencyId: string }) {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden">
+    <div className="bg-bg-secondary rounded-lg overflow-hidden border border-border-default">
       <table className="w-full">
-        <thead className="bg-gray-50">
+        <thead className="bg-bg-tertiary">
           <tr>
-            <th className="px-6 py-3 text-left font-semibold">File</th>
-            <th className="px-6 py-3 text-left font-semibold">Client</th>
-            <th className="px-6 py-3 text-left font-semibold">Status</th>
-            <th className="px-6 py-3 text-left font-semibold">Signed Date</th>
-            <th className="px-6 py-3 text-left font-semibold">Actions</th>
+            <th className="px-6 py-3 text-left font-semibold text-text-secondary">File</th>
+            <th className="px-6 py-3 text-left font-semibold text-text-secondary">Client</th>
+            <th className="px-6 py-3 text-left font-semibold text-text-secondary">Status</th>
+            <th className="px-6 py-3 text-left font-semibold text-text-secondary">Signed Date</th>
+            <th className="px-6 py-3 text-left font-semibold text-text-secondary">Actions</th>
           </tr>
         </thead>
         <tbody>
           {contracts.map(contract => (
-            <tr key={contract.id} className="border-t">
-              <td className="px-6 py-3">{contract.file_name}</td>
-              <td className="px-6 py-3">{contract.client_id}</td>
+            <tr key={contract.id} className="border-t border-border-default">
+              <td className="px-6 py-3 text-text-primary">{contract.file_name}</td>
+              <td className="px-6 py-3 text-text-secondary">{contract.client_id}</td>
               <td className="px-6 py-3">
                 <span className={`px-3 py-1 rounded text-sm font-medium ${
-                  contract.signed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  contract.signed ? 'bg-accent-green/10 text-accent-green' : 'bg-accent-amber/10 text-accent-amber'
                 }`}>
                   {contract.signed ? 'Signed' : 'Pending'}
                 </span>
               </td>
-              <td className="px-6 py-3">
+              <td className="px-6 py-3 text-text-secondary">
                 {contract.signed_at ? new Date(contract.signed_at).toLocaleDateString() : 'N/A'}
               </td>
               <td className="px-6 py-3">
-                <Link href={`/contracts/${contract.id}`} className="text-blue-600 hover:underline">
+                <Link href={`/contracts/${contract.id}`} className="text-accent-blue hover:underline">
                   View
                 </Link>
               </td>

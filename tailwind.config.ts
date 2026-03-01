@@ -28,6 +28,7 @@ const config: Config = {
           secondary: 'var(--bg-secondary)',
           tertiary: 'var(--bg-tertiary)',
           hover: 'var(--bg-hover)',
+          elevated: 'var(--bg-elevated)',
         },
         border: {
           default: 'var(--border-default)',
@@ -38,6 +39,7 @@ const config: Config = {
           primary: 'var(--text-primary)',
           secondary: 'var(--text-secondary)',
           tertiary: 'var(--text-tertiary)',
+          quaternary: 'var(--text-quaternary)',
         },
         accent: {
           blue: 'var(--accent-blue)',

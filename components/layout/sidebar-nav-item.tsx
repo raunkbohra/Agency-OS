@@ -29,7 +29,7 @@ export function SidebarNavItem({ href, icon: Icon, label }: SidebarNavItemProps)
       {isActive && (
         <motion.div
           layoutId="sidebar-active"
-          className="absolute inset-0 rounded-md bg-bg-tertiary"
+          className="absolute inset-0 rounded-md bg-bg-tertiary border border-border-default shadow-[0_0_12px_rgba(0,112,243,0.08)]"
           transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
         />
       )}

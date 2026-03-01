@@ -13,6 +13,9 @@ import {
 } from '@/lib/db-queries';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { PageTransition } from '@/components/motion/page-transition';
+import { PageHeader } from '@/components/layout/page-header';
+import { ScrollReveal } from '@/components/motion/scroll-reveal';
 
 interface ClientDetailPageProps {
   params: Promise<{
@@ -70,7 +73,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded">
         {error}
       </div>
     );
@@ -78,45 +81,45 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
 
   if (!client) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-        <p className="text-gray-600">Client not found</p>
+      <div className="bg-bg-tertiary border border-border-default rounded-lg p-6 text-center">
+        <p className="text-text-secondary">Client not found</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <PageTransition className="space-y-8">
       {/* Client Details */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{client.name}</h1>
-            <p className="text-gray-600 mt-1">Client Details</p>
-          </div>
-          <Link
-            href="/dashboard/clients"
-            className="text-blue-600 hover:text-blue-700 font-medium"
-          >
-            Back to Clients
-          </Link>
-        </div>
+        <PageHeader
+          title={client.name}
+          description="Client Details"
+          actions={
+            <Link
+              href="/dashboard/clients"
+              className="text-accent-blue hover:text-accent-blue/90 font-medium"
+            >
+              Back to Clients
+            </Link>
+          }
+        />
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Email</h3>
-              <p className="text-gray-900">{client.email}</p>
+              <h3 className="text-sm font-medium text-text-tertiary mb-2">Email</h3>
+              <p className="text-text-primary">{client.email}</p>
             </div>
             {client.company_name && (
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Company</h3>
-                <p className="text-gray-900">{client.company_name}</p>
+                <h3 className="text-sm font-medium text-text-tertiary mb-2">Company</h3>
+                <p className="text-text-primary">{client.company_name}</p>
               </div>
             )}
             {client.phone && (
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Phone</h3>
-                <p className="text-gray-900">{client.phone}</p>
+                <h3 className="text-sm font-medium text-text-tertiary mb-2">Phone</h3>
+                <p className="text-text-primary">{client.phone}</p>
               </div>
             )}
           </div>
@@ -125,18 +128,18 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
 
       {/* Plan Details */}
       {plan && clientPlan && (
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Current Plan</h2>
+        <ScrollReveal><div>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">Current Plan</h2>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <div className="bg-bg-secondary border border-border-default rounded-lg p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Plan Name</h3>
-                <p className="text-lg font-semibold text-gray-900">{plan.name}</p>
+                <h3 className="text-sm font-medium text-text-tertiary mb-2">Plan Name</h3>
+                <p className="text-lg font-semibold text-text-primary">{plan.name}</p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Monthly Price</h3>
-                <p className="text-lg font-semibold text-gray-900">
+                <h3 className="text-sm font-medium text-text-tertiary mb-2">Monthly Price</h3>
+                <p className="text-lg font-semibold text-text-primary">
                   NPR {Number(plan.price).toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -144,8 +147,8 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Status</h3>
-                <p className="text-lg font-semibold text-green-600 capitalize">
+                <h3 className="text-sm font-medium text-text-tertiary mb-2">Status</h3>
+                <p className="text-lg font-semibold text-accent-green capitalize">
                   {clientPlan.status}
                 </p>
               </div>
@@ -153,27 +156,27 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
 
             {plan.description && (
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Description</h3>
-                <p className="text-gray-700">{plan.description}</p>
+                <h3 className="text-sm font-medium text-text-tertiary mb-2">Description</h3>
+                <p className="text-text-secondary">{plan.description}</p>
               </div>
             )}
           </div>
 
           {/* Plan Deliverables */}
           {planItems.length > 0 && (
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Deliverables</h3>
+            <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Deliverables</h3>
               <ul className="space-y-3">
                 {planItems.map((item) => (
                   <li
                     key={item.id}
-                    className="flex items-start border-l-2 border-blue-500 pl-4 py-2"
+                    className="flex items-start border-l-2 border-accent-blue pl-4 py-2"
                   >
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-text-primary">
                         {item.deliverable_type}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-text-secondary">
                         {item.qty} per {item.recurrence}
                       </p>
                     </div>
@@ -183,42 +186,42 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
             </div>
           )}
         </div>
-      )}
+      </ScrollReveal>)}
 
       {/* Invoices */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Invoices</h2>
+      <ScrollReveal delay={0.1}><div>
+        <h2 className="text-2xl font-bold text-text-primary mb-6">Invoices</h2>
 
         {invoices.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-            <p className="text-gray-500">No invoices yet</p>
+          <div className="bg-bg-secondary border border-border-default rounded-lg p-6 text-center">
+            <p className="text-text-tertiary">No invoices yet</p>
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="bg-bg-secondary border border-border-default rounded-lg overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-bg-tertiary border-b border-border-default">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
                     Invoice ID
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
                     Due Date
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border-default">
                 {invoices.map((invoice) => (
-                  <tr key={invoice.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <tr key={invoice.id} className="hover:bg-bg-hover">
+                    <td className="px-6 py-4 text-sm font-medium text-text-primary">
                       {invoice.id.slice(0, 8)}...
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-text-secondary">
                       NPR {Number(invoice.amount).toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
@@ -227,15 +230,15 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
                         invoice.status === 'paid'
-                          ? 'bg-green-100 text-green-800'
+                          ? 'bg-accent-green/10 text-accent-green'
                           : invoice.status === 'sent'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-accent-blue/10 text-accent-blue'
+                          : 'bg-bg-hover text-text-primary'
                       }`}>
                         {invoice.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-text-secondary">
                       {invoice.due_date
                         ? new Date(invoice.due_date).toLocaleDateString('en-US', {
                             year: 'numeric',
@@ -250,7 +253,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
             </table>
           </div>
         )}
-      </div>
-    </div>
+      </div></ScrollReveal>
+    </PageTransition>
   );
 }

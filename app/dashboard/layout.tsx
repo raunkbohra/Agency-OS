@@ -24,7 +24,7 @@ export default async function DashboardLayout({
       <MobileNav />
 
       {/* Main content */}
-      <main className="lg:pl-sidebar">
+      <main className="lg:pl-sidebar bg-dot-grid min-h-screen">
         <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
           {children}
         </div>

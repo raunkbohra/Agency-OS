@@ -35,23 +35,23 @@ export default function MetricsDashboard({ agencyId }: { agencyId: string }) {
       <div>
         <h2 className="text-xl font-bold mb-4">Financial Metrics</h2>
         <div className="grid grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-lg border">
-            <p className="text-sm text-gray-600">Monthly Recurring Revenue</p>
+          <div className="bg-bg-secondary p-6 rounded-lg border border-border-default">
+            <p className="text-sm text-text-secondary">Monthly Recurring Revenue</p>
             <p className="text-3xl font-bold mt-2">₹{Math.round(metrics.mrr).toLocaleString()}</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border">
-            <p className="text-sm text-gray-600">Annual Recurring Revenue</p>
+          <div className="bg-bg-secondary p-6 rounded-lg border border-border-default">
+            <p className="text-sm text-text-secondary">Annual Recurring Revenue</p>
             <p className="text-3xl font-bold mt-2">₹{Math.round(metrics.arr).toLocaleString()}</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border">
-            <p className="text-sm text-gray-600">Collection Rate</p>
+          <div className="bg-bg-secondary p-6 rounded-lg border border-border-default">
+            <p className="text-sm text-text-secondary">Collection Rate</p>
             <p className="text-3xl font-bold mt-2">{metrics.collectionRate}%</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border">
-            <p className="text-sm text-gray-600">Outstanding Invoices</p>
+          <div className="bg-bg-secondary p-6 rounded-lg border border-border-default">
+            <p className="text-sm text-text-secondary">Outstanding Invoices</p>
             <p className="text-3xl font-bold mt-2">₹{Math.round(metrics.outstandingValue).toLocaleString()}</p>
           </div>
         </div>
@@ -61,18 +61,18 @@ export default function MetricsDashboard({ agencyId }: { agencyId: string }) {
       <div>
         <h2 className="text-xl font-bold mb-4">Operational Metrics</h2>
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white p-6 rounded-lg border">
-            <p className="text-sm text-gray-600">Deliverable Completion</p>
+          <div className="bg-bg-secondary p-6 rounded-lg border border-border-default">
+            <p className="text-sm text-text-secondary">Deliverable Completion</p>
             <p className="text-3xl font-bold mt-2">{metrics.completionPercentage}%</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border">
-            <p className="text-sm text-gray-600">On-Time Delivery Rate</p>
+          <div className="bg-bg-secondary p-6 rounded-lg border border-border-default">
+            <p className="text-sm text-text-secondary">On-Time Delivery Rate</p>
             <p className="text-3xl font-bold mt-2">{metrics.onTimePercentage}%</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border">
-            <p className="text-sm text-gray-600">Avg Days to Complete</p>
+          <div className="bg-bg-secondary p-6 rounded-lg border border-border-default">
+            <p className="text-sm text-text-secondary">Avg Days to Complete</p>
             <p className="text-3xl font-bold mt-2">{metrics.avgDaysToComplete} days</p>
           </div>
         </div>

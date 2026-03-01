@@ -10,33 +10,33 @@ export default async function Navigation({ session }: { session: Session | null 
   }
 
   return (
-    <nav className="bg-white border-b border-gray-200">
+    <nav className="bg-bg-secondary border-b border-border-default">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-8">
-            <h1 className="text-xl font-semibold text-gray-900">Agency OS</h1>
+            <h1 className="text-xl font-semibold text-text-primary">Agency OS</h1>
             <div className="flex gap-6">
               <Link
                 href="/dashboard"
-                className="text-sm text-gray-700 hover:text-gray-900 font-medium"
+                className="text-sm text-text-secondary hover:text-text-primary font-medium"
               >
                 Dashboard
               </Link>
               <Link
                 href="/dashboard/plans"
-                className="text-sm text-gray-700 hover:text-gray-900 font-medium"
+                className="text-sm text-text-secondary hover:text-text-primary font-medium"
               >
                 Plans
               </Link>
               <Link
                 href="/dashboard/clients"
-                className="text-sm text-gray-700 hover:text-gray-900 font-medium"
+                className="text-sm text-text-secondary hover:text-text-primary font-medium"
               >
                 Clients
               </Link>
               <Link
                 href="/dashboard/invoices"
-                className="text-sm text-gray-700 hover:text-gray-900 font-medium"
+                className="text-sm text-text-secondary hover:text-text-primary font-medium"
               >
                 Invoices
               </Link>
@@ -44,11 +44,11 @@ export default async function Navigation({ session }: { session: Session | null 
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{session?.user?.email}</span>
+            <span className="text-sm text-text-secondary">{session?.user?.email}</span>
             <form action={handleSignOut}>
               <button
                 type="submit"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-sm text-accent-blue hover:text-accent-blue/80 font-medium"
               >
                 Sign Out
               </button>

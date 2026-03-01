@@ -14,6 +14,8 @@ import {
 } from '@/lib/db-queries';
 import { SimpleClientForm } from '@/components/SimpleClientForm';
 import { redirect } from 'next/navigation';
+import { PageTransition } from '@/components/motion/page-transition';
+import { PageHeader } from '@/components/layout/page-header';
 
 async function handleCreateClient(formData: FormData) {
   'use server';
@@ -116,33 +118,30 @@ export default async function NewClientPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Add New Client</h1>
-        <p className="text-gray-600 mt-1">Create a new client and assign a plan</p>
-      </div>
+    <PageTransition className="max-w-2xl">
+      <PageHeader title="Add New Client" description="Create a new client and assign a plan" />
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+        <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded mb-6">
           {error}
         </div>
       )}
 
       {plans.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="text-gray-600 mb-4">You need to create at least one plan before adding a client.</p>
+        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+          <p className="text-text-secondary mb-4">You need to create at least one plan before adding a client.</p>
           <a
             href="/dashboard/plans/new"
-            className="inline-block bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 transition-colors"
+            className="inline-block bg-accent-blue text-white py-2 px-4 rounded-md font-medium hover:bg-accent-blue/90 transition-colors"
           >
             Create a Plan
           </a>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
           <SimpleClientForm action={handleCreateClient} plans={plans} />
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

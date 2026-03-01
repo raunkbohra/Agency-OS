@@ -2,6 +2,8 @@ import { auth } from '@/lib/auth';
 import { createPlan, getAgenciesByOwnerId, createAgency } from '@/lib/db-queries';
 import { PlanForm } from '@/components/PlanForm';
 import { redirect } from 'next/navigation';
+import { PageTransition } from '@/components/motion/page-transition';
+import { PageHeader } from '@/components/layout/page-header';
 
 async function handleCreatePlan(formData: {
   name: string;
@@ -46,15 +48,12 @@ export default async function NewPlanPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create New Plan</h1>
-        <p className="text-gray-600 mt-1">Add a new service plan to your offerings</p>
-      </div>
+    <PageTransition className="max-w-2xl">
+      <PageHeader title="Create New Plan" description="Add a new service plan to your offerings" />
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
         <PlanForm onSubmit={handleCreatePlan} />
       </div>
-    </div>
+    </PageTransition>
   );
 }

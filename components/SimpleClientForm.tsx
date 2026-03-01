@@ -29,13 +29,13 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="name" className="block text-sm font-medium text-text-secondary mb-1">
           Client Name
         </label>
         <input
@@ -43,14 +43,14 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
           id="name"
           name="name"
           placeholder="e.g., John's Company"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default rounded-md bg-bg-tertiary text-text-primary placeholder-text-tertiary focus:border-border-active focus:ring-1 focus:ring-accent-blue/30"
           disabled={isSubmitting}
           required
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-1">
           Email
         </label>
         <input
@@ -58,14 +58,14 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
           id="email"
           name="email"
           placeholder="e.g., john@example.com"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default rounded-md bg-bg-tertiary text-text-primary placeholder-text-tertiary focus:border-border-active focus:ring-1 focus:ring-accent-blue/30"
           disabled={isSubmitting}
           required
         />
       </div>
 
       <div>
-        <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="companyName" className="block text-sm font-medium text-text-secondary mb-1">
           Company Name (Optional)
         </label>
         <input
@@ -73,19 +73,19 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
           id="companyName"
           name="companyName"
           placeholder="e.g., Example Corp"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default rounded-md bg-bg-tertiary text-text-primary placeholder-text-tertiary focus:border-border-active focus:ring-1 focus:ring-accent-blue/30"
           disabled={isSubmitting}
         />
       </div>
 
       <div>
-        <label htmlFor="planId" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="planId" className="block text-sm font-medium text-text-secondary mb-1">
           Plan
         </label>
         <select
           id="planId"
           name="planId"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default rounded-md bg-bg-tertiary text-text-primary focus:border-border-active focus:ring-1 focus:ring-accent-blue/30"
           disabled={isSubmitting}
           required
         >
@@ -104,7 +104,7 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
       <button
         type="submit"
         disabled={isSubmitting || plans.length === 0}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-accent-blue text-white py-2 px-4 rounded-md font-medium hover:bg-accent-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isSubmitting ? 'Creating Client...' : 'Create Client'}
       </button>

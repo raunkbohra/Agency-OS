@@ -55,13 +55,13 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="name" className="block text-sm font-medium text-text-secondary mb-1">
           Plan Name
         </label>
         <input
@@ -70,13 +70,13 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Basic Plan"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default bg-bg-tertiary text-text-primary rounded-md focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 placeholder-text-tertiary"
           disabled={isSubmitting || isLoading}
         />
       </div>
 
       <div>
-        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="price" className="block text-sm font-medium text-text-secondary mb-1">
           Price (NPR)
         </label>
         <input
@@ -87,20 +87,20 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
           placeholder="0"
           step="0.01"
           min="0"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default bg-bg-tertiary text-text-primary rounded-md focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 placeholder-text-tertiary"
           disabled={isSubmitting || isLoading}
         />
       </div>
 
       <div>
-        <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="billingCycle" className="block text-sm font-medium text-text-secondary mb-1">
           Billing Cycle
         </label>
         <select
           id="billingCycle"
           value={billingCycle}
           onChange={(e) => setBillingCycle(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default bg-bg-tertiary text-text-primary rounded-md focus:border-border-active focus:ring-1 focus:ring-accent-blue/30"
           disabled={isSubmitting || isLoading}
         >
           <option value="monthly">Monthly</option>
@@ -110,7 +110,7 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="description" className="block text-sm font-medium text-text-secondary mb-1">
           Description (Optional)
         </label>
         <textarea
@@ -119,7 +119,7 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter plan description"
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-border-default bg-bg-tertiary text-text-primary rounded-md focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 placeholder-text-tertiary"
           disabled={isSubmitting || isLoading}
         />
       </div>
@@ -127,7 +127,7 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
       <button
         type="submit"
         disabled={isSubmitting || isLoading}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-accent-blue text-white py-2 px-4 rounded-md font-medium hover:bg-accent-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isSubmitting || isLoading ? 'Saving...' : 'Save Plan'}
       </button>
