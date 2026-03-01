@@ -1,5 +1,7 @@
 import { auth } from '@/lib/auth';
+import { db } from '@/lib/db';
 import { getDeliverableById, getDeliverableFiles, getDeliverableComments, updateDeliverableStatus } from '@/lib/db-queries';
+import { checkForScopeCreep } from '@/lib/scope-checker';
 
 export async function GET(
   request: Request,
@@ -44,6 +46,22 @@ export async function PATCH(
     const { id } = await params;
 
     const updated = await updateDeliverableStatus(id, session.user.agencyId, status);
+
+    // Trigger scope check
+    if (updated.client_id && updated.status === 'in_review') {
+      const clientPlanResult = await db.query(
+        `SELECT id FROM client_plans WHERE client_id = $1 LIMIT 1`,
+        [updated.client_id]
+      );
+
+      if (clientPlanResult.rows.length > 0) {
+        await checkForScopeCreep(
+          updated.client_id,
+          session.user.agencyId,
+          clientPlanResult.rows[0].id
+        );
+      }
+    }
 
     return Response.json(updated);
   } catch (error) {
