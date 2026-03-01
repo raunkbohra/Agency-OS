@@ -1123,3 +1123,71 @@ export async function getContractSignatures(contractId: string): Promise<Contrac
   );
   return result.rows;
 }
+
+// Scope alert interfaces and queries
+export interface ScopeAlert {
+  id: string;
+  agency_id: string;
+  client_id: string;
+  deliverable_id?: string;
+  alert_type: string;
+  threshold_exceeded: number;
+  status: 'active' | 'acknowledged' | 'resolved';
+  dismissed_at?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export async function createScopeAlert(data: {
+  agencyId: string;
+  clientId: string;
+  deliverableId?: string;
+  alertType: string;
+  thresholdExceeded: number;
+}): Promise<ScopeAlert> {
+  const result = await db.query(
+    `INSERT INTO scope_alerts (agency_id, client_id, deliverable_id, alert_type, threshold_exceeded)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING *`,
+    [data.agencyId, data.clientId, data.deliverableId, data.alertType, data.thresholdExceeded]
+  );
+  return result.rows[0];
+}
+
+export async function getScopeAlertsByClient(
+  clientId: string,
+  agencyId: string,
+  onlyActive = true
+): Promise<ScopeAlert[]> {
+  const query = onlyActive
+    ? `SELECT * FROM scope_alerts WHERE client_id = $1 AND agency_id = $2 AND status = 'active' ORDER BY created_at DESC`
+    : `SELECT * FROM scope_alerts WHERE client_id = $1 AND agency_id = $2 ORDER BY created_at DESC`;
+
+  const result = await db.query(query, [clientId, agencyId]);
+  return result.rows;
+}
+
+export async function acknowledgeScopeAlert(id: string, agencyId: string): Promise<ScopeAlert> {
+  const result = await db.query(
+    `UPDATE scope_alerts SET status = 'acknowledged', dismissed_at = NOW() WHERE id = $1 AND agency_id = $2 RETURNING *`,
+    [id, agencyId]
+  );
+  return result.rows[0];
+}
+
+export async function calculateClientRiskScore(clientId: string, agencyId: string): Promise<number> {
+  const result = await db.query(
+    `SELECT COUNT(*) as alert_count, AVG(threshold_exceeded) as avg_overage
+     FROM scope_alerts
+     WHERE client_id = $1 AND agency_id = $2 AND status = 'active'`,
+    [clientId, agencyId]
+  );
+
+  const row = result.rows[0];
+  const alertCount = parseInt(row.alert_count) || 0;
+  const avgOverage = parseFloat(row.avg_overage) || 0;
+
+  // Risk score: (alert count * 10) + (avg overage * 100)
+  const risk = Math.min((alertCount * 10) + (avgOverage * 100), 100);
+  return Math.round(risk);
+}
