@@ -7,6 +7,7 @@ import {
   getAgenciesByOwnerId,
   createAgency,
   getAgencyById,
+  getAgencyPaymentMethods,
   Invoice,
   InvoiceItem,
   Client,
@@ -52,6 +53,7 @@ export default async function InvoiceDetailPage({
   let agencyId: string | null = null;
   let error: string | null = null;
   let currencyLocale = 'en-IN'; // default to INR
+  let paymentMethods: any[] = [];
 
   try {
     // Get user's agencies
@@ -77,6 +79,9 @@ export default async function InvoiceDetailPage({
     if (agency?.currency === 'NPR') {
       currencyLocale = 'ne-NP';
     }
+
+    // Get payment methods
+    paymentMethods = await getAgencyPaymentMethods(agencyId);
 
     // Get invoice with multi-tenant isolation
     invoice = await getInvoiceById(id, agencyId);
@@ -350,6 +355,36 @@ export default async function InvoiceDetailPage({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Payment Methods Section */}
+      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h2 className="text-lg font-bold text-blue-900 mb-4">Available Payment Methods</h2>
+
+        {paymentMethods && paymentMethods.length > 0 ? (
+          <div className="space-y-2">
+            {paymentMethods.map(method => (
+              <div key={method.id} className="flex items-center justify-between pb-3 border-b last:border-b-0">
+                <span className="font-medium text-gray-700">
+                  {method.provider_id.charAt(0).toUpperCase() + method.provider_id.slice(1).replace('_', ' ')}
+                </span>
+                <Link
+                  href={`/dashboard/invoices/${id}/pay?method=${method.provider_id}`}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                >
+                  Pay Now
+                </Link>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-700">
+            No payment methods configured.
+            <Link href="/dashboard/settings/payments" className="text-blue-600 hover:underline ml-2">
+              Configure payment methods
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );
