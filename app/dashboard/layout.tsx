@@ -1,6 +1,7 @@
-import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import Navigation from '@/components/Navigation';
+import { auth } from '@/lib/auth';
+import { Sidebar } from '@/components/layout/sidebar';
+import { MobileNav } from '@/components/layout/mobile-nav';
 
 export default async function DashboardLayout({
   children,
@@ -8,18 +9,26 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-
   if (!session || !session.user || !session.user.agencyId) {
     redirect('/auth/signin');
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation session={session} />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
+    <div className="min-h-screen bg-bg-primary">
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
+        <Sidebar />
       </div>
+
+      {/* Mobile nav */}
+      <MobileNav />
+
+      {/* Main content */}
+      <main className="lg:pl-sidebar">
+        <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
