@@ -1,6 +1,14 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { getPool } from './db';
+import { createHash } from 'crypto';
+
+// Generate a deterministic UUID-like string from email
+function generateIdFromEmail(email: string): string {
+  const hash = createHash('sha256').update(email).digest('hex');
+  // Format as UUID v5-like string
+  return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(12, 16)}-${hash.slice(16, 20)}-${hash.slice(20, 32)}`;
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -16,7 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (credentials?.email && credentials?.password) {
           const email = credentials.email as string;
           return {
-            id: '1',
+            id: generateIdFromEmail(email),
             email: email,
             name: email.split('@')[0],
           };
