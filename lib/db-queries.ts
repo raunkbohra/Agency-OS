@@ -301,8 +301,12 @@ export async function createClient(
   }
 }
 
-export async function getClientById(id: string): Promise<Client | null> {
+export async function getClientById(id: string, agencyId?: string): Promise<Client | null> {
   try {
+    if (agencyId) {
+      const result = await db.query('SELECT * FROM clients WHERE id = $1 AND agency_id = $2', [id, agencyId]);
+      return result.rows[0] || null;
+    }
     const result = await db.query('SELECT * FROM clients WHERE id = $1', [id]);
     return result.rows[0] || null;
   } catch (err) {
@@ -566,5 +570,25 @@ export async function getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]>
   } catch (err) {
     console.error('Failed to get invoice items:', err);
     throw new Error(`Failed to fetch invoice items: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function updateInvoiceStatus(
+  invoiceId: string,
+  agencyId: string,
+  status: string,
+  pdfUrl?: string
+): Promise<Invoice | null> {
+  try {
+    const result = await db.query(
+      pdfUrl
+        ? 'UPDATE invoices SET status = $1, pdf_url = $2, updated_at = NOW() WHERE id = $3 AND agency_id = $4 RETURNING *'
+        : 'UPDATE invoices SET status = $1, updated_at = NOW() WHERE id = $2 AND agency_id = $3 RETURNING *',
+      pdfUrl ? [status, pdfUrl, invoiceId, agencyId] : [status, invoiceId, agencyId]
+    );
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to update invoice status:', err);
+    throw new Error(`Failed to update invoice status: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 }
