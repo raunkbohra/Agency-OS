@@ -617,3 +617,103 @@ export async function updateInvoiceStatus(
     throw new Error(`Failed to update invoice status: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 }
+
+// Payment type definitions
+export interface Payment {
+  id: string;
+  invoice_id: string;
+  agency_id: string;
+  amount: string | number;
+  provider: string;
+  status: string;
+  reference_id?: string;
+  receipt_url?: string;
+  meta_json?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+// Payment queries
+export async function createPayment(
+  invoiceId: string,
+  agencyId: string,
+  paymentData: {
+    amount: number;
+    provider?: string;
+    referenceId?: string;
+    meta?: Record<string, any>;
+  }
+): Promise<Payment> {
+  try {
+    const result = await db.query(
+      'INSERT INTO payments (invoice_id, agency_id, amount, provider, status, reference_id, meta_json) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [
+        invoiceId,
+        agencyId,
+        paymentData.amount,
+        paymentData.provider || 'bank_transfer',
+        'pending',
+        paymentData.referenceId || '',
+        JSON.stringify(paymentData.meta || {}),
+      ]
+    );
+    return result.rows[0] as Payment;
+  } catch (error) {
+    console.error('Error creating payment:', error);
+    throw new Error(`Failed to create payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+export async function updatePaymentStatus(
+  paymentId: string,
+  agencyId: string,
+  status: string,
+  receiptUrl?: string
+): Promise<Payment | null> {
+  try {
+    let query: string;
+    let params: (string | null)[];
+
+    if (receiptUrl) {
+      query =
+        'UPDATE payments SET status = $1, receipt_url = $2, updated_at = NOW() WHERE id = $3 AND agency_id = $4 RETURNING *';
+      params = [status, receiptUrl, paymentId, agencyId];
+    } else {
+      query =
+        'UPDATE payments SET status = $1, updated_at = NOW() WHERE id = $2 AND agency_id = $3 RETURNING *';
+      params = [status, paymentId, agencyId];
+    }
+
+    const result = await db.query(query, params);
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+    throw new Error(`Failed to update payment status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+export async function getPaymentsByInvoice(invoiceId: string, agencyId: string): Promise<Payment[]> {
+  try {
+    const result = await db.query(
+      'SELECT * FROM payments WHERE invoice_id = $1 AND agency_id = $2 ORDER BY created_at DESC',
+      [invoiceId, agencyId]
+    );
+    return result.rows as Payment[];
+  } catch (error) {
+    console.error('Error fetching payments by invoice:', error);
+    throw new Error(`Failed to fetch payments: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+export async function getPaymentById(paymentId: string, agencyId: string): Promise<Payment | null> {
+  try {
+    const result = await db.query(
+      'SELECT * FROM payments WHERE id = $1 AND agency_id = $2',
+      [paymentId, agencyId]
+    );
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error('Error fetching payment:', error);
+    throw new Error(`Failed to fetch payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}

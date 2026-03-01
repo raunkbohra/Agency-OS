@@ -139,11 +139,19 @@ export default async function InvoiceDetailPage({
             >
               Download PDF
             </a>
+            {invoice.status !== 'paid' && invoice.status !== 'payment_pending' && (
+              <Link
+                href={`/dashboard/invoices/${id}/pay?amount=${invoice.amount}`}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors inline-block"
+              >
+                Pay Now
+              </Link>
+            )}
             {invoice.status !== 'paid' && (
               <form action={() => markInvoiceAsPaid(invoice.id, agencyId || '')}>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
                 >
                   Mark as Paid
                 </button>
