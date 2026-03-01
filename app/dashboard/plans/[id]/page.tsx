@@ -19,8 +19,8 @@ export default async function PlanDetailPage({ params }: PlanDetailPageProps) {
 
   const { id } = await params;
 
-  let plan = null;
-  let planItems = [];
+  let plan: any = null;
+  let planItems: any[] = [];
   let error = null;
 
   try {

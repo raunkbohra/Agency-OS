@@ -198,6 +198,7 @@ export async function getPlansByAgency(agencyId: string): Promise<Plan[]> {
 
 export async function updatePlan(
   id: string,
+  agencyId: string,
   name?: string,
   price?: number,
   billingCycle?: string,
@@ -225,7 +226,7 @@ export async function updatePlan(
       values.push(description);
     }
 
-    if (fields.length === 0) return getPlanById(id);
+    if (fields.length === 0) return getPlanById(id, agencyId);
 
     values.push(id);
     const query = `UPDATE plans SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
