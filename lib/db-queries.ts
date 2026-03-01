@@ -46,6 +46,7 @@ export interface Client {
   email: string;
   phone: string | null;
   company_name: string | null;
+  token: string | null;
   created_at: string;
 }
 
@@ -875,4 +876,12 @@ export async function getPlanItems(planId: string): Promise<PlanItem[]> {
     [planId]
   );
   return result.rows;
+}
+
+export async function getClientByToken(token: string): Promise<Client | null> {
+  const result = await db.query(
+    `SELECT * FROM clients WHERE token = $1`,
+    [token]
+  );
+  return result.rows[0] || null;
 }
