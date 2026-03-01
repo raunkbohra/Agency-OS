@@ -13,7 +13,10 @@
   "license": "MIT",
   "description": "Run your marketing agency from one system",
   "dependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
     "next": "16.1.6",
+    "next-auth": "^5.0.0-beta.30",
+    "pg": "^8.19.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "typescript": "5.9.3"
@@ -21,6 +24,9 @@
   "devDependencies": {
     "@shadcn/ui": "^0.0.4",
     "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "25.3.3",
+    "@types/pg": "^8.18.0",
+    "@types/react": "19.2.14",
     "autoprefixer": "^10.4.27",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
