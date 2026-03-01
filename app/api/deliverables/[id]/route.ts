@@ -3,7 +3,7 @@ import { getDeliverableById, getDeliverableFiles, getDeliverableComments, update
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
@@ -12,14 +12,15 @@ export async function GET(
   }
 
   try {
-    const deliverable = await getDeliverableById(params.id, session.user.agencyId);
+    const { id } = await params;
+    const deliverable = await getDeliverableById(id, session.user.agencyId);
 
     if (!deliverable) {
       return Response.json({ error: 'Not found' }, { status: 404 });
     }
 
-    const files = await getDeliverableFiles(params.id);
-    const comments = await getDeliverableComments(params.id);
+    const files = await getDeliverableFiles(id);
+    const comments = await getDeliverableComments(id);
 
     return Response.json({ deliverable, files, comments });
   } catch (error) {
@@ -30,7 +31,7 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
@@ -40,8 +41,9 @@ export async function PATCH(
 
   try {
     const { status } = await request.json();
+    const { id } = await params;
 
-    const updated = await updateDeliverableStatus(params.id, session.user.agencyId, status);
+    const updated = await updateDeliverableStatus(id, session.user.agencyId, status);
 
     return Response.json(updated);
   } catch (error) {

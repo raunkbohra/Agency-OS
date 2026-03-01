@@ -3,7 +3,7 @@ import { updateAgencyPaymentMethod } from '@/lib/db-queries';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
@@ -13,8 +13,9 @@ export async function PATCH(
 
   try {
     const updates = await request.json();
+    const { id } = await params;
 
-    const result = await updateAgencyPaymentMethod(params.id, session.user.agencyId, updates);
+    const result = await updateAgencyPaymentMethod(id, session.user.agencyId, updates);
     return Response.json(result);
   } catch (error) {
     console.error('Error updating payment method:', error);

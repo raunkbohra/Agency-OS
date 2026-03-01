@@ -3,7 +3,7 @@ import { addDeliverableComment } from '@/lib/db-queries';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
@@ -13,9 +13,10 @@ export async function POST(
 
   try {
     const { comment, isRevisionRequest } = await request.json();
+    const { id } = await params;
 
     const result = await addDeliverableComment({
-      deliverableId: params.id,
+      deliverableId: id,
       userId: session.user.id,
       comment,
       isRevisionRequest,
