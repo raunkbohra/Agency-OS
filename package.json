@@ -1,0 +1,32 @@
+{
+  "name": "agency-os",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "Run your marketing agency from one system",
+  "dependencies": {
+    "next": "16.1.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "typescript": "5.9.3"
+  },
+  "devDependencies": {
+    "@shadcn/ui": "^0.0.4",
+    "@tailwindcss/typography": "^0.5.19",
+    "autoprefixer": "^10.4.27",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.575.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.2.1",
+    "tailwindcss-animate": "^1.0.7"
+  }
+}
