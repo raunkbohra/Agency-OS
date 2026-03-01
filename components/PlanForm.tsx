@@ -16,7 +16,7 @@ interface PlanFormProps {
 
 export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormProps) {
   const [name, setName] = useState(initialData?.name || '');
-  const [price, setPrice] = useState(initialData?.price ? parseFloat(initialData.price as unknown as string) : '');
+  const [price, setPrice] = useState<string | number>(initialData?.price ? parseFloat(initialData.price as unknown as string) : '');
   const [billingCycle, setBillingCycle] = useState(initialData?.billing_cycle || 'monthly');
   const [description, setDescription] = useState(initialData?.description || '');
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,8 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
       return;
     }
 
-    if (!price || price <= 0) {
+    const priceNum = typeof price === 'string' ? parseFloat(price) : price;
+    if (!priceNum || priceNum <= 0) {
       setError('Price must be greater than 0');
       return;
     }

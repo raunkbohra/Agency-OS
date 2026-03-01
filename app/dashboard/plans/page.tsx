@@ -11,8 +11,8 @@ export default async function PlansPage() {
   }
 
   let agencyId: string | null = null;
-  let plans = [];
-  let error = null;
+  let plans: any[] = [];
+  let error: string | null = null;
 
   try {
     // Get user's agencies

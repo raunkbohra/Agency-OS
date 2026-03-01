@@ -2,6 +2,21 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { getPool } from './db';
 import { createHash } from 'crypto';
+import type { DefaultSession } from 'next-auth';
+
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string;
+      agencyId?: string;
+    } & DefaultSession['user'];
+  }
+
+  interface User {
+    id: string;
+    agencyId?: string;
+  }
+}
 
 // Generate a deterministic UUID-like string from email
 function generateIdFromEmail(email: string): string {
@@ -23,11 +38,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // For now, accept any non-empty email/password
         if (credentials?.email && credentials?.password) {
           const email = credentials.email as string;
-          return {
-            id: generateIdFromEmail(email),
-            email: email,
-            name: email.split('@')[0],
-          };
+          const userId = generateIdFromEmail(email);
+
+          try {
+            // Try to fetch the agency for this user
+            const pool = getPool();
+            const result = await pool.query(
+              'SELECT id FROM agencies WHERE user_id = $1 LIMIT 1',
+              [userId]
+            );
+            const agencyId = result.rows[0]?.id;
+
+            return {
+              id: userId,
+              email: email,
+              name: email.split('@')[0],
+              agencyId: agencyId,
+            };
+          } catch (err) {
+            // If database lookup fails, still allow login but without agencyId
+            return {
+              id: userId,
+              email: email,
+              name: email.split('@')[0],
+            };
+          }
         }
         return null;
       },
@@ -41,6 +76,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.agencyId = user.agencyId;
       }
       return token;
     },
@@ -48,6 +84,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
+        session.user.agencyId = token.agencyId as string | undefined;
       }
       return session;
     },
