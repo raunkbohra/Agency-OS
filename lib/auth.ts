@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import { getPool } from './db';
 import { createHash } from 'crypto';
 import type { DefaultSession } from 'next-auth';
@@ -8,13 +9,13 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
-      agencyId?: string;
+      agencyId: string;
     } & DefaultSession['user'];
   }
 
   interface User {
     id: string;
-    agencyId?: string;
+    agencyId: string;
   }
 }
 
@@ -41,13 +42,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const userId = generateIdFromEmail(email);
 
           try {
-            // Try to fetch the agency for this user
+            // Fetch the agency for this user
             const pool = getPool();
             const result = await pool.query(
               'SELECT id FROM agencies WHERE owner_id = $1 LIMIT 1',
               [userId]
             );
             const agencyId = result.rows[0]?.id;
+
+            if (!agencyId) {
+              // Fail authentication if user has no agency
+              return null;
+            }
 
             return {
               id: userId,
@@ -56,27 +62,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               agencyId: agencyId,
             };
           } catch (err) {
-            // If database lookup fails, still allow login but without agencyId
-            return {
-              id: userId,
-              email: email,
-              name: email.split('@')[0],
-            };
+            // If database lookup fails, deny authentication
+            return null;
           }
         }
         return null;
       },
+    }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
   pages: {
     signIn: '/auth/signin',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.agencyId = user.agencyId;
+      }
+      // Handle Google sign-in: populate id + agencyId from DB
+      if (account?.provider === 'google' && token.email) {
+        const userId = generateIdFromEmail(token.email as string);
+        token.id = userId;
+        try {
+          const pool = getPool();
+          const result = await pool.query(
+            'SELECT id FROM agencies WHERE owner_id = $1 LIMIT 1',
+            [userId]
+          );
+          token.agencyId = result.rows[0]?.id;
+        } catch (err) {
+          // If database lookup fails, token.agencyId remains undefined
+        }
       }
       return token;
     },
@@ -84,7 +105,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
-        session.user.agencyId = token.agencyId as string | undefined;
+        session.user.agencyId = token.agencyId as string;
       }
       return session;
     },
