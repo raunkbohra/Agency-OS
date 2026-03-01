@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 export default async function DeliverablesPage() {
   const session = await auth();
 
-  if (!session?.user?.id) {
+  if (!session?.user?.agencyId) {
     redirect('/auth/signin');
   }
 
