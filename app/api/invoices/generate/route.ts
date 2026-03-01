@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch invoice items
-    const items = await getInvoiceItems(invoiceId);
+    const items = await getInvoiceItems(invoiceId, session.user.agencyId);
 
     // Generate PDF
     const pdfStream = await generateInvoicePDF({

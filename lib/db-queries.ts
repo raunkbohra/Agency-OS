@@ -46,6 +46,7 @@ export interface Client {
   email: string;
   phone: string | null;
   company_name: string | null;
+  token: string | null;
   created_at: string;
 }
 
@@ -56,6 +57,32 @@ export interface ClientPlan {
   start_date: string;
   status: string;
   created_at: string;
+}
+
+export interface PaymentTransaction {
+  id: string;
+  invoice_id: string;
+  agency_id: string;
+  provider_id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  transaction_id?: string;
+  reference_id?: string;
+  webhook_payload?: Record<string, any>;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface AgencyPaymentMethod {
+  id: string;
+  agency_id: string;
+  provider_id: string;
+  credentials: Record<string, string>;
+  enabled: boolean;
+  test_mode: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 // Agency queries
@@ -718,4 +745,289 @@ export async function getPaymentById(paymentId: string, agencyId: string): Promi
     console.error('Error fetching payment:', error);
     throw new Error(`Failed to fetch payment: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+// Deliverable type definitions
+export interface Deliverable {
+  id: string;
+  agency_id: string;
+  client_id: string;
+  plan_id: string;
+  title: string;
+  description?: string;
+  status: 'draft' | 'in_review' | 'approved' | 'changes_requested' | 'done';
+  month_year: string;
+  due_date?: Date;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DeliverableFile {
+  id: string;
+  deliverable_id: string;
+  file_name: string;
+  file_size?: number;
+  file_type?: string;
+  file_url: string;
+  uploaded_by: string;
+  version: number;
+  created_at: Date;
+}
+
+export interface DeliverableComment {
+  id: string;
+  deliverable_id: string;
+  user_id: string;
+  user_name?: string;
+  comment: string;
+  is_revision_request: boolean;
+  created_at: Date;
+}
+
+// ============================================================
+// Deliverable queries
+// ============================================================
+
+export async function createDeliverable(data: {
+  agencyId: string;
+  clientId: string;
+  planId: string;
+  title: string;
+  description?: string;
+  monthYear: string;
+  dueDate?: Date;
+}): Promise<Deliverable> {
+  const result = await db.query(
+    `INSERT INTO deliverables
+     (agency_id, client_id, plan_id, title, description, month_year, due_date, status)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
+     RETURNING *`,
+    [data.agencyId, data.clientId, data.planId, data.title, data.description ?? null, data.monthYear, data.dueDate ?? null]
+  );
+  return result.rows[0];
+}
+
+export async function getDeliverablesByClient(clientId: string, agencyId: string): Promise<Deliverable[]> {
+  const result = await db.query(
+    `SELECT * FROM deliverables WHERE client_id = $1 AND agency_id = $2 ORDER BY due_date ASC`,
+    [clientId, agencyId]
+  );
+  return result.rows;
+}
+
+export async function getDeliverablesByAgency(agencyId: string): Promise<Deliverable[]> {
+  const result = await db.query(
+    `SELECT d.*, c.name as client_name FROM deliverables d
+     JOIN clients c ON d.client_id = c.id
+     WHERE d.agency_id = $1
+     ORDER BY d.due_date ASC`,
+    [agencyId]
+  );
+  return result.rows;
+}
+
+export async function getDeliverableById(id: string, agencyId: string): Promise<Deliverable | null> {
+  const result = await db.query(
+    `SELECT * FROM deliverables WHERE id = $1 AND agency_id = $2`,
+    [id, agencyId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function updateDeliverableStatus(
+  id: string,
+  agencyId: string,
+  status: string
+): Promise<Deliverable> {
+  const result = await db.query(
+    `UPDATE deliverables SET status = $1, updated_at = NOW() WHERE id = $2 AND agency_id = $3 RETURNING *`,
+    [status, id, agencyId]
+  );
+  return result.rows[0];
+}
+
+export async function addDeliverableFile(data: {
+  deliverableId: string;
+  fileName: string;
+  fileSize?: number;
+  fileType?: string;
+  fileUrl: string;
+  uploadedBy: string;
+}): Promise<DeliverableFile> {
+  const result = await db.query(
+    `INSERT INTO deliverable_files (deliverable_id, file_name, file_size, file_type, file_url, uploaded_by)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING *`,
+    [data.deliverableId, data.fileName, data.fileSize ?? null, data.fileType ?? null, data.fileUrl, data.uploadedBy]
+  );
+  return result.rows[0];
+}
+
+export async function getDeliverableFiles(deliverableId: string): Promise<DeliverableFile[]> {
+  const result = await db.query(
+    `SELECT * FROM deliverable_files WHERE deliverable_id = $1 ORDER BY created_at DESC`,
+    [deliverableId]
+  );
+  return result.rows;
+}
+
+export async function addDeliverableComment(data: {
+  deliverableId: string;
+  userId: string;
+  comment: string;
+  isRevisionRequest?: boolean;
+}): Promise<DeliverableComment> {
+  const result = await db.query(
+    `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request)
+     VALUES ($1, $2, $3, $4)
+     RETURNING *`,
+    [data.deliverableId, data.userId, data.comment, data.isRevisionRequest ?? false]
+  );
+  return result.rows[0];
+}
+
+export async function getDeliverableComments(deliverableId: string): Promise<DeliverableComment[]> {
+  const result = await db.query(
+    `SELECT dc.*, u.name as user_name FROM deliverable_comments dc
+     LEFT JOIN users u ON dc.user_id = u.id
+     WHERE dc.deliverable_id = $1 ORDER BY dc.created_at DESC`,
+    [deliverableId]
+  );
+  return result.rows;
+}
+
+export async function getPlanItems(planId: string): Promise<PlanItem[]> {
+  const result = await db.query(
+    `SELECT * FROM plan_items WHERE plan_id = $1`,
+    [planId]
+  );
+  return result.rows;
+}
+
+export async function getClientByToken(token: string): Promise<Client | null> {
+  const result = await db.query(
+    `SELECT * FROM clients WHERE token = $1`,
+    [token]
+  );
+  return result.rows[0] || null;
+}
+
+// ============================================================
+// Payment Transaction queries
+// ============================================================
+
+export async function createPaymentTransaction(data: {
+  invoiceId: string;
+  agencyId: string;
+  providerId: string;
+  amount: number;
+  currency?: string;
+  transactionId?: string;
+  referenceId?: string;
+  webhookPayload?: Record<string, any>;
+}): Promise<PaymentTransaction> {
+  const result = await db.query(
+    `INSERT INTO payment_transactions
+     (invoice_id, agency_id, provider_id, amount, currency, status, transaction_id, reference_id, webhook_payload)
+     VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8)
+     RETURNING *`,
+    [
+      data.invoiceId,
+      data.agencyId,
+      data.providerId,
+      data.amount,
+      data.currency || 'NPR',
+      data.transactionId ?? null,
+      data.referenceId ?? null,
+      data.webhookPayload ? JSON.stringify(data.webhookPayload) : null,
+    ]
+  );
+  return result.rows[0];
+}
+
+export async function updatePaymentTransactionStatus(
+  id: string,
+  agencyId: string,
+  status: string
+): Promise<PaymentTransaction> {
+  const result = await db.query(
+    `UPDATE payment_transactions
+     SET status = $1, updated_at = NOW()
+     WHERE id = $2 AND agency_id = $3
+     RETURNING *`,
+    [status, id, agencyId]
+  );
+  return result.rows[0];
+}
+
+export async function getPaymentTransactionsByInvoice(
+  invoiceId: string,
+  agencyId: string
+): Promise<PaymentTransaction[]> {
+  const result = await db.query(
+    `SELECT * FROM payment_transactions
+     WHERE invoice_id = $1 AND agency_id = $2
+     ORDER BY created_at DESC`,
+    [invoiceId, agencyId]
+  );
+  return result.rows;
+}
+
+// ============================================================
+// Agency Payment Method queries
+// ============================================================
+
+export async function addAgencyPaymentMethod(data: {
+  agencyId: string;
+  providerId: string;
+  credentials: Record<string, string>;
+  testMode?: boolean;
+}): Promise<AgencyPaymentMethod> {
+  const result = await db.query(
+    `INSERT INTO agency_payment_methods
+     (agency_id, provider_id, credentials, enabled, test_mode)
+     VALUES ($1, $2, $3, true, $4)
+     RETURNING *`,
+    [data.agencyId, data.providerId, JSON.stringify(data.credentials), data.testMode || false]
+  );
+  return result.rows[0];
+}
+
+export async function getAgencyPaymentMethods(agencyId: string): Promise<AgencyPaymentMethod[]> {
+  const result = await db.query(
+    `SELECT * FROM agency_payment_methods WHERE agency_id = $1 AND enabled = true`,
+    [agencyId]
+  );
+  return result.rows;
+}
+
+export async function updateAgencyPaymentMethod(
+  id: string,
+  agencyId: string,
+  data: { credentials?: Record<string, string>; enabled?: boolean }
+): Promise<AgencyPaymentMethod> {
+  const updates = [];
+  const values: any[] = [id, agencyId];
+  let paramCount = 2;
+
+  if (data.credentials) {
+    updates.push(`credentials = $${++paramCount}`);
+    values.push(JSON.stringify(data.credentials));
+  }
+
+  if (data.enabled !== undefined) {
+    updates.push(`enabled = $${++paramCount}`);
+    values.push(data.enabled);
+  }
+
+  updates.push(`updated_at = NOW()`);
+
+  const result = await db.query(
+    `UPDATE agency_payment_methods
+     SET ${updates.join(', ')}
+     WHERE id = $1 AND agency_id = $2
+     RETURNING *`,
+    values
+  );
+  return result.rows[0];
 }
