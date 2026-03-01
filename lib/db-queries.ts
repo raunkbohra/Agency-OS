@@ -865,3 +865,11 @@ export async function getDeliverableComments(deliverableId: string): Promise<Del
   );
   return result.rows;
 }
+
+export async function getPlanItems(planId: string): Promise<PlanItem[]> {
+  const result = await db.query(
+    `SELECT * FROM plan_items WHERE plan_id = $1`,
+    [planId]
+  );
+  return result.rows;
+}
