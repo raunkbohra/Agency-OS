@@ -331,40 +331,40 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
     y -= 20;
     drawLine(page, totalLabelX - 5, y, totalValueX + 80, 0.5);
 
-    // ─── BANK DETAILS (at bottom) ───
-    y -= 25;
+    // ─── BANK DETAILS (at absolute bottom left) ───
+    let bankDetailsY = 80; // Fixed position from bottom
 
     if (data.bankDetails) {
       page.drawText('Bank Details', {
         x: margin,
-        y: y,
+        y: bankDetailsY,
         size: 10,
         color: COLORS.mediumGray,
       });
 
-      y -= 12;
+      bankDetailsY -= 12;
 
       page.drawText(`Bank Name: ${data.bankDetails.bankName}`, {
         x: margin,
-        y: y,
+        y: bankDetailsY,
         size: 9,
         color: COLORS.black,
       });
 
-      y -= 11;
+      bankDetailsY -= 11;
 
       page.drawText(`Account Number: ${data.bankDetails.accountNumber}`, {
         x: margin,
-        y: y,
+        y: bankDetailsY,
         size: 9,
         color: COLORS.black,
       });
 
-      y -= 11;
+      bankDetailsY -= 11;
 
       page.drawText(`Routing Number: ${data.bankDetails.routingNumber}`, {
         x: margin,
-        y: y,
+        y: bankDetailsY,
         size: 9,
         color: COLORS.black,
       });
