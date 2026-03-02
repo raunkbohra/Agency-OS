@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
 import { PageTransition } from '@/components/motion/page-transition';
 import { PageHeader } from '@/components/layout/page-header';
 
@@ -47,7 +49,16 @@ export default function ContractUploadPage() {
   };
 
   return (
-    <PageTransition className="max-w-lg">
+    <PageTransition>
+      <Link
+        href="/dashboard/contracts"
+        className="inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors mb-4"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Back to Contracts
+      </Link>
+
+      <div className="max-w-xl mx-auto">
       <PageHeader title="Upload Contract" description="Upload a contract PDF for a client" />
 
       <form onSubmit={handleUpload} className="bg-bg-secondary rounded-xl p-5 border border-border-default space-y-4">
@@ -100,6 +111,7 @@ export default function ContractUploadPage() {
           {loading ? 'Uploading...' : 'Upload Contract'}
         </button>
       </form>
+      </div>
     </PageTransition>
   );
 }
