@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { SparkleButtonSm } from '@/components/ui/sparkle-button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
@@ -60,6 +61,7 @@ export function Navbar() {
 
         {/* CTA */}
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           {status === 'loading' ? (
             <div className="w-20 h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.04)' }} />
           ) : isSignedIn ? (

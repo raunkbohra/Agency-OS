@@ -15,6 +15,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', color: '#8fa0b0' },
@@ -57,6 +58,10 @@ export function Sidebar() {
 
       {/* Bottom section */}
       <div className="border-t border-border-default px-3 py-3 space-y-1">
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-xs text-text-tertiary">Theme</span>
+          <ThemeToggle />
+        </div>
         {bottomItems.map((item) => (
           <SidebarNavItem key={item.href} {...item} />
         ))}
