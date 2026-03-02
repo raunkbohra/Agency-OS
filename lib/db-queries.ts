@@ -922,6 +922,56 @@ export async function getDeliverablesByAgency(agencyId: string): Promise<Deliver
   return result.rows;
 }
 
+export async function getDeliverablesFiltered(
+  agencyId: string,
+  options: {
+    statusFilter?: string;
+    urgent?: boolean;
+    sort?: string;
+  } = {}
+): Promise<(Deliverable & { client_name?: string })[]> {
+  const { statusFilter = 'all', urgent = false, sort = 'due_date' } = options;
+
+  let query = `SELECT d.*, c.name as client_name FROM deliverables d
+               JOIN clients c ON d.client_id = c.id
+               WHERE d.agency_id = $1`;
+
+  const params: any[] = [agencyId];
+  let paramCount = 2;
+
+  // Apply status filter
+  if (statusFilter && statusFilter !== 'all') {
+    query += ` AND d.status = $${paramCount}`;
+    params.push(statusFilter);
+    paramCount++;
+  }
+
+  // Apply urgent filter (due within 7 days from now)
+  if (urgent) {
+    query += ` AND d.due_date IS NOT NULL AND d.due_date <= NOW() + INTERVAL '7 days' AND d.due_date > NOW()`;
+  }
+
+  // Apply sorting
+  switch (sort) {
+    case 'due_date_desc':
+      query += ` ORDER BY d.due_date DESC`;
+      break;
+    case 'client':
+      query += ` ORDER BY c.name ASC`;
+      break;
+    case 'status':
+      query += ` ORDER BY d.status ASC, d.due_date ASC`;
+      break;
+    case 'due_date':
+    default:
+      query += ` ORDER BY d.due_date ASC`;
+      break;
+  }
+
+  const result = await db.query(query, params);
+  return result.rows;
+}
+
 export async function getDeliverableById(id: string, agencyId: string): Promise<Deliverable | null> {
   const result = await db.query(
     `SELECT * FROM deliverables WHERE id = $1 AND agency_id = $2`,

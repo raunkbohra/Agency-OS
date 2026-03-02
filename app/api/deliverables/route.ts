@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { getDeliverablesByAgency, createDeliverable } from '@/lib/db-queries';
+import { getDeliverablesByAgency, getDeliverablesFiltered, createDeliverable } from '@/lib/db-queries';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -9,7 +9,27 @@ export async function GET(request: Request) {
   }
 
   try {
-    const deliverables = await getDeliverablesByAgency(session.user.agencyId);
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status') || 'all';
+    const urgent = url.searchParams.get('urgent') === 'true';
+    const sort = url.searchParams.get('sort') || 'due_date';
+
+    // Check if any filters are applied
+    const hasFilters = status !== 'all' || urgent || sort !== 'due_date';
+
+    let deliverables;
+    if (hasFilters) {
+      // Use filtered query if any filters are applied
+      deliverables = await getDeliverablesFiltered(session.user.agencyId, {
+        statusFilter: status,
+        urgent,
+        sort,
+      });
+    } else {
+      // Use the basic query if no filters
+      deliverables = await getDeliverablesByAgency(session.user.agencyId);
+    }
+
     return Response.json(deliverables);
   } catch (error) {
     console.error('Error fetching deliverables:', error);
