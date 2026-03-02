@@ -53,6 +53,8 @@ export interface Client {
   email: string;
   phone: string | null;
   company_name: string | null;
+  address: string | null;
+  billing_address: string | null;
   token: string | null;
   created_at: string;
 }
@@ -406,12 +408,14 @@ export async function createClient(
   name: string,
   email: string,
   phone?: string,
-  companyName?: string
+  companyName?: string,
+  address?: string,
+  billingAddress?: string
 ): Promise<Client> {
   try {
     const result = await db.query(
-      'INSERT INTO clients (agency_id, name, email, phone, company_name) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [agencyId, name, email, phone || null, companyName || null]
+      'INSERT INTO clients (agency_id, name, email, phone, company_name, address, billing_address) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [agencyId, name, email, phone || null, companyName || null, address || null, billingAddress || null]
     );
     return result.rows[0];
   } catch (err) {
@@ -476,7 +480,9 @@ export async function updateClient(
   name?: string,
   email?: string,
   phone?: string,
-  companyName?: string
+  companyName?: string,
+  address?: string,
+  billingAddress?: string
 ): Promise<Client | null> {
   try {
     const fields: string[] = [];
@@ -498,6 +504,14 @@ export async function updateClient(
     if (companyName !== undefined) {
       fields.push(`company_name = $${paramCount++}`);
       values.push(companyName);
+    }
+    if (address !== undefined) {
+      fields.push(`address = $${paramCount++}`);
+      values.push(address);
+    }
+    if (billingAddress !== undefined) {
+      fields.push(`billing_address = $${paramCount++}`);
+      values.push(billingAddress);
     }
 
     if (fields.length === 0) return getClientById(id, agencyId);
