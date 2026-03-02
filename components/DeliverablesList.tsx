@@ -9,7 +9,7 @@ import DeliverableStats from './DeliverableStats';
 interface Deliverable {
   id: string;
   client_id: string;
-  client_name: string;
+  client_name?: string;
   title: string;
   status: string;
   month_year: string;
@@ -65,7 +65,7 @@ export default function DeliverablesList() {
   const sortOptions = [
     { value: 'due_date', label: 'Due Date (Earliest)' },
     { value: 'due_date_desc', label: 'Due Date (Latest)' },
-    { value: 'created_at', label: 'Recently Created' },
+    { value: 'client', label: 'By Client' },
     { value: 'status', label: 'By Status' },
   ];
 
@@ -144,7 +144,7 @@ export default function DeliverablesList() {
 
       {deliverables.length === 0 ? (
         <div className="text-center py-16 text-text-tertiary text-sm bg-bg-secondary rounded-xl border border-border-default">
-          No deliverables found.
+          No deliverables{statusFilter !== 'all' ? ` with status "${statusFilter.replace(/_/g, ' ')}"` : ''} found.
         </div>
       ) : (
         <>
