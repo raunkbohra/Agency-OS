@@ -5,7 +5,7 @@ import { generateDeliverablesForClientPlan, calcFirstInvoice } from '@/lib/gener
 export async function GET(req: Request, { params }: { params: Promise<{ agencyId: string }> }) {
   const { agencyId } = await params;
   const agencyResult = await db.query(
-    'SELECT id, name, billing_start_policy FROM agencies WHERE id = $1',
+    'SELECT id, name FROM agencies WHERE id = $1',
     [agencyId]
   );
   if (!agencyResult.rows[0]) return Response.json({ error: 'Agency not found' }, { status: 404 });
@@ -15,7 +15,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ agencyId
   return Response.json({
     id: agencyResult.rows[0].id,
     name: agencyResult.rows[0].name,
-    billing_start_policy: agencyResult.rows[0].billing_start_policy ?? 'next_month',
     plans: plans.map(p => ({
       id: p.id,
       name: p.name,
@@ -30,12 +29,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
   const { agencyId } = await params;
 
   const agencyResult = await db.query(
-    'SELECT id, name, billing_start_policy FROM agencies WHERE id = $1',
+    'SELECT id FROM agencies WHERE id = $1',
     [agencyId]
   );
   if (!agencyResult.rows[0]) return Response.json({ error: 'Agency not found' }, { status: 404 });
-  const billingPolicy: 'next_month' | 'prorated' =
-    agencyResult.rows[0].billing_start_policy ?? 'next_month';
 
   const body = await req.json();
   const { name, email, companyName, phone, planId } = body;
@@ -53,6 +50,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
     return Response.json({ error: 'A client with this email already exists' }, { status: 409 });
   }
 
+  // Onboarding clients always start on next full period (agency sets policy at creation time)
+  const billingPolicy: 'next_month' | 'prorated' = 'next_month';
+
   try {
     const client = await createClient(
       agencyId,
@@ -65,14 +65,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
     // Assign plan and immediately generate deliverables if a plan was selected
     if (planId) {
       const planResult = await db.query(
-        'SELECT id, billing_cycle FROM plans WHERE id = $1 AND agency_id = $2',
+        'SELECT id, billing_cycle, price FROM plans WHERE id = $1 AND agency_id = $2',
         [planId, agencyId]
       );
       const plan = planResult.rows[0];
 
       if (plan) {
         const startDate = new Date();
-        await createClientPlan(client.id, plan.id, startDate);
+        await createClientPlan(client.id, plan.id, startDate, 'active', billingPolicy);
 
         await generateDeliverablesForClientPlan({
           client_id: client.id,

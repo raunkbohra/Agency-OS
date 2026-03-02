@@ -3,6 +3,19 @@
 import { FormEvent, useState } from 'react';
 import { Plan } from '@/lib/db-queries';
 
+const BILLING_OPTIONS = [
+  {
+    value: 'next_month' as const,
+    label: 'Start next full period',
+    description: 'No deliverables or invoice for the current partial month. Full billing starts next period.',
+  },
+  {
+    value: 'prorated' as const,
+    label: 'Pro-rate first period',
+    description: 'Deliverables and invoice proportional to remaining days this month. Full billing from next period.',
+  },
+];
+
 interface SimpleClientFormProps {
   action: (formData: FormData) => Promise<void>;
   plans: Plan[];
@@ -11,6 +24,7 @@ interface SimpleClientFormProps {
 export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [billingPolicy, setBillingPolicy] = useState<'next_month' | 'prorated'>('next_month');
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -99,6 +113,49 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
             </option>
           ))}
         </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-text-secondary mb-2">
+          First Month Billing
+        </label>
+        <div className="space-y-2">
+          {BILLING_OPTIONS.map((opt) => (
+            <label
+              key={opt.value}
+              className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                billingPolicy === opt.value
+                  ? 'border-accent-blue bg-accent-blue/5'
+                  : 'border-border-default bg-bg-tertiary hover:bg-bg-hover'
+              }`}
+            >
+              <div className="mt-0.5 flex-shrink-0">
+                <div
+                  className={`h-4 w-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+                    billingPolicy === opt.value ? 'border-accent-blue' : 'border-border-hover'
+                  }`}
+                >
+                  {billingPolicy === opt.value && (
+                    <div className="h-2 w-2 rounded-full bg-accent-blue" />
+                  )}
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-text-primary">{opt.label}</p>
+                <p className="text-xs text-text-tertiary mt-0.5 leading-relaxed">{opt.description}</p>
+              </div>
+              <input
+                type="radio"
+                name="billingStartPolicy"
+                value={opt.value}
+                checked={billingPolicy === opt.value}
+                onChange={() => setBillingPolicy(opt.value)}
+                disabled={isSubmitting}
+                className="sr-only"
+              />
+            </label>
+          ))}
+        </div>
       </div>
 
       <button

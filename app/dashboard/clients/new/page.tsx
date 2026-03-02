@@ -31,6 +31,7 @@ async function handleCreateClient(formData: FormData) {
   const email = formData.get('email') as string;
   const companyName = formData.get('companyName') as string;
   const planId = formData.get('planId') as string;
+  const billingPolicy = (formData.get('billingStartPolicy') ?? 'next_month') as 'next_month' | 'prorated';
 
   try {
     // Get or create agency
@@ -53,17 +54,14 @@ async function handleCreateClient(formData: FormData) {
       companyName
     );
 
-    // Get agency billing start policy
-    const billingPolicy = (agencies[0]?.billing_start_policy ?? 'next_month') as 'next_month' | 'prorated';
-
     // Get the plan (needed for invoice + immediate deliverable generation)
     const plan = await getPlanById(planId, agencyId);
     if (!plan) throw new Error('Plan not found');
 
     const startDate = new Date();
-    await createClientPlan(client.id, planId, startDate);
+    await createClientPlan(client.id, planId, startDate, 'active', billingPolicy);
 
-    // Generate deliverables respecting the agency's billing start policy
+    // Generate deliverables respecting the per-client billing start policy
     await generateDeliverablesForClientPlan({
       client_id: client.id,
       plan_id: plan.id,

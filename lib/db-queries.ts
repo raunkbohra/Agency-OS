@@ -7,7 +7,6 @@ export interface Agency {
   owner_id: string;
   currency: string;
   email?: string;
-  billing_start_policy: 'next_month' | 'prorated';
   created_at: string;
 }
 
@@ -57,6 +56,7 @@ export interface ClientPlan {
   plan_id: string;
   start_date: string;
   status: string;
+  billing_start_policy: 'next_month' | 'prorated';
   created_at: string;
 }
 
@@ -135,17 +135,6 @@ export async function getAgenciesByOwnerId(ownerId: string): Promise<Agency[]> {
     console.error('Failed to get agencies by owner ID:', err);
     throw new Error(`Failed to fetch agencies: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
-}
-
-export async function updateAgencyBillingPolicy(
-  agencyId: string,
-  policy: 'next_month' | 'prorated'
-): Promise<Agency> {
-  const result = await db.query(
-    'UPDATE agencies SET billing_start_policy = $1 WHERE id = $2 RETURNING *',
-    [policy, agencyId]
-  );
-  return result.rows[0];
 }
 
 // User queries
@@ -449,12 +438,13 @@ export async function createClientPlan(
   clientId: string,
   planId: string,
   startDate: Date = new Date(),
-  status: string = 'active'
+  status: string = 'active',
+  billingStartPolicy: 'next_month' | 'prorated' = 'next_month'
 ): Promise<ClientPlan> {
   try {
     const result = await db.query(
-      'INSERT INTO client_plans (client_id, plan_id, start_date, status) VALUES ($1, $2, $3, $4) RETURNING *',
-      [clientId, planId, startDate.toISOString(), status]
+      'INSERT INTO client_plans (client_id, plan_id, start_date, status, billing_start_policy) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [clientId, planId, startDate.toISOString(), status, billingStartPolicy]
     );
     return result.rows[0];
   } catch (err) {

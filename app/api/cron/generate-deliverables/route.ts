@@ -12,16 +12,14 @@ export async function GET(request: Request) {
   try {
     const now = new Date();
 
-    // Join plans + agency so we have billing_cycle, start_date, and billing_start_policy
+    // Join plans so we have billing_cycle, start_date, and per-client billing_start_policy
     const result = await db.query(
-      `SELECT cp.id, cp.client_id, cp.start_date,
+      `SELECT cp.id, cp.client_id, cp.start_date, cp.billing_start_policy,
               c.agency_id,
-              p.id as plan_id, p.billing_cycle,
-              a.billing_start_policy
+              p.id as plan_id, p.billing_cycle
        FROM client_plans cp
        JOIN clients c ON cp.client_id = c.id
        JOIN plans p ON cp.plan_id = p.id
-       JOIN agencies a ON c.agency_id = a.id
        WHERE cp.status = 'active'`
     );
 
