@@ -1116,6 +1116,26 @@ export async function getClientByToken(token: string): Promise<Client | null> {
   return result.rows[0] || null;
 }
 
+// Contract Signing Token Functions
+export async function getSigningTokenData(token: string): Promise<any | null> {
+  const result = await db.query(
+    `SELECT
+      cst.contract_id,
+      cst.email,
+      cst.verified,
+      cst.signed,
+      c.file_name,
+      cl.name as client_name
+    FROM contract_signing_tokens cst
+    JOIN contracts c ON cst.contract_id = c.id
+    JOIN clients cl ON c.client_id = cl.id
+    WHERE cst.token = $1
+    AND (cst.expires_at IS NULL OR cst.expires_at > NOW())`,
+    [token]
+  );
+  return result.rows[0] || null;
+}
+
 // ============================================================
 // Payment Transaction queries
 // ============================================================
