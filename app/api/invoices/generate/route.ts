@@ -57,14 +57,32 @@ export async function GET(req: NextRequest) {
         : undefined;
 
     // Generate PDF (pdf-lib returns Promise<Readable>)
+    const today = new Date();
+    const invoiceDate = today.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    const dueDate = invoice.due_date
+      ? new Date(invoice.due_date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : 'Not specified';
+
     const pdfStream = await generateInvoicePDF({
       invoiceNumber: `INV-${invoiceId.slice(0, 8).toUpperCase()}`,
       agencyName: agency.name,
       agencyEmail: agency.email ?? process.env.SMTP_FROM ?? 'contact@agencyos.dev',
+      agencyPhone: undefined, // TODO: Add phone to agencies table
+      agencyWebsite: undefined, // TODO: Add website to agencies table
       agencyAddress: agency.address || undefined,
       agencyLogoUrl: agency.logo_url || undefined,
       clientName: client.name,
       clientEmail: client.email || 'client@example.com',
+      clientAddress: undefined, // TODO: Add address to clients table
       currencySymbol,
       items: items.map((i: any) => ({
         description: i.description,
@@ -72,13 +90,9 @@ export async function GET(req: NextRequest) {
         rate: parseFloat(i.rate),
       })),
       totalAmount: parseFloat(invoice.amount),
-      dueDate: invoice.due_date
-        ? new Date(invoice.due_date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-        : 'Not specified',
+      invoiceDate,
+      dueDate,
+      paymentTerms: 'Net 30 days',
       bankDetails,
     });
 
