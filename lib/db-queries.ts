@@ -562,8 +562,7 @@ export async function getDeliverablesByClient(clientId: string): Promise<Array<a
     const result = await db.query(
       `SELECT d.id, d.title, d.status, d.month_year, d.due_date
        FROM deliverables d
-       JOIN client_plans cp ON d.client_plan_id = cp.id
-       WHERE cp.client_id = $1
+       WHERE d.client_id = $1
        ORDER BY d.month_year DESC, d.due_date DESC`,
       [clientId]
     );
