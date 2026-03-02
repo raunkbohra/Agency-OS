@@ -1,8 +1,8 @@
 import { auth } from '@/lib/auth';
 import {
   getClientById, getClientPlansByClient, getPlanById,
-  getPlanItemsByPlan, getInvoicesByClient,
-  Client, ClientPlan, Plan, PlanItem, Invoice,
+  getPlanItemsByPlan, getInvoicesByClient, getContractsByClient,
+  Client, ClientPlan, Plan, PlanItem, Invoice, Contract,
 } from '@/lib/db-queries';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -10,8 +10,9 @@ import { PageTransition } from '@/components/motion/page-transition';
 import { PageHeader } from '@/components/layout/page-header';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { ChevronLeft, Mail, Building2, Phone, Package, CheckSquare } from 'lucide-react';
+import { ChevronLeft, Mail, Building2, Phone, Package, CheckSquare, Edit2, MapPin } from 'lucide-react';
 import EmailClientButton from '@/components/EmailClientButton';
+import ClientEditForm from '@/components/ClientEditForm';
 
 interface ClientDetailPageProps {
   params: Promise<{ id: string }>;
@@ -29,6 +30,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
   let plan: Plan | null = null;
   let planItems: PlanItem[] = [];
   let invoices: Invoice[] = [];
+  let contracts: Contract[] = [];
   let error: string | null = null;
 
   try {
@@ -44,6 +46,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
     }
 
     invoices = await getInvoicesByClient(clientId, agencyId);
+    contracts = await getContractsByClient(clientId, agencyId);
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load client details';
   }
@@ -75,7 +78,10 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
         title={client.name}
         description="Client profile"
         actions={
-          <EmailClientButton clientId={client.id} clientName={client.name} clientEmail={client.email} />
+          <div className="flex items-center gap-2">
+            <ClientEditForm client={client} agencyId={agencyId} />
+            <EmailClientButton clientId={client.id} clientName={client.name} clientEmail={client.email} />
+          </div>
         }
       />
 
@@ -112,6 +118,17 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                 <div>
                   <p className="text-xs text-text-tertiary mb-0.5">Phone</p>
                   <p className="text-sm font-medium text-text-primary">{client.phone}</p>
+                </div>
+              </div>
+            )}
+            {client.address && (
+              <div className="flex items-start gap-3">
+                <div className="p-1.5 rounded-md bg-bg-tertiary border border-border-default flex-shrink-0 mt-0.5">
+                  <MapPin className="h-3.5 w-3.5 text-text-tertiary" />
+                </div>
+                <div>
+                  <p className="text-xs text-text-tertiary mb-0.5">Address</p>
+                  <p className="text-sm font-medium text-text-primary whitespace-pre-line">{client.address}</p>
                 </div>
               </div>
             )}
@@ -231,6 +248,66 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
                           {invoice.due_date
                             ? new Date(invoice.due_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
                             : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      </ScrollReveal>
+
+      {/* Contracts */}
+      <ScrollReveal delay={0.15}>
+        <div className="bg-bg-secondary border border-border-default rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-border-default">
+            <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Contracts</h2>
+          </div>
+
+          {contracts.length === 0 ? (
+            <div className="p-8 text-center text-sm text-text-tertiary">No contracts yet.</div>
+          ) : (
+            <>
+              {/* Mobile: card list */}
+              <div className="sm:hidden divide-y divide-border-default">
+                {contracts.map((contract) => (
+                  <Link
+                    key={contract.id}
+                    href={`/dashboard/contracts`}
+                    className="flex items-center justify-between px-5 py-4 hover:bg-bg-hover transition-colors"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">{contract.file_name}</p>
+                      <p className="text-xs text-text-tertiary mt-0.5">
+                        {new Date(contract.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    </div>
+                    <StatusBadge status={contract.signed ? 'signed' : 'unsigned'} />
+                  </Link>
+                ))}
+              </div>
+
+              {/* Desktop: table */}
+              <div className="hidden sm:block">
+                <table className="w-full">
+                  <thead className="bg-bg-tertiary border-b border-border-default">
+                    <tr>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Contract</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Status</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border-default">
+                    {contracts.map((contract) => (
+                      <tr key={contract.id} className="hover:bg-bg-hover transition-colors cursor-pointer">
+                        <td className="px-5 py-4 text-sm font-medium text-text-primary">{contract.file_name}</td>
+                        <td className="px-5 py-4">
+                          <StatusBadge status={contract.signed ? 'signed' : 'unsigned'} />
+                        </td>
+                        <td className="px-5 py-4 text-sm text-text-secondary">
+                          {new Date(contract.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                         </td>
                       </tr>
                     ))}
