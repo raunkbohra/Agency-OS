@@ -526,6 +526,33 @@ export async function updateClient(
   }
 }
 
+// Portal token functions
+export function generatePortalToken(): string {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+export async function setClientPortalToken(clientId: string, token: string): Promise<void> {
+  try {
+    await db.query(
+      'UPDATE clients SET token = $1 WHERE id = $2',
+      [token, clientId]
+    );
+  } catch (err) {
+    console.error('Failed to set client portal token:', err);
+    throw new Error(`Failed to set client portal token: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getClientByPortalToken(token: string): Promise<Client | null> {
+  try {
+    const result = await db.query('SELECT * FROM clients WHERE token = $1', [token]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get client by portal token:', err);
+    throw new Error(`Failed to get client by portal token: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 // Client plans (subscriptions) queries
 export async function createClientPlan(
   clientId: string,
