@@ -1117,6 +1117,22 @@ export async function getClientByToken(token: string): Promise<Client | null> {
 }
 
 // Contract Signing Token Functions
+export async function createSigningToken(contractId: string, email: string): Promise<string> {
+  const { v4: uuidv4 } = require('uuid');
+  const crypto = require('crypto');
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
+  await db.query(
+    `INSERT INTO contract_signing_tokens (id, contract_id, token, email, expires_at)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [uuidv4(), contractId, token, email, expiresAt]
+  );
+
+  return token;
+}
+
 export async function getSigningTokenData(token: string): Promise<any | null> {
   const result = await db.query(
     `SELECT

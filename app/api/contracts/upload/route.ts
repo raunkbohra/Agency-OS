@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { uploadContract, getClientById } from '@/lib/db-queries';
+import { uploadContract, getClientById, createSigningToken } from '@/lib/db-queries';
 import { sendSigningRequestEmail } from '@/lib/email';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -33,15 +33,18 @@ export async function POST(request: Request) {
       fileSize: file.size
     });
 
-    // Send signing request email asynchronously
+    // Create signing token and send request email asynchronously
     try {
       const client = await getClientById(clientId, session.user.agencyId);
       if (client?.email) {
+        // Create a signing token for this contract
+        const signingToken = await createSigningToken(contract.id, client.email);
+
         await sendSigningRequestEmail({
           to: client.email,
           clientName: client.name,
           contractFileName: file.name,
-          signingUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/sign/contracts/${contract.id}`,
+          signingUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/sign/contracts/${signingToken}`,
           agencyName: session.user.agencyName || 'Agency OS'
         });
       }
