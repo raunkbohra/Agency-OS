@@ -190,9 +190,10 @@ export function Pricing() {
                     href={tier.ctaHref}
                     className="block text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5"
                     style={{
-                      background: 'rgba(255,255,255,0.06)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      color: '#d1d5db',
+                      background: 'linear-gradient(135deg, rgba(160,180,200,0.12) 0%, rgba(100,120,145,0.07) 100%)',
+                      border: '1px solid rgba(180,200,220,0.25)',
+                      color: '#b8cad4',
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
                     }}
                   >
                     {tier.cta}

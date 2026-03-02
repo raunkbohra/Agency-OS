@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Input } from '@/components/ui/input';
-import { Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Package, FileText, Users, BarChart3, Check } from 'lucide-react';
 
 function GoogleIcon() {
   return (
@@ -19,12 +18,180 @@ function GoogleIcon() {
   );
 }
 
+interface Sparkle {
+  id: number; x: number; y: number; size: number;
+  delay: number; duration: number; opacity: number;
+}
+
+function makeSparkles(count: number): Sparkle[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: 4 + Math.random() * 92,
+    y: 4 + Math.random() * 92,
+    size: Math.random() < 0.12 ? 3 : Math.random() < 0.35 ? 2 : 1.5,
+    delay: Math.random() * 3.5,
+    duration: 1.0 + Math.random() * 2.0,
+    opacity: 0.55 + Math.random() * 0.45,
+  }));
+}
+
+function SparkleParticles({ count }: { count: number }) {
+  const [sparkles, setSparkles] = useState<Sparkle[]>([]);
+  useEffect(() => { setSparkles(makeSparkles(count)); }, [count]);
+  return (
+    <>
+      {sparkles.map((s) => (
+        <motion.span
+          key={s.id}
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: `${s.x}%`, top: `${s.y}%`,
+            width: `${s.size}px`, height: `${s.size}px`,
+            borderRadius: '50%',
+            background: s.size >= 3 ? '#ffffff' : '#c8e0f0',
+            boxShadow: s.size >= 2 ? `0 0 ${s.size * 3}px rgba(200,230,248,0.9)` : 'none',
+            pointerEvents: 'none',
+          }}
+          animate={{ opacity: [0, s.opacity, 0], scale: [0.2, 1, 0.2] }}
+          transition={{ duration: s.duration, delay: s.delay, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      ))}
+    </>
+  );
+}
+
+const capabilities = [
+  { icon: Package, label: 'Service plans', desc: 'Build & assign custom plans per client' },
+  { icon: FileText, label: 'Smart invoicing', desc: 'Auto-generate and track payments' },
+  { icon: Users, label: 'Client portal', desc: 'Deliverables, contracts & more' },
+  { icon: BarChart3, label: 'Metrics dashboard', desc: 'Real-time revenue & KPI tracking' },
+];
+
+function ProductPanel() {
+  return (
+    <div
+      className="relative w-full h-full flex flex-col overflow-hidden"
+      style={{
+        background: 'linear-gradient(155deg, #07080d 0%, #0c1118 55%, #070d14 100%)',
+        borderRight: '1px solid rgba(255,255,255,0.055)',
+      }}
+    >
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 85% 65% at 25% 35%, rgba(107,126,147,0.12) 0%, transparent 65%)',
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 55% 45% at 75% 80%, rgba(143,160,176,0.07) 0%, transparent 65%)',
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.032) 1px, transparent 1px)',
+        backgroundSize: '30px 30px',
+        maskImage: 'radial-gradient(ellipse 85% 85% at 40% 50%, black 30%, transparent 100%)',
+      }} />
+      <div className="absolute top-0 left-0 right-0 h-px" style={{
+        background: 'linear-gradient(90deg, transparent, rgba(160,185,210,0.18), transparent)',
+      }} />
+
+      <div className="relative z-10 flex flex-col h-full px-10 xl:px-14 py-10">
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.45 }}
+          className="flex items-center gap-2.5"
+        >
+          <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}>
+            <span className="text-white font-bold text-[11px]">A</span>
+          </div>
+          <span className="text-sm font-semibold text-white tracking-tight">Agency OS</span>
+        </motion.div>
+
+        <motion.div
+          className="mt-auto mb-8"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.12 }}
+        >
+          <div
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest mb-5"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
+          >
+            <Check size={9} style={{ color: '#8fa0b0' }} />
+            Free to start
+          </div>
+          <h2
+            className="text-[38px] xl:text-[44px] font-black leading-[1.05] tracking-[-0.035em] text-white"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          >
+            Everything your
+            <br />
+            <span style={{
+              background: 'linear-gradient(135deg, #8fa4b8 0%, #dde6ed 45%, #a8bbc8 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              agency needs.
+            </span>
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed" style={{ color: '#6b7280', maxWidth: '300px' }}>
+            Set up in minutes. No credit card required. Cancel anytime.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-2 gap-2.5">
+          {capabilities.map((cap, i) => (
+            <motion.div
+              key={cap.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.35 + i * 0.08 }}
+              className="rounded-2xl p-4"
+              style={{
+                background: 'rgba(255,255,255,0.025)',
+                border: '1px solid rgba(255,255,255,0.065)',
+              }}
+            >
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center mb-3"
+                style={{ background: 'rgba(160,180,200,0.08)', border: '1px solid rgba(160,180,200,0.1)' }}
+              >
+                <cap.icon size={13} style={{ color: '#8fa4b8' }} />
+              </div>
+              <p className="text-[12px] font-semibold text-white mb-0.5">{cap.label}</p>
+              <p className="text-[10px] leading-snug" style={{ color: '#44445a' }}>{cap.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.85 }}
+          className="mt-7 flex items-center gap-3"
+        >
+          <div className="flex -space-x-2">
+            {['#6b7e93', '#8fa0b0', '#a0b4c4', '#c4d0d8'].map((bg, i) => (
+              <div key={i} className="w-6 h-6 rounded-full border-2 flex items-center justify-center" style={{ background: bg, borderColor: '#07080d', fontSize: '8px', fontWeight: 700, color: 'white' }}>
+                {String.fromCharCode(65 + i)}
+              </div>
+            ))}
+          </div>
+          <p className="text-xs" style={{ color: '#44445a' }}>
+            Join <span style={{ color: '#8fa0b0' }}>500+ agencies</span> already running on Agency OS
+          </p>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
 export default function SignUpPage() {
   const [form, setForm] = useState({ name: '', email: '', agencyName: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
+  const [focused, setFocused] = useState<string | null>(null);
   const router = useRouter();
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -34,7 +201,6 @@ export default function SignUpPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -42,21 +208,9 @@ export default function SignUpPage() {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? 'Something went wrong');
-        return;
-      }
-
-      // Sign in automatically after signup
-      const result = await signIn('credentials', {
-        redirect: false,
-        email: form.email,
-        password: form.password,
-      });
-
+      if (!res.ok) { setError(data.error ?? 'Something went wrong'); return; }
+      const result = await signIn('credentials', { redirect: false, email: form.email, password: form.password });
       if (result?.error) {
-        // Account created, redirect to sign in
         router.push('/auth/signin?registered=1');
       } else {
         router.push('/dashboard');
@@ -68,32 +222,61 @@ export default function SignUpPage() {
     }
   };
 
+  const inputStyle = (name: string): React.CSSProperties => ({
+    width: '100%',
+    height: '46px',
+    padding: '0 16px',
+    borderRadius: '10px',
+    fontSize: '14px',
+    color: '#e2eaf0',
+    background: focused === name ? 'rgba(180,200,220,0.07)' : 'rgba(255,255,255,0.03)',
+    border: focused === name ? '1px solid rgba(180,205,225,0.38)' : '1px solid rgba(255,255,255,0.1)',
+    outline: 'none',
+    transition: 'all 0.18s ease',
+    boxShadow: focused === name ? '0 0 0 3px rgba(160,190,215,0.08)' : 'none',
+  });
+
   return (
-    <div
-      className="min-h-screen flex items-center justify-center relative overflow-hidden py-12"
-      style={{ background: '#060609' }}
-    >
-      <div className="absolute pointer-events-none" style={{ top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(107,126,147,0.06), transparent 70%)', filter: 'blur(80px)' }} />
-      <div className="absolute pointer-events-none" style={{ bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(143,160,176,0.05), transparent 70%)', filter: 'blur(80px)' }} />
+    <div className="min-h-screen flex" style={{ background: '#060609' }}>
+      <style>{`
+        .auth-input::placeholder { color: #3a3a50; }
+        .auth-input:-webkit-autofill,
+        .auth-input:-webkit-autofill:focus {
+          -webkit-box-shadow: 0 0 0 1000px #0d1520 inset !important;
+          -webkit-text-fill-color: #e2eaf0 !important;
+          caret-color: #e2eaf0;
+        }
+      `}</style>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative z-10 w-full max-w-sm px-4"
-      >
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2.5 mb-8">
-          <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}>
-            <span className="text-white font-bold text-sm">A</span>
+      <div className="hidden lg:block lg:w-[54%] xl:w-[56%]">
+        <ProductPanel />
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center px-8 py-12 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(107,126,147,0.055) 0%, transparent 70%)',
+        }} />
+
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative z-10 w-full max-w-[360px]"
+        >
+          <div className="flex lg:hidden items-center justify-center gap-2.5 mb-10">
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}>
+              <span className="text-white font-bold text-[11px]">A</span>
+            </div>
+            <span className="text-sm font-semibold text-white tracking-tight">Agency OS</span>
           </div>
-          <span className="text-lg font-semibold tracking-tight text-white">Agency OS</span>
-        </div>
 
-        <div className="rounded-2xl p-8" style={{ background: 'rgba(12, 12, 20, 0.9)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)' }}>
-          <div className="text-center mb-6">
-            <h1 className="text-lg font-semibold text-white">Create your account</h1>
-            <p className="text-sm mt-1" style={{ color: '#6b7280' }}>Start managing your agency today</p>
+          <div className="mb-7">
+            <h1 className="text-[26px] font-black tracking-[-0.03em] text-white leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              Create your account
+            </h1>
+            <p className="mt-1.5 text-sm" style={{ color: '#6b7280' }}>
+              Start managing your agency today — free
+            </p>
           </div>
 
           {/* Google */}
@@ -101,57 +284,69 @@ export default function SignUpPage() {
             type="button"
             onClick={() => { setGoogleLoading(true); signIn('google', { callbackUrl: '/dashboard' }); }}
             disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 mb-5"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#e5e7eb' }}
+            className="w-full flex items-center justify-center gap-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60"
+            style={{
+              height: '46px',
+              background: 'linear-gradient(135deg, rgba(160,180,200,0.11) 0%, rgba(100,120,145,0.06) 100%)',
+              border: '1px solid rgba(180,200,220,0.22)',
+              color: '#c4d0d8',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
+            }}
           >
-            {googleLoading ? <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> : <GoogleIcon />}
+            {googleLoading ? (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+            ) : <GoogleIcon />}
             Continue with Google
           </button>
 
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <span className="text-xs" style={{ color: '#3b3b4f' }}>or sign up with email</span>
+            <span className="text-[11px] font-medium" style={{ color: '#333348' }}>or sign up with email</span>
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {error && (
               <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="p-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
                 {error}
               </motion.div>
             )}
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium" style={{ color: '#9ca3af' }}>Your name</label>
-              <Input type="text" value={form.name} onChange={set('name')} placeholder="Jane Smith" required />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Your name</label>
+                <input type="text" value={form.name} onChange={set('name')} onFocus={() => setFocused('name')} onBlur={() => setFocused(null)} placeholder="Jane Smith" required autoFocus className="auth-input" style={inputStyle('name')} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Agency</label>
+                <input type="text" value={form.agencyName} onChange={set('agencyName')} onFocus={() => setFocused('agency')} onBlur={() => setFocused(null)} placeholder="Acme Agency" required className="auth-input" style={inputStyle('agency')} />
+              </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium" style={{ color: '#9ca3af' }}>Agency name</label>
-              <Input type="text" value={form.agencyName} onChange={set('agencyName')} placeholder="Acme Agency" required />
+              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Email</label>
+              <input type="email" value={form.email} onChange={set('email')} onFocus={() => setFocused('email')} onBlur={() => setFocused(null)} placeholder="you@agency.com" required className="auth-input" style={inputStyle('email')} />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium" style={{ color: '#9ca3af' }}>Email</label>
-              <Input type="email" value={form.email} onChange={set('email')} placeholder="you@agency.com" required />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium" style={{ color: '#9ca3af' }}>Password</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Password</label>
               <div className="relative">
-                <Input
+                <input
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={set('password')}
+                  onFocus={() => setFocused('password')}
+                  onBlur={() => setFocused(null)}
                   placeholder="At least 8 characters"
                   required
-                  className="pr-10"
+                  className="auth-input"
+                  style={{ ...inputStyle('password'), paddingRight: '44px' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-                  style={{ color: '#555565' }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors hover:text-white"
+                  style={{ color: '#44445a' }}
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -161,21 +356,42 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)', boxShadow: '0 4px 20px rgba(107,126,147,0.25)' }}
+              className="relative overflow-hidden w-full flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60 mt-1"
+              style={{
+                height: '50px',
+                fontSize: '14px',
+                background: 'linear-gradient(135deg, #0b1520 0%, #172030 50%, #0f1c28 100%)',
+                border: '1px solid rgba(160,200,230,0.2)',
+                boxShadow: '0 0 20px rgba(140,190,220,0.12), 0 4px 24px rgba(0,0,0,0.55)',
+                color: '#ddeef8',
+              }}
             >
-              {loading ? 'Creating account…' : 'Create account'}
+              <SparkleParticles count={28} />
+              <span className="relative z-10 flex items-center gap-2">
+                {loading ? (
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                ) : (
+                  <>Create account <ArrowRight size={14} /></>
+                )}
+              </span>
             </button>
-          </form>
-        </div>
 
-        <p className="text-center text-sm mt-6" style={{ color: '#555565' }}>
-          Already have an account?{' '}
-          <Link href="/auth/signin" className="font-medium hover:text-white transition-colors" style={{ color: '#b0bec8' }}>
-            Sign in
-          </Link>
-        </p>
-      </motion.div>
+            <p className="text-[11px] text-center" style={{ color: '#333348' }}>
+              By creating an account you agree to our{' '}
+              <Link href="#" className="hover:text-white transition-colors" style={{ color: '#555568' }}>Terms</Link>
+              {' '}and{' '}
+              <Link href="#" className="hover:text-white transition-colors" style={{ color: '#555568' }}>Privacy Policy</Link>
+            </p>
+          </form>
+
+          <p className="text-center text-[13px] mt-6" style={{ color: '#44445a' }}>
+            Already have an account?{' '}
+            <Link href="/auth/signin" className="font-semibold transition-colors hover:text-white" style={{ color: '#b0bec8' }}>
+              Sign in
+            </Link>
+          </p>
+        </motion.div>
+      </div>
     </div>
   );
 }

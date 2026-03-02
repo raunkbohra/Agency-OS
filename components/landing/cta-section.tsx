@@ -74,9 +74,10 @@ export function CtaSection() {
               href="#features"
               className="inline-flex items-center gap-2 px-8 py-4 text-base font-medium rounded-2xl transition-all duration-200 hover:-translate-y-0.5"
               style={{
-                color: '#9ca3af',
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.03)',
+                color: '#b8cad4',
+                border: '1px solid rgba(180,200,220,0.25)',
+                background: 'linear-gradient(135deg, rgba(160,180,200,0.12) 0%, rgba(100,120,145,0.07) 100%)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
               }}
             >
               Learn more
