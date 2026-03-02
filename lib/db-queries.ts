@@ -6,7 +6,12 @@ export interface Agency {
   name: string;
   owner_id: string;
   currency: string;
-  email?: string;
+  email: string | null;
+  bank_name: string | null;
+  bank_account: string | null;
+  bank_routing: string | null;
+  country: string | null;
+  logo_url: string | null;
   created_at: string;
 }
 
@@ -134,6 +139,69 @@ export async function getAgenciesByOwnerId(ownerId: string): Promise<Agency[]> {
   } catch (err) {
     console.error('Failed to get agencies by owner ID:', err);
     throw new Error(`Failed to fetch agencies: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function updateAgency(
+  id: string,
+  fields: {
+    name?: string;
+    email?: string;
+    currency?: string;
+    country?: string;
+    bank_name?: string;
+    bank_account?: string;
+    bank_routing?: string;
+    logo_url?: string;
+  }
+): Promise<Agency | null> {
+  try {
+    const updateFields: string[] = [];
+    const values: (string | undefined)[] = [];
+    let paramCount = 1;
+
+    if (fields.name !== undefined) {
+      updateFields.push(`name = $${paramCount++}`);
+      values.push(fields.name);
+    }
+    if (fields.email !== undefined) {
+      updateFields.push(`email = $${paramCount++}`);
+      values.push(fields.email);
+    }
+    if (fields.currency !== undefined) {
+      updateFields.push(`currency = $${paramCount++}`);
+      values.push(fields.currency);
+    }
+    if (fields.country !== undefined) {
+      updateFields.push(`country = $${paramCount++}`);
+      values.push(fields.country);
+    }
+    if (fields.bank_name !== undefined) {
+      updateFields.push(`bank_name = $${paramCount++}`);
+      values.push(fields.bank_name);
+    }
+    if (fields.bank_account !== undefined) {
+      updateFields.push(`bank_account = $${paramCount++}`);
+      values.push(fields.bank_account);
+    }
+    if (fields.bank_routing !== undefined) {
+      updateFields.push(`bank_routing = $${paramCount++}`);
+      values.push(fields.bank_routing);
+    }
+    if (fields.logo_url !== undefined) {
+      updateFields.push(`logo_url = $${paramCount++}`);
+      values.push(fields.logo_url);
+    }
+
+    if (updateFields.length === 0) return getAgencyById(id);
+
+    values.push(id);
+    const query = `UPDATE agencies SET ${updateFields.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+    const result = await db.query(query, values);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to update agency:', err);
+    throw new Error(`Failed to update agency: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 }
 
@@ -516,6 +584,7 @@ export interface Invoice {
   due_date: string | null;
   paid_date: string | null;
   pdf_url?: string | null;
+  billing_period?: string | null;
   created_at: string;
   updated_at?: string;
   // Only populated by getInvoicesByAgency() which JOINs with clients table

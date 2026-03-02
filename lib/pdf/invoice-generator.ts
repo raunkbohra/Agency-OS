@@ -5,8 +5,10 @@ export interface InvoiceData {
   invoiceNumber: string;
   agencyName: string;
   agencyEmail: string;
+  agencyLogoUrl?: string;
   clientName: string;
   clientEmail: string;
+  currencySymbol: string;
   items: Array<{ description: string; qty: number; rate: number }>;
   totalAmount: number;
   dueDate: string;
@@ -30,35 +32,48 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
     });
     doc.on('error', reject);
 
+    let yPosition = 50;
+
+    // Logo (if available)
+    if (data.agencyLogoUrl) {
+      try {
+        doc.image(data.agencyLogoUrl, 50, yPosition, { width: 100, height: 50 });
+        yPosition += 65;
+      } catch (err) {
+        console.warn('Failed to load logo image:', err);
+      }
+    }
+
     // Header
-    doc.fontSize(24).font('Helvetica-Bold').text('INVOICE', 50, 50);
-    doc.fontSize(10).font('Helvetica').text(`Invoice #${data.invoiceNumber}`, 50, 90);
+    doc.fontSize(24).font('Helvetica-Bold').text('INVOICE', 50, yPosition);
+    doc.fontSize(10).font('Helvetica').text(`Invoice #${data.invoiceNumber}`, 50, yPosition + 40);
 
     // Agency details
-    doc.fontSize(12).font('Helvetica-Bold').text(data.agencyName, 50, 130);
-    doc.fontSize(10).font('Helvetica').text(data.agencyEmail, 50, 150);
+    const headerOffset = yPosition;
+    doc.fontSize(12).font('Helvetica-Bold').text(data.agencyName, 50, headerOffset + 80);
+    doc.fontSize(10).font('Helvetica').text(data.agencyEmail, 50, headerOffset + 100);
 
     // Client details
-    doc.fontSize(12).font('Helvetica-Bold').text('Bill To:', 300, 130);
-    doc.fontSize(10).font('Helvetica').text(data.clientName, 300, 150);
-    doc.text(data.clientEmail, 300, 170);
+    doc.fontSize(12).font('Helvetica-Bold').text('Bill To:', 300, headerOffset + 80);
+    doc.fontSize(10).font('Helvetica').text(data.clientName, 300, headerOffset + 100);
+    doc.text(data.clientEmail, 300, headerOffset + 120);
 
     // Due date
-    doc.fontSize(10).text(`Due Date: ${data.dueDate}`, 300, 200);
+    doc.fontSize(10).text(`Due Date: ${data.dueDate}`, 300, headerOffset + 150);
 
     // Items table header
-    doc.fontSize(12).font('Helvetica-Bold').text('Description', 50, 280);
-    doc.text('Qty', 300, 280);
-    doc.text('Rate', 400, 280);
-    doc.text('Amount', 480, 280);
+    doc.fontSize(12).font('Helvetica-Bold').text('Description', 50, headerOffset + 230);
+    doc.text('Qty', 300, headerOffset + 230);
+    doc.text('Rate', 400, headerOffset + 230);
+    doc.text('Amount', 480, headerOffset + 230);
 
     // Items
-    let y = 310;
+    let y = headerOffset + 260;
     data.items.forEach((item) => {
       doc.fontSize(10).font('Helvetica').text(item.description, 50, y);
       doc.text(item.qty.toString(), 300, y);
-      doc.text(`₹${item.rate}`, 400, y);
-      doc.text(`₹${(item.qty * item.rate).toFixed(2)}`, 480, y);
+      doc.text(`${data.currencySymbol}${item.rate}`, 400, y);
+      doc.text(`${data.currencySymbol}${(item.qty * item.rate).toFixed(2)}`, 480, y);
       y += 30;
     });
 
@@ -66,7 +81,7 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
     doc
       .fontSize(14)
       .font('Helvetica-Bold')
-      .text(`Total: ₹${data.totalAmount.toFixed(2)}`, 400, y + 20);
+      .text(`Total: ${data.currencySymbol}${data.totalAmount.toFixed(2)}`, 400, y + 20);
 
     // Bank details
     if (data.bankDetails) {

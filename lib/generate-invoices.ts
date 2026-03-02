@@ -10,7 +10,7 @@ import { isDuePeriod, calcFirstInvoice } from './generate-deliverables';
  *   'prorated'   — generate prorated invoice for the remaining days in the join month
  *
  * Idempotent: skips if invoice already exists for this client + plan + billing_period.
- * Returns true if created, false if skipped.
+ * Returns invoice ID if created, null if skipped.
  */
 export async function generateInvoiceForClientPlan(
   clientPlan: {
@@ -24,7 +24,7 @@ export async function generateInvoiceForClientPlan(
     plan_price: number;
   },
   referenceDate: Date = new Date()
-): Promise<boolean> {
+): Promise<string | null> {
   const startDate = new Date(clientPlan.start_date);
   const policy = clientPlan.billing_start_policy ?? 'next_month';
   const months = monthsSince(startDate, referenceDate);
@@ -32,11 +32,11 @@ export async function generateInvoiceForClientPlan(
 
   // next_month policy: skip the partial join month entirely
   if (policy === 'next_month' && isFirstPartialMonth) {
-    return false;
+    return null;
   }
 
   if (!isDuePeriod(startDate, clientPlan.billing_cycle, referenceDate)) {
-    return false;
+    return null;
   }
 
   const billingPeriod = `${referenceDate.getFullYear()}-${String(
@@ -50,7 +50,7 @@ export async function generateInvoiceForClientPlan(
      LIMIT 1`,
     [clientPlan.client_id, billingPeriod]
   );
-  if (existing.rows.length > 0) return false;
+  if (existing.rows.length > 0) return null;
 
   // Calculate amount and due date based on policy
   let amount: number;
@@ -95,7 +95,7 @@ export async function generateInvoiceForClientPlan(
     invoice.id,
   ]);
 
-  return true;
+  return invoice.id;
 }
 
 /** Whole-month difference between two dates (negative = start is in the future) */

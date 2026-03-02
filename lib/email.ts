@@ -133,3 +133,67 @@ export async function sendClientEmail(options: {
 </html>`.trim(),
   });
 }
+
+export async function sendInvoiceEmail(options: {
+  to: string;
+  clientName: string;
+  agencyName: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  amount: number;
+  currencySymbol: string;
+  billingPeriod: string;
+  dueDate: string;
+  payUrl: string;
+}): Promise<void> {
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: `New Invoice from ${options.agencyName} — ${options.billingPeriod}`,
+    text: `Hi ${options.clientName},\n\nYou have a new invoice for ${options.billingPeriod}.\n\nAmount Due: ${options.currencySymbol}${options.amount.toFixed(2)}\nDue Date: ${options.dueDate}\n\nView and pay your invoice:\n${options.payUrl}`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <tr>
+          <td align="center" style="padding-bottom:24px;">
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${options.clientName},</p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;">You have a new invoice for <strong>${options.billingPeriod}</strong>.</p>
+
+            <div style="margin:24px 0;padding:16px;background:#f3f4f6;border-left:3px solid #0070f3;border-radius:4px;">
+              <p style="margin:0 0 8px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Amount Due</p>
+              <p style="margin:0;font-size:28px;font-weight:700;color:#0d1117;">${options.currencySymbol}${options.amount.toFixed(2)}</p>
+              <p style="margin:8px 0 0;font-size:13px;color:#6b7280;">Due: ${options.dueDate}</p>
+            </div>
+
+            <table cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
+              <tr>
+                <td align="center">
+                  <a href="${options.payUrl}"
+                    style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#0070f3,#7c3aed);color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;letter-spacing:0.01em;">
+                    View &amp; Pay Invoice
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Invoice #${options.invoiceNumber} · Sent via Agency OS</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim(),
+  });
+}

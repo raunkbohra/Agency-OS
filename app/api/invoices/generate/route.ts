@@ -9,14 +9,14 @@ import {
 import { auth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.agencyId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { invoiceId } = await req.json();
+    const invoiceId = req.nextUrl.searchParams.get('invoiceId');
 
     if (!invoiceId) {
       return NextResponse.json({ error: 'Invoice ID is required' }, { status: 400 });
@@ -43,13 +43,28 @@ export async function POST(req: NextRequest) {
     // Fetch invoice items
     const items = await getInvoiceItems(invoiceId, session.user.agencyId);
 
+    // Determine currency symbol
+    const currencySymbol = agency.currency === 'NPR' ? 'Rs.' : '$';
+
+    // Build bank details (only if all three fields are present)
+    const bankDetails =
+      agency.bank_name && agency.bank_account && agency.bank_routing
+        ? {
+            accountNumber: agency.bank_account,
+            routingNumber: agency.bank_routing,
+            bankName: agency.bank_name,
+          }
+        : undefined;
+
     // Generate PDF
     const pdfStream = await generateInvoicePDF({
       invoiceNumber: `INV-${invoiceId.slice(0, 8).toUpperCase()}`,
       agencyName: agency.name,
-      agencyEmail: 'contact@agency.com', // TODO: Make this configurable
+      agencyEmail: agency.email ?? process.env.SMTP_FROM ?? 'contact@agencyos.dev',
+      agencyLogoUrl: agency.logo_url || undefined,
       clientName: client.name,
       clientEmail: client.email || 'client@example.com',
+      currencySymbol,
       items: items.map((i: any) => ({
         description: i.description,
         qty: i.quantity,
@@ -63,11 +78,7 @@ export async function POST(req: NextRequest) {
             day: 'numeric',
           })
         : 'Not specified',
-      bankDetails: {
-        accountNumber: '1234567890',
-        routingNumber: '123456',
-        bankName: 'Bank Name',
-      },
+      bankDetails,
     });
 
     // TODO: Upload PDF to storage (Vercel Blob, S3, etc.)
