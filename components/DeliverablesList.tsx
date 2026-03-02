@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Plus } from 'lucide-react';
 import NewDeliverableModal from './NewDeliverableModal';
+import DeliverableStats from './DeliverableStats';
 
 interface Deliverable {
   id: string;
@@ -29,13 +30,20 @@ export default function DeliverablesList() {
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [urgent, setUrgent] = useState(false);
+  const [sort, setSort] = useState('due_date');
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchDeliverables = async () => {
       try {
-        const res = await fetch('/api/deliverables');
+        const params = new URLSearchParams({
+          status: statusFilter,
+          urgent: urgent.toString(),
+          sort,
+        });
+        const res = await fetch(`/api/deliverables?${params}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         setDeliverables(data);
@@ -46,7 +54,7 @@ export default function DeliverablesList() {
       }
     };
     fetchDeliverables();
-  }, []);
+  }, [statusFilter, urgent, sort]);
 
   const handleCreated = (deliverable: any) => {
     // Prepend the new deliverable with a placeholder client_name
@@ -54,9 +62,12 @@ export default function DeliverablesList() {
     setDeliverables(prev => [{ ...deliverable, client_name: deliverable.client_name ?? '' }, ...prev]);
   };
 
-  const filtered = statusFilter === 'all'
-    ? deliverables
-    : deliverables.filter(d => d.status === statusFilter);
+  const sortOptions = [
+    { value: 'due_date', label: 'Due Date (Earliest)' },
+    { value: 'due_date_desc', label: 'Due Date (Latest)' },
+    { value: 'created_at', label: 'Recently Created' },
+    { value: 'status', label: 'By Status' },
+  ];
 
   if (loading) {
     return (
@@ -103,15 +114,43 @@ export default function DeliverablesList() {
         onCreated={handleCreated}
       />
 
-      {filtered.length === 0 ? (
+      {/* Stats widget */}
+      <DeliverableStats deliverables={deliverables} />
+
+      {/* Urgent filter + Sort dropdown */}
+      <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3">
+        <label className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-secondary border border-border-default cursor-pointer hover:bg-bg-hover transition-colors">
+          <input
+            type="checkbox"
+            checked={urgent}
+            onChange={(e) => setUrgent(e.target.checked)}
+            className="h-4 w-4 rounded cursor-pointer"
+          />
+          <span className="text-xs font-medium text-text-primary">Urgent (due within 7 days)</span>
+        </label>
+
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="px-3 py-1.5 rounded-lg bg-bg-secondary border border-border-default text-text-primary text-xs font-medium hover:bg-bg-hover transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-blue/50"
+        >
+          {sortOptions.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {deliverables.length === 0 ? (
         <div className="text-center py-16 text-text-tertiary text-sm bg-bg-secondary rounded-xl border border-border-default">
-          No deliverables{statusFilter !== 'all' ? ` with status "${statusFilter.replace('_', ' ')}"` : ''}.
+          No deliverables found.
         </div>
       ) : (
         <>
           {/* Mobile: card list */}
           <div className="sm:hidden space-y-2">
-            {filtered.map(d => (
+            {deliverables.map(d => (
               <Link
                 key={d.id}
                 href={`/dashboard/deliverables/${d.id}`}
@@ -150,7 +189,7 @@ export default function DeliverablesList() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-default">
-                {filtered.map(d => (
+                {deliverables.map(d => (
                   <tr key={d.id} className="hover:bg-bg-hover transition-colors">
                     <td className="px-6 py-4 text-sm font-medium text-text-primary">{d.title}</td>
                     <td className="px-6 py-4 text-sm text-text-secondary">{d.client_name || '—'}</td>
