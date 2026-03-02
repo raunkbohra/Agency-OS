@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         await sendSigningRequestEmail({
           to: client.email,
           clientName: client.name,
-          fileName: file.name,
+          contractFileName: file.name,
           signingUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/sign/contracts/${contract.id}`,
           agencyName: session.user.agencyName || 'Agency OS'
         });
