@@ -526,6 +526,50 @@ export async function updateClient(
   }
 }
 
+// Portal token functions
+export function generatePortalToken(): string {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+export async function setClientPortalToken(clientId: string, token: string): Promise<void> {
+  try {
+    await db.query(
+      'UPDATE clients SET token = $1 WHERE id = $2',
+      [token, clientId]
+    );
+  } catch (err) {
+    console.error('Failed to set client portal token:', err);
+    throw new Error(`Failed to set client portal token: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getClientByPortalToken(token: string): Promise<Client | null> {
+  try {
+    const result = await db.query('SELECT * FROM clients WHERE token = $1', [token]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get client by portal token:', err);
+    throw new Error(`Failed to get client by portal token: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getDeliverablesByClient(clientId: string): Promise<Array<any>> {
+  try {
+    const result = await db.query(
+      `SELECT d.id, d.title, d.status, d.month_year, d.due_date
+       FROM deliverables d
+       JOIN client_plans cp ON d.client_plan_id = cp.id
+       WHERE cp.client_id = $1
+       ORDER BY d.month_year DESC, d.due_date DESC`,
+      [clientId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get deliverables by client:', err);
+    throw new Error(`Failed to get deliverables by client: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 // Client plans (subscriptions) queries
 export async function createClientPlan(
   clientId: string,
@@ -903,14 +947,6 @@ export async function createDeliverable(data: {
   return result.rows[0];
 }
 
-export async function getDeliverablesByClient(clientId: string, agencyId: string): Promise<Deliverable[]> {
-  const result = await db.query(
-    `SELECT * FROM deliverables WHERE client_id = $1 AND agency_id = $2 ORDER BY due_date ASC`,
-    [clientId, agencyId]
-  );
-  return result.rows;
-}
-
 export async function getDeliverablesByAgency(agencyId: string): Promise<(Deliverable & { client_name?: string })[]> {
   const result = await db.query(
     `SELECT d.*, c.name as client_name FROM deliverables d
@@ -993,32 +1029,24 @@ export async function updateDeliverableStatus(
 }
 
 export async function updateDeliverablesBulk(
-  deliverableIds: string[],
-  newStatus: string,
-  agencyId: string
-): Promise<number> {
+  ids: string[],
+  agencyId: string,
+  status: string
+): Promise<{ updated: number; total: number }> {
   try {
-    // First, verify ALL deliverables belong to the given agency
-    const verifyResult = await db.query(
-      `SELECT COUNT(*) as count FROM deliverables WHERE agency_id = $1 AND id = ANY($2)`,
-      [agencyId, deliverableIds]
+    const result = await db.query(
+      `UPDATE deliverables
+       SET status = $1, updated_at = NOW()
+       WHERE id = ANY($2) AND agency_id = $3`,
+      [status, ids, agencyId]
     );
-
-    const count = parseInt(verifyResult.rows[0].count, 10);
-    if (count !== deliverableIds.length) {
-      throw new Error('Some deliverables do not belong to this agency');
-    }
-
-    // Update all deliverables in a single transaction
-    const updateResult = await db.query(
-      `UPDATE deliverables SET status = $1, updated_at = NOW() WHERE id = ANY($2) AND agency_id = $3 RETURNING id`,
-      [newStatus, deliverableIds, agencyId]
-    );
-
-    return updateResult.rowCount || 0;
+    return {
+      updated: result.rowCount ?? 0,
+      total: ids.length,
+    };
   } catch (err) {
-    console.error('Failed to update deliverables in bulk:', err);
-    throw new Error(`Failed to update deliverables: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    console.error('Failed to bulk update deliverables:', err);
+    throw new Error(`Failed to bulk update deliverables: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 }
 
@@ -1366,202 +1394,4 @@ export async function calculateClientRiskScore(clientId: string, agencyId: strin
   // Risk score: (alert count * 10) + (avg overage * 100)
   const risk = Math.min((alertCount * 10) + (avgOverage * 100), 100);
   return Math.round(risk);
-}
-
-// ============================================================
-// Contract Signing Token helpers
-// ============================================================
-
-/**
- * Generate a random alphanumeric token of specified length
- */
-function generateToken(length: number = 32): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let token = '';
-  for (let i = 0; i < length; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return token;
-}
-
-/**
- * Generate a 6-digit verification code as a string
- */
-function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// Contract Signing Token interface
-export interface SigningToken {
-  id: string;
-  contract_id: string;
-  token: string;
-  email: string;
-  verified: boolean;
-  signed: boolean;
-  verification_code: string | null;
-  code_expires_at: string | null;
-  created_at: string;
-  expires_at: string | null;
-}
-
-/**
- * Create a new signing token for a contract
- * Returns the token and verification code for the client
- */
-export async function createSigningToken(
-  contractId: string,
-  email: string
-): Promise<{ token: string; code: string }> {
-  try {
-    const token = generateToken(32);
-    const code = generateVerificationCode();
-    const codeExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // NOW() + 10 minutes
-
-    const result = await db.query(
-      `INSERT INTO contract_signing_tokens
-       (contract_id, token, email, verification_code, code_expires_at)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [contractId, token, email, code, codeExpiresAt.toISOString()]
-    );
-
-    return {
-      token,
-      code,
-    };
-  } catch (err) {
-    console.error('Failed to create signing token:', err);
-    throw new Error(`Failed to create signing token: ${err instanceof Error ? err.message : 'Unknown error'}`);
-  }
-}
-
-/**
- * Verify the signing code for a token
- * Returns true if code is valid and not expired, false otherwise
- * Marks the token as verified on success
- */
-export async function verifySigningCode(
-  token: string,
-  email: string,
-  code: string
-): Promise<boolean> {
-  try {
-    // Check if token exists, email matches, code matches, and code is not expired
-    const selectResult = await db.query(
-      `SELECT * FROM contract_signing_tokens
-       WHERE token = $1 AND email = $2 AND verification_code = $3`,
-      [token, email, code]
-    );
-
-    if (selectResult.rows.length === 0) {
-      return false;
-    }
-
-    const tokenData = selectResult.rows[0];
-
-    // Check if code has expired
-    const codeExpiresAt = new Date(tokenData.code_expires_at);
-    if (codeExpiresAt < new Date()) {
-      return false;
-    }
-
-    // Code is valid and not expired - mark as verified
-    await db.query(
-      `UPDATE contract_signing_tokens SET verified = true WHERE token = $1`,
-      [token]
-    );
-
-    return true;
-  } catch (err) {
-    console.error('Failed to verify signing code:', err);
-    throw new Error(`Failed to verify signing code: ${err instanceof Error ? err.message : 'Unknown error'}`);
-  }
-}
-
-/**
- * Get signing token data along with contract and client information
- */
-export interface SigningTokenData {
-  contract_id: string;
-  email: string;
-  verified: boolean;
-  signed: boolean;
-  file_name: string;
-  client_name: string;
-}
-
-export async function getSigningTokenData(token: string): Promise<SigningTokenData | null> {
-  try {
-    const result = await db.query(
-      `SELECT cst.contract_id, cst.email, cst.verified, cst.signed,
-              c.file_name, cl.name as client_name
-       FROM contract_signing_tokens cst
-       JOIN contracts c ON cst.contract_id = c.id
-       JOIN clients cl ON c.client_id = cl.id
-       WHERE cst.token = $1`,
-      [token]
-    );
-
-    return result.rows[0] || null;
-  } catch (err) {
-    console.error('Failed to get signing token data:', err);
-    throw new Error(`Failed to get signing token data: ${err instanceof Error ? err.message : 'Unknown error'}`);
-  }
-}
-
-/**
- * Submit a signature for a contract
- * Verifies token is valid and verified, then updates contract and creates signature record
- */
-export async function submitSignature(
-  token: string,
-  email: string,
-  signatureImage: string,
-  signerName: string
-): Promise<boolean> {
-  try {
-    // Get the token data to verify it exists and is verified
-    const tokenResult = await db.query(
-      `SELECT contract_id, verified FROM contract_signing_tokens WHERE token = $1 AND email = $2`,
-      [token, email]
-    );
-
-    if (tokenResult.rows.length === 0) {
-      return false;
-    }
-
-    const tokenData = tokenResult.rows[0];
-
-    if (!tokenData.verified) {
-      return false;
-    }
-
-    const contractId = tokenData.contract_id;
-
-    // Update contracts table to mark as signed
-    await db.query(
-      `UPDATE contracts SET signed = true, signed_at = NOW() WHERE id = $1`,
-      [contractId]
-    );
-
-    // Insert signature record
-    await db.query(
-      `INSERT INTO contract_signatures
-       (contract_id, signer_name, signed_date, signature_image)
-       VALUES ($1, $2, NOW(), $3)`,
-      [contractId, signerName, signatureImage]
-    );
-
-    // Update signing token to mark as signed
-    await db.query(
-      `UPDATE contract_signing_tokens SET signed = true WHERE token = $1`,
-      [token]
-    );
-
-    return true;
-  } catch (err) {
-    console.error('Failed to submit signature:', err);
-    throw new Error(`Failed to submit signature: ${err instanceof Error ? err.message : 'Unknown error'}`);
-  }
 }
