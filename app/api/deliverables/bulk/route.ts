@@ -26,6 +26,10 @@ export async function PATCH(request: Request) {
       return Response.json({ updated: 0, total: 0 });
     }
 
+    if (ids.length > 500) {
+      return Response.json({ error: 'Maximum 500 IDs per request' }, { status: 400 });
+    }
+
     if (!ids.every((id) => typeof id === 'string')) {
       return Response.json({ error: 'ids must be an array of strings' }, { status: 400 });
     }
@@ -38,6 +42,9 @@ export async function PATCH(request: Request) {
       );
     }
 
+    // Note: IDs that don't exist or belong to different agencies will be silently excluded.
+    // The response { updated, total } allows the caller to detect partial updates (updated < total).
+    // This is intentional: we don't fail or error, just update what we can access.
     const result = await updateDeliverablesBulk(ids, session.user.agencyId, status);
 
     return Response.json(result);
