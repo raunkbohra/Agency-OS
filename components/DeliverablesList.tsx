@@ -6,6 +6,7 @@ import { ArrowRight, Plus } from 'lucide-react';
 import NewDeliverableModal from './NewDeliverableModal';
 import DeliverableStats from './DeliverableStats';
 import { DeliverableGroupedList } from './DeliverableGroupedList';
+import { toast } from '@/components/ui/use-toast';
 
 interface Deliverable {
   id: string;
@@ -96,10 +97,15 @@ export default function DeliverablesList() {
       );
 
       setSelectedBulk([]);
+      setBulkStatus(null);
       setBulkMode(false);
     } catch (err) {
       console.error('Bulk update error:', err);
-      setError('Failed to update deliverables');
+      toast({
+        variant: 'destructive' as const,
+        title: 'Bulk update failed',
+        description: 'Could not update the selected deliverables. Please try again.',
+      } as any);
     } finally {
       setBulkLoading(false);
     }
@@ -193,6 +199,7 @@ export default function DeliverablesList() {
             onClick={() => {
               setBulkMode(!bulkMode);
               setSelectedBulk([]);
+              setBulkStatus(null);
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
               bulkMode
@@ -207,18 +214,16 @@ export default function DeliverablesList() {
 
       {/* Bulk action bar */}
       {bulkMode && selectedBulk.length > 0 && (
-        <div className="mb-4 p-4 bg-accent-blue/10 border border-accent-blue/20 rounded-xl flex items-center justify-between">
-          <span className="text-sm font-medium text-accent-blue">{selectedBulk.length} items selected</span>
+        <div className="mb-4 p-4 bg-accent-blue/10 border border-accent-blue/20 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <span className="text-sm font-medium text-accent-blue">
+            {selectedBulk.length} {selectedBulk.length === 1 ? 'item' : 'items'} selected
+          </span>
           <div className="flex items-center gap-2">
             <select
               value={bulkStatus || ''}
-              onChange={(e) => {
-                setBulkStatus(e.target.value);
-                if (e.target.value) {
-                  handleBulkStatusChange(e.target.value);
-                }
-              }}
-              className="px-3 py-1.5 rounded-lg text-xs border border-border-default bg-white text-text-primary focus:border-border-active focus:outline-none"
+              onChange={(e) => setBulkStatus(e.target.value || null)}
+              disabled={bulkLoading}
+              className="px-3 py-1.5 rounded-lg text-xs border border-border-default bg-white text-text-primary focus:border-border-active focus:outline-none disabled:opacity-50"
             >
               <option value="">Change Status to...</option>
               <option value="draft">Draft</option>
@@ -227,7 +232,15 @@ export default function DeliverablesList() {
               <option value="changes_requested">Changes Requested</option>
               <option value="done">Done</option>
             </select>
-            {bulkLoading && <span className="text-xs text-accent-blue">Updating...</span>}
+            <button
+              onClick={() => {
+                if (bulkStatus) handleBulkStatusChange(bulkStatus);
+              }}
+              disabled={!bulkStatus || bulkLoading}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-blue text-white hover:bg-accent-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {bulkLoading ? 'Applying...' : 'Apply'}
+            </button>
           </div>
         </div>
       )}
