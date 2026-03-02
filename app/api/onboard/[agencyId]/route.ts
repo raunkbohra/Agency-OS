@@ -1,6 +1,8 @@
 import { db } from '@/lib/db';
-import { createClient, createClientPlan, getPlansByAgency } from '@/lib/db-queries';
+import { createClient, createClientPlan, getPlansByAgency, setClientInviteToken } from '@/lib/db-queries';
 import { generateDeliverablesForClientPlan, calcFirstInvoice } from '@/lib/generate-deliverables';
+import { sendClientInviteEmail } from '@/lib/email';
+import crypto from 'crypto';
 
 export async function GET(req: Request, { params }: { params: Promise<{ agencyId: string }> }) {
   const { agencyId } = await params;
@@ -62,6 +64,25 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
       companyName?.trim() || undefined
     );
 
+    // Generate invite token and set expiry (72 hours)
+    const inviteToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
+    await setClientInviteToken(client.id, inviteToken, expiresAt);
+
+    // Build setup URL
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const setupUrl = `${baseUrl}/client-portal/setup/${inviteToken}`;
+
+    // Send invite email (non-blocking)
+    const agencyResult = await db.query('SELECT name FROM agencies WHERE id = $1', [agencyId]);
+    const agencyName = agencyResult.rows[0]?.name || 'Agency';
+    sendClientInviteEmail({
+      to: email.toLowerCase().trim(),
+      clientName: name.trim(),
+      agencyName,
+      setupUrl,
+    }).catch(err => console.error('Failed to send client invite email:', err));
+
     // Assign plan and immediately generate deliverables if a plan was selected
     if (planId) {
       const planResult = await db.query(
@@ -96,7 +117,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
     }
 
     return Response.json(
-      { success: true, client: { id: client.id, name: client.name } },
+      { success: true, client: { id: client.id, name: client.name, setupUrl } },
       { status: 201 }
     );
   } catch (err) {

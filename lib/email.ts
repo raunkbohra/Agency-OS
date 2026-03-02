@@ -410,3 +410,60 @@ export async function sendVerificationCodeEmail(options: {
     `.trim(),
   });
 }
+
+export async function sendClientInviteEmail(options: {
+  to: string;
+  clientName: string;
+  agencyName: string;
+  setupUrl: string;
+}): Promise<void> {
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+      to: options.to,
+      subject: `Welcome to ${options.agencyName}! Set up your account`,
+      text: `Hi ${options.clientName},\n\nYou have been invited to ${options.agencyName}. Please click below to set your password and access your client portal.\n\n${options.setupUrl}\n\nThis is an automated message. Please do not reply.`,
+      html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <tr>
+          <td align="center" style="padding-bottom:24px;">
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${options.clientName},</p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;line-height:1.6;">You have been invited to <strong>${options.agencyName}</strong>. Please click below to set your password and access your client portal.</p>
+
+            <table cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
+              <tr>
+                <td align="center">
+                  <a href="${options.setupUrl}"
+                    style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#0070f3,#7c3aed);color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;letter-spacing:0.01em;">
+                    Set Up Your Account
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
+            <p style="margin:0;font-size:12px;color:#9ca3af;">This is an automated message. Please do not reply to this email.</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim(),
+    });
+  } catch (error) {
+    console.error('Failed to send client invite email:', error);
+    // Don't throw - email failures shouldn't block the API
+  }
+}

@@ -14,6 +14,7 @@ import { ChevronLeft, Mail, Building2, Phone, Package, CheckSquare, Edit2, MapPi
 import EmailClientButton from '@/components/EmailClientButton';
 import ClientEditForm from '@/components/ClientEditForm';
 import PlanEditForm from '@/components/PlanEditForm';
+import ResendInviteButton from '@/components/ResendInviteButton';
 
 interface ClientDetailPageProps {
   params: Promise<{ id: string }>;
@@ -84,6 +85,7 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
         actions={
           <div className="flex items-center gap-2">
             <ClientEditForm client={client} agencyId={agencyId} />
+            <ResendInviteButton clientId={client.id} clientName={client.name} />
             <EmailClientButton clientId={client.id} clientName={client.name} clientEmail={client.email} />
           </div>
         }
