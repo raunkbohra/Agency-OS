@@ -18,10 +18,30 @@ export async function GET(request: Request) {
     }
 
     // Parallelize financial and operational metrics calculations
-    const [financialMetrics, operationalMetrics] = await Promise.all([
+    // Use allSettled for resilience: if one fails, still return the other
+    const [financialResult, operationalResult] = await Promise.allSettled([
       calculateFinancialMetrics(agencyId),
       calculateOperationalMetrics(agencyId),
     ]);
+
+    const financialMetrics = financialResult.status === 'fulfilled' ? financialResult.value : {
+      mrr: 0,
+      arr: 0,
+      collectionRate: 0,
+      outstandingValue: 0,
+    };
+    const operationalMetrics = operationalResult.status === 'fulfilled' ? operationalResult.value : {
+      completionPercentage: 0,
+      onTimePercentage: 0,
+      avgDaysToComplete: 0,
+    };
+
+    if (financialResult.status === 'rejected') {
+      console.warn('Financial metrics calculation failed:', financialResult.reason);
+    }
+    if (operationalResult.status === 'rejected') {
+      console.warn('Operational metrics calculation failed:', operationalResult.reason);
+    }
 
     return Response.json({
       ...financialMetrics,

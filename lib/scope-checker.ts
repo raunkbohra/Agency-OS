@@ -31,12 +31,17 @@ export async function checkForScopeCreep(
       getScopeAlertsByClient(clientId, agencyId, false),
     ]);
 
+    // Pre-build map of deliverable counts by type for O(1) lookup instead of O(n) filtering
+    const deliverableCountByType = new Map<string, number>();
+    deliverables.forEach(d => {
+      const count = deliverableCountByType.get(d.title) || 0;
+      deliverableCountByType.set(d.title, count + 1);
+    });
+
     // For each plan item, count actual deliverables
     for (const planItem of planItems) {
       const planned = 1; // Each plan_item represents 1 planned deliverable
-      const actual = deliverables.filter(
-        d => d.title.includes(planItem.deliverable_type)
-      ).length;
+      const actual = deliverableCountByType.get(planItem.deliverable_type) || 0;
 
       // Check threshold: >50% overage
       const overage = (actual - planned) / planned;

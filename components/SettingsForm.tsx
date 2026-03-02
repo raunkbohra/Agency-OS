@@ -12,6 +12,7 @@ export default function SettingsForm({ initialAgency }: SettingsFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadController, setUploadController] = useState<AbortController | null>(null);
 
   // Form state
   const [name, setName] = useState(initialAgency.name || '');
@@ -31,6 +32,14 @@ export default function SettingsForm({ initialAgency }: SettingsFormProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Cancel previous upload if still in progress
+    if (uploadController) {
+      uploadController.abort();
+    }
+
+    const newController = new AbortController();
+    setUploadController(newController);
+
     // Client-side validation
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
     const MAX_WIDTH = 2000;
@@ -39,11 +48,13 @@ export default function SettingsForm({ initialAgency }: SettingsFormProps) {
 
     if (file.size > MAX_FILE_SIZE) {
       setError(`File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds 2MB limit`);
+      setUploadController(null);
       return;
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
       setError('Only JPG, PNG, and WebP images are supported');
+      setUploadController(null);
       return;
     }
 
@@ -55,11 +66,13 @@ export default function SettingsForm({ initialAgency }: SettingsFormProps) {
       img.onload = async () => {
         if (img.width > MAX_WIDTH) {
           setError(`Image width (${img.width}px) exceeds 2000px limit`);
+          setUploadController(null);
           return;
         }
 
         if (img.height > MAX_HEIGHT) {
           setError(`Image height (${img.height}px) exceeds 500px limit`);
+          setUploadController(null);
           return;
         }
 
@@ -73,6 +86,7 @@ export default function SettingsForm({ initialAgency }: SettingsFormProps) {
           const res = await fetch('/api/upload', {
             method: 'POST',
             body: formData,
+            signal: newController.signal,
           });
 
           if (!res.ok) {
@@ -85,14 +99,19 @@ export default function SettingsForm({ initialAgency }: SettingsFormProps) {
           setLogoPreview(data.fileUrl);
           setError(null);
         } catch (err) {
+          if (err instanceof Error && err.name === 'AbortError') {
+            return; // Upload was cancelled
+          }
           setError(err instanceof Error ? err.message : 'Failed to upload logo');
         } finally {
           setUploading(false);
+          setUploadController(null);
         }
       };
 
       img.onerror = () => {
         setError('Invalid image file');
+        setUploadController(null);
       };
 
       img.src = e.target?.result as string;
