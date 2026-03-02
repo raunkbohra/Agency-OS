@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -92,8 +93,9 @@ export default function PaymentPage() {
 
   return (
     <div className="max-w-lg mx-auto space-y-5">
-      <Link href={`/dashboard/invoices/${invoiceId}`} className="inline-flex items-center gap-1 text-sm text-accent-blue hover:text-accent-blue/80 font-medium">
-        ← Back to Invoice
+      <Link href={`/dashboard/invoices/${invoiceId}`} className="inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors">
+        <ChevronLeft className="h-4 w-4" />
+        Back to Invoice
       </Link>
 
       <h1 className="text-xl font-bold text-text-primary">Submit Payment</h1>
