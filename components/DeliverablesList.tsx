@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Plus } from 'lucide-react';
 import NewDeliverableModal from './NewDeliverableModal';
-import { DeliverableStats } from './DeliverableStats';
+import DeliverableStats from './DeliverableStats';
 import { DeliverableGroupedList } from './DeliverableGroupedList';
 
 interface Deliverable {
