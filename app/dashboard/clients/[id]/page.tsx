@@ -13,6 +13,7 @@ import { StatusBadge } from '@/components/shared/status-badge';
 import { ChevronLeft, Mail, Building2, Phone, Package, CheckSquare, Edit2, MapPin } from 'lucide-react';
 import EmailClientButton from '@/components/EmailClientButton';
 import ClientEditForm from '@/components/ClientEditForm';
+import PlanEditForm from '@/components/PlanEditForm';
 
 interface ClientDetailPageProps {
   params: Promise<{ id: string }>;
@@ -140,9 +141,12 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
       {plan && clientPlan && (
         <ScrollReveal delay={0.05}>
           <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Package className="h-4 w-4 text-text-secondary" />
-              <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Current Plan</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4 text-text-secondary" />
+                <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Current Plan</h2>
+              </div>
+              <PlanEditForm clientPlan={clientPlan} currentPlan={plan} clientId={client.id} />
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
