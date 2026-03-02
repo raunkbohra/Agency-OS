@@ -28,7 +28,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const verificationCode = result.rows[0].verification_code;
+    // Generate a 6-digit verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const codeExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Store the code in the database
+    await db.query(
+      `UPDATE contract_signing_tokens
+       SET verification_code = $1, code_expires_at = $2
+       WHERE token = $3`,
+      [verificationCode, codeExpiresAt, token]
+    );
 
     // Send email with code
     await sendVerificationCodeEmail({
