@@ -60,202 +60,233 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([612, 792]);
     const { width, height } = page.getSize();
-    const margin = 40;
+    const margin = 50;
     const contentWidth = width - 2 * margin;
-    let y = height - 35; // Start lower to prevent overflow
+    let y = height - margin;
 
-    // ─── HEADER ───
-    // Logo
-    let logoWidth = 0;
+    // ─── HEADER SECTION ───
+    // Company info on left
+    page.drawText(data.agencyName, {
+      x: margin,
+      y: y,
+      size: 18,
+      color: COLORS.black,
+    });
+
+    y -= 22;
+
+    if (data.agencyAddress) {
+      const addressLines = data.agencyAddress.split('\n').slice(0, 2);
+      for (const line of addressLines) {
+        page.drawText(line.trim(), {
+          x: margin,
+          y: y,
+          size: 10,
+          color: COLORS.mediumGray,
+        });
+        y -= 12;
+      }
+    }
+
+    // Logo on right
+    const logoX = width - margin - 100;
+    const logoY = height - margin - 20;
+    let logoHeight = 60;
+    let logoWidth = 100;
+
     if (data.agencyLogoUrl) {
       try {
         const logoResponse = await fetch(data.agencyLogoUrl);
         if (logoResponse.ok) {
           const logoBuffer = await logoResponse.arrayBuffer();
           const logoImage = await pdfDoc.embedPng(Buffer.from(logoBuffer));
-          logoWidth = 50;
+          const logoDims = logoImage.scale(0.15);
+          logoWidth = logoDims.width;
+          logoHeight = logoDims.height;
           page.drawImage(logoImage, {
-            x: margin,
-            y: y - 40,
-            width: 50,
-            height: 40,
+            x: logoX - logoWidth / 2,
+            y: logoY - logoHeight,
+            width: logoWidth,
+            height: logoHeight,
           });
         }
       } catch (err) {
         console.warn('Failed to load logo:', err);
       }
-    }
-
-    // Company name and details
-    const companyX = margin + logoWidth + (logoWidth > 0 ? 15 : 0);
-    page.drawText(data.agencyName.toUpperCase(), {
-      x: companyX,
-      y: y - 15,
-      size: 16,
-      color: COLORS.black,
-    });
-
-    page.drawText(data.agencyEmail, {
-      x: companyX,
-      y: y - 30,
-      size: 8,
-      color: COLORS.mediumGray,
-    });
-
-    // Right-aligned invoice heading
-    page.drawText('INVOICE', {
-      x: width - margin - 80,
-      y: y - 15,
-      size: 20,
-      color: COLORS.black,
-    });
-
-    y -= 55;
-
-    // ─── INVOICE DETAILS ROW ───
-    const boxW = (contentWidth - 20) / 3;
-    page.drawText('Invoice #:', {
-      x: margin,
-      y: y,
-      size: 8,
-      color: COLORS.mediumGray,
-    });
-    page.drawText(data.invoiceNumber, {
-      x: margin,
-      y: y - 12,
-      size: 10,
-      color: COLORS.black,
-    });
-
-    if (data.invoiceDate) {
-      page.drawText('Date:', {
-        x: margin + boxW,
-        y: y,
-        size: 8,
+    } else {
+      // Logo placeholder
+      drawRectangle(page, logoX - 50, logoY, 100, 60, COLORS.lightGray);
+      page.drawText('Logo', {
+        x: logoX - 20,
+        y: logoY - 30,
+        size: 10,
         color: COLORS.mediumGray,
       });
-      page.drawText(data.invoiceDate, {
-        x: margin + boxW,
-        y: y - 12,
-        size: 10,
-        color: COLORS.black,
-      });
     }
 
-    page.drawText('Due:', {
-      x: margin + boxW * 2,
-      y: y,
-      size: 8,
-      color: COLORS.mediumGray,
-    });
-    page.drawText(data.dueDate, {
-      x: margin + boxW * 2,
-      y: y - 12,
-      size: 10,
+    // INVOICE title on right
+    page.drawText('INVOICE', {
+      x: width - margin - 120,
+      y: height - 80,
+      size: 28,
       color: COLORS.black,
     });
 
-    y -= 25;
+    y = height - margin - 100;
 
-    // ─── BILL TO ───
-    page.drawText('Bill To:', {
+    // ─── BILL TO and INVOICE DETAILS (Two Column) ───
+    const colWidth = contentWidth / 2;
+
+    // Left column - Bill To
+    page.drawText('Bill To', {
       x: margin,
       y: y,
-      size: 9,
+      size: 11,
       color: COLORS.mediumGray,
     });
+
+    y -= 14;
 
     page.drawText(data.clientName, {
       x: margin,
-      y: y - 12,
-      size: 11,
+      y: y,
+      size: 12,
       color: COLORS.black,
     });
 
-    page.drawText(data.clientEmail, {
-      x: margin,
-      y: y - 24,
-      size: 8,
-      color: COLORS.mediumGray,
-    });
+    y -= 14;
 
     if (data.clientAddress) {
-      let addressY = y - 34;
-      for (const line of data.clientAddress.split('\n').slice(0, 2)) {
+      const addressLines = data.clientAddress.split('\n').slice(0, 2);
+      for (const line of addressLines) {
         page.drawText(line.trim(), {
           x: margin,
-          y: addressY,
-          size: 8,
+          y: y,
+          size: 9,
           color: COLORS.mediumGray,
         });
-        addressY -= 10;
+        y -= 11;
       }
     }
 
+    // Right column - Invoice details
+    const invoiceY = height - margin - 100;
+    const detailsX = margin + colWidth;
+
+    page.drawText('Invoice #', {
+      x: detailsX,
+      y: invoiceY,
+      size: 9,
+      color: COLORS.mediumGray,
+    });
+
+    page.drawText(data.invoiceNumber, {
+      x: width - margin - 80,
+      y: invoiceY,
+      size: 9,
+      color: COLORS.black,
+    });
+
+    page.drawText('Invoice date', {
+      x: detailsX,
+      y: invoiceY - 18,
+      size: 9,
+      color: COLORS.mediumGray,
+    });
+
+    page.drawText(data.invoiceDate || '', {
+      x: width - margin - 80,
+      y: invoiceY - 18,
+      size: 9,
+      color: COLORS.black,
+    });
+
+    page.drawText('Due date', {
+      x: detailsX,
+      y: invoiceY - 36,
+      size: 9,
+      color: COLORS.mediumGray,
+    });
+
+    page.drawText(data.dueDate, {
+      x: width - margin - 80,
+      y: invoiceY - 36,
+      size: 9,
+      color: COLORS.black,
+    });
+
     y -= 50;
 
-    // ─── TABLE ───
-    const headerY = y;
-    const rowHeight = 18;
+    // ─── ITEMS TABLE ───
+    const tableY = y;
+    const rowHeight = 16;
+    const qtyWidth = 40;
+    const descWidth = contentWidth - qtyWidth - 80 - 60;
+    const priceWidth = 60;
+    const amountWidth = 80;
 
-    // Header row - light gray background
-    drawRectangle(page, margin, headerY, contentWidth, rowHeight, COLORS.lightGray);
-    page.drawText('Description', {
+    // Header row with dark background
+    drawRectangle(page, margin, tableY, contentWidth, rowHeight, COLORS.darkGray);
+
+    page.drawText('QTY', {
       x: margin + 5,
-      y: headerY - 12,
+      y: tableY - 11,
       size: 9,
-      color: COLORS.black,
-    });
-    page.drawText('Qty', {
-      x: margin + 280,
-      y: headerY - 12,
-      size: 9,
-      color: COLORS.black,
-    });
-    page.drawText('Rate', {
-      x: margin + 330,
-      y: headerY - 12,
-      size: 9,
-      color: COLORS.black,
-    });
-    page.drawText('Amount', {
-      x: margin + 420,
-      y: headerY - 12,
-      size: 9,
-      color: COLORS.black,
+      color: COLORS.white,
     });
 
-    y -= rowHeight + 2;
+    page.drawText('Description', {
+      x: margin + qtyWidth + 5,
+      y: tableY - 11,
+      size: 9,
+      color: COLORS.white,
+    });
+
+    page.drawText('Unit Price', {
+      x: margin + qtyWidth + descWidth + 5,
+      y: tableY - 11,
+      size: 9,
+      color: COLORS.white,
+    });
+
+    page.drawText('Amount', {
+      x: margin + qtyWidth + descWidth + priceWidth + 5,
+      y: tableY - 11,
+      size: 9,
+      color: COLORS.white,
+    });
+
+    y -= rowHeight;
 
     // Data rows
     for (const item of data.items) {
       drawRectangle(page, margin, y, contentWidth, rowHeight, COLORS.white);
       drawLine(page, margin, y, margin + contentWidth, 0.5);
 
-      page.drawText(item.description.substring(0, 40), {
+      page.drawText(item.qty.toString(), {
         x: margin + 5,
-        y: y - 12,
+        y: y - 11,
         size: 9,
         color: COLORS.black,
       });
 
-      page.drawText(item.qty.toString(), {
-        x: margin + 280,
-        y: y - 12,
+      page.drawText(item.description.substring(0, 50), {
+        x: margin + qtyWidth + 5,
+        y: y - 11,
         size: 9,
         color: COLORS.black,
       });
 
       page.drawText(`${data.currencySymbol}${item.rate.toFixed(2)}`, {
-        x: margin + 330,
-        y: y - 12,
+        x: margin + qtyWidth + descWidth + 5,
+        y: y - 11,
         size: 9,
         color: COLORS.black,
       });
 
       page.drawText(`${data.currencySymbol}${(item.qty * item.rate).toFixed(2)}`, {
-        x: margin + 420,
-        y: y - 12,
+        x: margin + qtyWidth + descWidth + priceWidth + 5,
+        y: y - 11,
         size: 9,
         color: COLORS.black,
       });
@@ -265,75 +296,87 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
 
     // Bottom border
     drawLine(page, margin, y, margin + contentWidth, 0.5);
-    y -= 12;
 
-    // Total
-    page.drawText('Total:', {
-      x: margin + 320,
+    // ─── TOTALS (Right Aligned) ───
+    y -= 15;
+
+    const totalLabelX = margin + qtyWidth + descWidth + 5;
+    const totalValueX = margin + qtyWidth + descWidth + priceWidth + 5;
+
+    page.drawText('Subtotal', {
+      x: totalLabelX,
+      y: y,
+      size: 9,
+      color: COLORS.mediumGray,
+    });
+
+    page.drawText(`${data.currencySymbol}${data.totalAmount.toFixed(2)}`, {
+      x: totalValueX,
+      y: y,
+      size: 9,
+      color: COLORS.black,
+    });
+
+    y -= 15;
+    drawLine(page, totalLabelX - 5, y, totalValueX + 80, 0.5);
+
+    y -= 15;
+
+    page.drawText(`Total (${data.currencySymbol === 'Rs.' ? 'NPR' : 'USD'})`, {
+      x: totalLabelX,
       y: y,
       size: 11,
       color: COLORS.black,
     });
+
     page.drawText(`${data.currencySymbol}${data.totalAmount.toFixed(2)}`, {
-      x: margin + 420,
+      x: totalValueX,
       y: y,
       size: 12,
       color: COLORS.black,
     });
 
-    y -= 30;
+    y -= 20;
+    drawLine(page, totalLabelX - 5, y, totalValueX + 80, 0.5);
 
     // ─── BANK DETAILS (at bottom) ───
+    y -= 25;
+
     if (data.bankDetails) {
-      page.drawText('Bank Transfer Details', {
+      page.drawText('Bank Details', {
+        x: margin,
+        y: y,
+        size: 10,
+        color: COLORS.mediumGray,
+      });
+
+      y -= 12;
+
+      page.drawText(`Bank Name: ${data.bankDetails.bankName}`, {
         x: margin,
         y: y,
         size: 9,
-        color: COLORS.mediumGray,
-      });
-
-      page.drawText(`Bank: ${data.bankDetails.bankName}`, {
-        x: margin,
-        y: y - 12,
-        size: 8,
         color: COLORS.black,
       });
 
-      page.drawText(`Account: ${data.bankDetails.accountNumber}`, {
-        x: margin,
-        y: y - 22,
-        size: 8,
-        color: COLORS.black,
-      });
+      y -= 11;
 
-      page.drawText(`Routing: ${data.bankDetails.routingNumber}`, {
-        x: margin,
-        y: y - 32,
-        size: 8,
-        color: COLORS.black,
-      });
-
-      y -= 45;
-    }
-
-    // Payment terms
-    if (data.paymentTerms) {
-      page.drawText(data.paymentTerms, {
+      page.drawText(`Account Number: ${data.bankDetails.accountNumber}`, {
         x: margin,
         y: y,
-        size: 8,
-        color: COLORS.mediumGray,
+        size: 9,
+        color: COLORS.black,
       });
-      y -= 12;
-    }
 
-    // Thank you
-    page.drawText('Thank you for your business!', {
-      x: margin,
-      y: y,
-      size: 9,
-      color: COLORS.black,
-    });
+      y -= 11;
+
+      page.drawText(`Routing Number: ${data.bankDetails.routingNumber}`, {
+        x: margin,
+        y: y,
+        size: 9,
+        color: COLORS.black,
+      });
+    }
 
     const pdfBytes = await pdfDoc.save();
     const stream = Readable.from([Buffer.from(pdfBytes)]);
