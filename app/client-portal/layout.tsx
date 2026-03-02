@@ -66,7 +66,7 @@ export default function ClientPortalLayout({
     };
 
     checkAuth();
-  }, [pathname, router]);
+  }, [pathname]);
 
   // Show loading state while checking authentication
   if (isChecking && !isPublicRoute(pathname)) {
