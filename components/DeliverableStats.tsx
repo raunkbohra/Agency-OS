@@ -1,9 +1,6 @@
 'use client';
 
-interface Deliverable {
-  id: string;
-  status: string;
-}
+import { Deliverable } from '@/lib/db-queries';
 
 interface DeliverableStatsProps {
   deliverables: Deliverable[];
@@ -12,12 +9,12 @@ interface DeliverableStatsProps {
 export default function DeliverableStats({ deliverables }: DeliverableStatsProps) {
   // Calculate statistics
   const pending = deliverables.filter(d =>
-    d.status === 'draft' || d.status === 'in_review' || d.status === 'changes_requested'
+    d.status === 'draft' || d.status === 'changes_requested'
   ).length;
 
   const inReview = deliverables.filter(d => d.status === 'in_review').length;
 
-  const done = deliverables.filter(d => d.status === 'done').length;
+  const done = deliverables.filter(d => d.status === 'done' || d.status === 'approved').length;
 
   const total = deliverables.length;
   const completionPercent = total === 0 ? 0 : Math.round((done / total) * 100);
