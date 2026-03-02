@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
       invoiceNumber: `INV-${invoiceId.slice(0, 8).toUpperCase()}`,
       agencyName: agency.name,
       agencyEmail: agency.email ?? process.env.SMTP_FROM ?? 'contact@agencyos.dev',
+      agencyAddress: agency.address || undefined,
       agencyLogoUrl: agency.logo_url || undefined,
       clientName: client.name,
       clientEmail: client.email || 'client@example.com',

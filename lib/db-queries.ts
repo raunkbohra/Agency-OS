@@ -12,6 +12,8 @@ export interface Agency {
   bank_routing: string | null;
   country: string | null;
   logo_url: string | null;
+  address: string | null;
+  billing_address: string | null;
   created_at: string;
 }
 
@@ -153,6 +155,8 @@ export async function updateAgency(
     bank_account?: string;
     bank_routing?: string;
     logo_url?: string;
+    address?: string;
+    billing_address?: string;
   }
 ): Promise<Agency | null> {
   try {
@@ -191,6 +195,14 @@ export async function updateAgency(
     if (fields.logo_url !== undefined) {
       updateFields.push(`logo_url = $${paramCount++}`);
       values.push(fields.logo_url);
+    }
+    if (fields.address !== undefined) {
+      updateFields.push(`address = $${paramCount++}`);
+      values.push(fields.address);
+    }
+    if (fields.billing_address !== undefined) {
+      updateFields.push(`billing_address = $${paramCount++}`);
+      values.push(fields.billing_address);
     }
 
     if (updateFields.length === 0) return getAgencyById(id);

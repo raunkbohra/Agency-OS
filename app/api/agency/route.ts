@@ -45,6 +45,8 @@ export async function PATCH(request: Request) {
       bank_account: body.bank_account,
       bank_routing: body.bank_routing,
       logo_url: body.logo_url,
+      address: body.address,
+      billing_address: body.billing_address,
     });
 
     if (!updated) {

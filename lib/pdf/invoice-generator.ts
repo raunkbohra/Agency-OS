@@ -5,6 +5,7 @@ export interface InvoiceData {
   invoiceNumber: string;
   agencyName: string;
   agencyEmail: string;
+  agencyAddress?: string;
   agencyLogoUrl?: string;
   clientName: string;
   clientEmail: string;
@@ -27,7 +28,8 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
     const margin = 50;
     let y = height - margin;
 
-    // Add logo if available
+    // Header section with logo and company info
+    let logoHeight = 0;
     if (data.agencyLogoUrl) {
       try {
         const logoResponse = await fetch(data.agencyLogoUrl);
@@ -37,47 +39,63 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
           page.drawImage(logoImage, {
             x: margin,
             y: y - 50,
-            width: 80,
+            width: 60,
             height: 50
           });
-          y -= 65;
+          logoHeight = 60;
         }
       } catch (err) {
         console.warn('Failed to load logo:', err);
       }
     }
 
-    // Header
-    page.drawText('INVOICE', {
-      x: margin,
-      y: y - 24,
-      size: 24,
-      color: rgb(0, 0, 0)
-    });
-
-    page.drawText(`Invoice #${data.invoiceNumber}`, {
-      x: margin,
-      y: y - 44,
-      size: 10,
-      color: rgb(0.4, 0.4, 0.4)
-    });
-
-    y -= 80;
-
-    // Agency details
+    // Company name and contact next to logo
+    const companyInfoX = margin + (logoHeight > 0 ? 80 : 0);
     page.drawText(data.agencyName, {
-      x: margin,
-      y,
-      size: 12,
+      x: companyInfoX,
+      y: y - 10,
+      size: 14,
       color: rgb(0, 0, 0)
     });
 
     page.drawText(data.agencyEmail, {
-      x: margin,
-      y: y - 20,
-      size: 10,
+      x: companyInfoX,
+      y: y - 28,
+      size: 9,
       color: rgb(0.4, 0.4, 0.4)
     });
+
+    // Agency address
+    if (data.agencyAddress) {
+      const addressLines = data.agencyAddress.split('\n');
+      let addressY = y - 42;
+      for (const line of addressLines.slice(0, 3)) {
+        page.drawText(line.trim(), {
+          x: companyInfoX,
+          y: addressY,
+          size: 8,
+          color: rgb(0.5, 0.5, 0.5)
+        });
+        addressY -= 12;
+      }
+    }
+
+    // Invoice heading on the right
+    page.drawText('INVOICE', {
+      x: 400,
+      y: y - 10,
+      size: 24,
+      color: rgb(0, 0, 0)
+    });
+
+    page.drawText(`#${data.invoiceNumber}`, {
+      x: 400,
+      y: y - 38,
+      size: 12,
+      color: rgb(0.4, 0.4, 0.4)
+    });
+
+    y -= 100;
 
     // Client details
     page.drawText('Bill To:', {

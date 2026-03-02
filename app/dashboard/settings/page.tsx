@@ -19,6 +19,8 @@ export default function SettingsPage() {
   const [email, setEmail] = useState('');
   const [currency, setCurrency] = useState('NPR');
   const [country, setCountry] = useState('');
+  const [address, setAddress] = useState('');
+  const [billingAddress, setBillingAddress] = useState('');
   const [bankName, setBankName] = useState('');
   const [bankAccount, setBankAccount] = useState('');
   const [bankRouting, setBankRouting] = useState('');
@@ -45,6 +47,8 @@ export default function SettingsPage() {
         setEmail(agencyData.email || '');
         setCurrency(agencyData.currency || 'NPR');
         setCountry(agencyData.country || '');
+        setAddress(agencyData.address || '');
+        setBillingAddress(agencyData.billing_address || '');
         setBankName(agencyData.bank_name || '');
         setBankAccount(agencyData.bank_account || '');
         setBankRouting(agencyData.bank_routing || '');
@@ -161,6 +165,8 @@ export default function SettingsPage() {
           email: email.trim() || null,
           currency,
           country: country.trim() || null,
+          address: address.trim() || null,
+          billing_address: billingAddress.trim() || null,
           bank_name: bankName.trim() || null,
           bank_account: bankAccount.trim() || null,
           bank_routing: bankRouting.trim() || null,
@@ -196,7 +202,7 @@ export default function SettingsPage() {
     <PageTransition>
       <PageHeader title="Settings" description="Configure your agency preferences" />
 
-      <div className="space-y-5 max-w-2xl">
+      <div className="space-y-6 max-w-5xl">
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-4">
             <p className="text-sm text-red-700">{error}</p>
@@ -209,10 +215,10 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Agency Logo Section */}
-          <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-text-primary mb-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Logo Section */}
+          <div className="bg-bg-secondary border border-border-default rounded-xl p-5 lg:p-6">
+            <h3 className="text-sm lg:text-base font-semibold text-text-primary mb-4">
               Agency Logo
             </h3>
 
@@ -235,7 +241,9 @@ export default function SettingsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-text-secondary font-medium">Logo uploaded</p>
-                      <p className="text-xs text-text-secondary truncate font-mono text-[10px] break-all">{logoPreview.split('/').pop() || 'image'}</p>
+                      <p className="text-xs text-text-secondary truncate font-mono text-[10px] break-all">
+                        {logoPreview.split('/').pop() || 'image'}
+                      </p>
                     </div>
                   </div>
                   <button
@@ -273,54 +281,40 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Agency Profile Section */}
-          <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-text-primary mb-4">
-              Agency Profile
-            </h3>
+          {/* Agency Information Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Basic Info */}
+            <div className="bg-bg-secondary border border-border-default rounded-xl p-5 lg:p-6">
+              <h3 className="text-sm lg:text-base font-semibold text-text-primary mb-4">
+                Basic Information
+              </h3>
 
-            <div className="space-y-3">
-              <div>
-                <label htmlFor="name" className="text-sm font-medium text-text-primary">
-                  Agency Name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="text-sm font-medium text-text-primary">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3">
                 <div>
-                  <label htmlFor="currency" className="text-sm font-medium text-text-primary">
-                    Currency
+                  <label htmlFor="name" className="text-sm font-medium text-text-primary">
+                    Agency Name
                   </label>
-                  <select
-                    id="currency"
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm"
-                  >
-                    <option value="NPR">NPR (₹)</option>
-                    <option value="USD">USD ($)</option>
-                  </select>
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="text-sm font-medium text-text-primary">
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm"
+                  />
                 </div>
 
                 <div>
@@ -336,20 +330,75 @@ export default function SettingsPage() {
                     className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm"
                   />
                 </div>
+
+                <div>
+                  <label htmlFor="currency" className="text-sm font-medium text-text-primary">
+                    Currency
+                  </label>
+                  <select
+                    id="currency"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm"
+                  >
+                    <option value="NPR">NPR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Address Info */}
+            <div className="bg-bg-secondary border border-border-default rounded-xl p-5 lg:p-6">
+              <h3 className="text-sm lg:text-base font-semibold text-text-primary mb-4">
+                Address Information
+              </h3>
+
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="address" className="text-sm font-medium text-text-primary">
+                    Office Address
+                  </label>
+                  <textarea
+                    id="address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Enter your office address"
+                    rows={3}
+                    className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm resize-none"
+                  />
+                  <p className="text-xs text-text-secondary mt-1">
+                    Displayed on invoices
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="billingAddress" className="text-sm font-medium text-text-primary">
+                    Billing Address
+                  </label>
+                  <textarea
+                    id="billingAddress"
+                    value={billingAddress}
+                    onChange={(e) => setBillingAddress(e.target.value)}
+                    placeholder="Leave blank to use office address"
+                    rows={3}
+                    className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm resize-none"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Bank Details Section */}
-          <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-text-primary mb-4">
+          {/* Bank Details */}
+          <div className="bg-bg-secondary border border-border-default rounded-xl p-5 lg:p-6">
+            <h3 className="text-sm lg:text-base font-semibold text-text-primary mb-2">
               Bank Details
             </h3>
             <p className="text-xs text-text-secondary mb-4">
               Leave empty if you don't want to display bank details on invoices.
             </p>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label htmlFor="bankName" className="text-sm font-medium text-text-primary">
                   Bank Name
@@ -392,11 +441,11 @@ export default function SettingsPage() {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-4">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {isSubmitting ? 'Saving...' : 'Save Settings'}
             </button>
