@@ -1878,44 +1878,29 @@ export async function getAgencyTeamMembers(
 > {
   try {
     const result = await db.query(
-      `SELECT DISTINCT
+      `SELECT
          u.id,
          u.name,
          u.email,
          u.created_at as "joinedAt",
-         (u.agency_id = $1 AND u.role = 'owner') as "isOwner"
+         (u.agency_id = $1 AND u.role = 'owner') as "isOwner",
+         COALESCE(ARRAY_AGG(ur.role) FILTER (WHERE ur.role IS NOT NULL), '{}') AS roles
        FROM users u
        LEFT JOIN user_roles ur ON u.id = ur.user_id AND ur.agency_id = $1
        WHERE u.agency_id = $1 OR ur.agency_id = $1
+       GROUP BY u.id, u.name, u.email, u.created_at, u.agency_id, u.role
        ORDER BY u.created_at ASC`,
       [agencyId]
     );
 
-    const membersMap = new Map();
-    for (const row of result.rows) {
-      if (!membersMap.has(row.id)) {
-        membersMap.set(row.id, {
-          id: row.id,
-          name: row.name,
-          email: row.email,
-          roles: [],
-          joinedAt: row.joinedAt,
-          isOwner: row.isOwner,
-        });
-      }
-      // Find the role for this row (from JOIN)
-      const roleResult = await db.query(
-        `SELECT role FROM user_roles WHERE user_id = $1 AND agency_id = $2`,
-        [row.id, agencyId]
-      );
-      for (const roleRow of roleResult.rows) {
-        const member = membersMap.get(row.id);
-        if (!member.roles.includes(roleRow.role)) {
-          member.roles.push(roleRow.role);
-        }
-      }
-    }
-    return Array.from(membersMap.values());
+    return result.rows.map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      roles: row.roles || [],
+      joinedAt: row.joinedAt,
+      isOwner: row.isOwner,
+    }));
   } catch (err) {
     console.error('Failed to get team members:', err);
     throw new Error(
