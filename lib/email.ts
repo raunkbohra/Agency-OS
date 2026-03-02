@@ -517,7 +517,7 @@ export async function sendTeamInviteEmail(options: {
     from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
     to: options.to,
     subject: `You're invited to join ${options.agencyName}`,
-    text: `Hi ${options.memberName},\n\nYou've been invited to join ${options.agencyName} as:\n\n${options.roles.map(r => `• ${r}`).join('\n')}\n\nClick the link below to accept the invitation:\n\n${options.inviteUrl}\n\nThis invitation link doesn't expire, so you can accept it anytime.`,
+    text: `Hi ${options.memberName},\n\nYou've been invited to join ${options.agencyName} as:\n\n${options.roles.map(r => `• ${r}`).join('\n')}\n\nClick the link below to accept the invitation:\n\n${options.inviteUrl}\n\nThis invitation link expires in 7 days.`,
     html: `
 <!DOCTYPE html>
 <html>
@@ -556,7 +556,7 @@ export async function sendTeamInviteEmail(options: {
 
             <p style="margin:12px 0;font-size:12px;color:#666;">Or copy this link: <code style="background:#f3f4f6;padding:2px 6px;border-radius:3px;">${escapedInviteUrl}</code></p>
 
-            <p style="margin:12px 0;font-size:12px;color:#666;">This invitation link doesn't expire, so you can accept it anytime.</p>
+            <p style="margin:12px 0;font-size:12px;color:#666;">This invitation link expires in 7 days.</p>
 
             <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
             <p style="margin:0;font-size:12px;color:#9ca3af;">If you have questions, contact ${escapedAgencyName}. Sent via Agency OS</p>

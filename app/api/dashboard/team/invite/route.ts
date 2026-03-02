@@ -26,9 +26,28 @@ export async function POST(request: NextRequest) {
     const { email, roles } = body;
 
     // Validation
-    if (!email || typeof email !== 'string' || !Array.isArray(roles) || roles.length === 0) {
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const VALID_ROLES = ['Designer', 'Developer', 'Project Manager', 'Account Manager'];
+
+    if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email)) {
       return NextResponse.json(
-        { error: 'Invalid email or roles' },
+        { error: 'Invalid email address' },
+        { status: 400 }
+      );
+    }
+
+    if (!Array.isArray(roles) || roles.length === 0) {
+      return NextResponse.json(
+        { error: 'At least one role is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate all roles are known
+    const unknownRoles = roles.filter(r => !VALID_ROLES.includes(r));
+    if (unknownRoles.length > 0) {
+      return NextResponse.json(
+        { error: `Unknown roles: ${unknownRoles.join(', ')}` },
         { status: 400 }
       );
     }

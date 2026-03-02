@@ -9,10 +9,12 @@ import {
 } from '@/lib/db-queries';
 import { hashPassword } from '@/lib/password';
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ token: string }> }
+) {
   try {
-    const url = new URL(request.url);
-    const token = url.pathname.split('/').pop();
+    const { token } = await params;
 
     if (!token) {
       return NextResponse.json({ error: 'Invite token required' }, { status: 400 });
@@ -44,11 +46,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Hash password
+      const passwordHash = await hashPassword(password);
+
       // Create user
       user = await createUser(invite.agency_id, invite.email, name, 'member');
 
-      // Hash and set password
-      const passwordHash = await hashPassword(password);
+      // Set password
       await setUserPassword(user.id, passwordHash);
     }
 

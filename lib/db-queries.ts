@@ -1925,6 +1925,12 @@ export async function removeUserFromAgency(userId: string, agencyId: string): Pr
       `DELETE FROM user_roles WHERE user_id = $1 AND agency_id = $2`,
       [userId, agencyId]
     );
+
+    // Remove user from agency (set agency_id to NULL)
+    await db.query(
+      `UPDATE users SET agency_id = NULL WHERE id = $1 AND agency_id = $2`,
+      [userId, agencyId]
+    );
   } catch (err) {
     console.error('Failed to remove user from agency:', err);
     throw new Error(
