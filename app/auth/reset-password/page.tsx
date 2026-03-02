@@ -60,8 +60,8 @@ function PasswordStrength({ password }: { password: string }) {
     <div className="flex items-center gap-3 mt-1.5">
       {checks.map((c) => (
         <div key={c.label} className="flex items-center gap-1">
-          <div className="w-1 h-1 rounded-full" style={{ background: c.pass ? '#22c55e' : '#333348' }} />
-          <span className="text-[10px]" style={{ color: c.pass ? '#4ade80' : '#333348' }}>{c.label}</span>
+          <div className="w-1 h-1 rounded-full" style={{ background: c.pass ? '#22c55e' : '#6b7280' }} />
+          <span className="text-[10px]" style={{ color: c.pass ? '#4ade80' : '#6b7280' }}>{c.label}</span>
         </div>
       ))}
     </div>
@@ -159,7 +159,7 @@ function IdentityPanel() {
                   </div>
                   <div>
                     <span className="text-[12px] font-semibold text-white">{tip.label}</span>
-                    <span className="text-[11px] ml-1.5" style={{ color: '#44445a' }}>— {tip.desc}</span>
+                    <span className="text-[11px] ml-1.5" style={{ color: '#8b95a3' }}>— {tip.desc}</span>
                   </div>
                 </motion.div>
               ))}
@@ -174,7 +174,7 @@ function IdentityPanel() {
           className="flex items-center gap-2 mt-auto"
         >
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#22c55e' }} />
-          <p className="text-xs" style={{ color: '#44445a' }}>
+          <p className="text-xs" style={{ color: '#8b95a3' }}>
             Your account is protected with <span style={{ color: '#6b7e93' }}>bcrypt hashing</span>
           </p>
         </motion.div>
@@ -281,7 +281,7 @@ function ResetPasswordForm() {
             )}
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#8b95a3' }}>
                 New password
               </label>
               <div className="relative">
@@ -301,7 +301,7 @@ function ResetPasswordForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors hover:text-white"
-                  style={{ color: '#44445a' }}
+                  style={{ color: '#8b95a3' }}
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -310,7 +310,7 @@ function ResetPasswordForm() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#8b95a3' }}>
                 Confirm password
               </label>
               <input
@@ -397,7 +397,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex" style={{ background: '#060609' }}>
       <style>{`
-        .auth-input::placeholder { color: #3a3a50; }
+        .auth-input::placeholder { color: #8b95a3; }
         .auth-input:-webkit-autofill,
         .auth-input:-webkit-autofill:focus {
           -webkit-box-shadow: 0 0 0 1000px #0d1520 inset !important;
@@ -438,7 +438,7 @@ export default function ResetPasswordPage() {
             <Link
               href="/auth/signin"
               className="inline-flex items-center gap-1.5 text-[13px] transition-colors hover:text-white"
-              style={{ color: '#44445a' }}
+              style={{ color: '#8b95a3' }}
             >
               <ArrowLeft size={13} /> Back to sign in
             </Link>

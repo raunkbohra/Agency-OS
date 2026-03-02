@@ -180,7 +180,7 @@ function ProductPanel() {
                 className="flex items-center gap-2"
               >
                 <f.icon size={12} style={{ color: '#6b8fa0', flexShrink: 0 }} />
-                <span className="text-xs" style={{ color: '#555568' }}>{f.text}</span>
+                <span className="text-xs" style={{ color: '#8b95a3' }}>{f.text}</span>
               </motion.li>
             ))}
           </ul>
@@ -208,7 +208,7 @@ function ProductPanel() {
                 <m.icon size={13} style={{ color: '#8fa4b8' }} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: '#44445a' }}>
+                <p className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: '#8b95a3' }}>
                   {m.label}
                 </p>
                 <p
@@ -246,7 +246,7 @@ function ProductPanel() {
               </div>
             ))}
           </div>
-          <p className="text-xs" style={{ color: '#44445a' }}>
+          <p className="text-xs" style={{ color: '#8b95a3' }}>
             Trusted by <span style={{ color: '#8fa0b0' }}>500+ agencies</span> globally
           </p>
         </motion.div>
@@ -307,7 +307,7 @@ export default function SignInPage() {
     <div className="min-h-screen flex" style={{ background: '#060609' }}>
       {/* Input placeholder color override */}
       <style>{`
-        .auth-input::placeholder { color: #3a3a50; }
+        .auth-input::placeholder { color: #8b95a3; }
         .auth-input:-webkit-autofill,
         .auth-input:-webkit-autofill:focus {
           -webkit-box-shadow: 0 0 0 1000px #0d1520 inset !important;
@@ -381,7 +381,7 @@ export default function SignInPage() {
           {/* Divider */}
           <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <span className="text-[11px] font-medium" style={{ color: '#333348' }}>or continue with email</span>
+            <span className="text-[11px] font-medium" style={{ color: '#6b7280' }}>or continue with email</span>
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
           </div>
 
@@ -404,7 +404,7 @@ export default function SignInPage() {
             <div className="space-y-1.5">
               <label
                 className="block text-[11px] font-semibold uppercase tracking-widest"
-                style={{ color: '#44445a' }}
+                style={{ color: '#8b95a3' }}
               >
                 Email
               </label>
@@ -426,7 +426,7 @@ export default function SignInPage() {
               <div className="flex items-center justify-between">
                 <label
                   className="block text-[11px] font-semibold uppercase tracking-widest"
-                  style={{ color: '#44445a' }}
+                  style={{ color: '#8b95a3' }}
                 >
                   Password
                 </label>
@@ -479,7 +479,7 @@ export default function SignInPage() {
             </button>
           </form>
 
-          <p className="text-center text-[13px] mt-7" style={{ color: '#44445a' }}>
+          <p className="text-center text-[13px] mt-7" style={{ color: '#8b95a3' }}>
             No account yet?{' '}
             <Link
               href="/auth/signup"

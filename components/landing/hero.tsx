@@ -346,7 +346,7 @@ export function Hero() {
         {/* Social proof */}
         <motion.div
           className="mt-6 flex items-center justify-center gap-1.5 text-xs"
-          style={{ color: '#555565' }}
+          style={{ color: '#7b8899' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}

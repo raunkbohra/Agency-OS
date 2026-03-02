@@ -142,7 +142,7 @@ function SecurityPanel() {
                   </div>
                   <div>
                     <p className="text-[12px] font-semibold text-white">{pt.title}</p>
-                    <p className="text-[11px] mt-0.5" style={{ color: '#44445a' }}>{pt.desc}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: '#8b95a3' }}>{pt.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -157,7 +157,7 @@ function SecurityPanel() {
           className="flex items-center gap-2 mt-auto"
         >
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#22c55e' }} />
-          <p className="text-xs" style={{ color: '#44445a' }}>
+          <p className="text-xs" style={{ color: '#8b95a3' }}>
             All data encrypted with <span style={{ color: '#6b7e93' }}>AES-256</span>
           </p>
         </motion.div>
@@ -213,7 +213,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex" style={{ background: '#060609' }}>
       <style>{`
-        .auth-input::placeholder { color: #3a3a50; }
+        .auth-input::placeholder { color: #8b95a3; }
         .auth-input:-webkit-autofill,
         .auth-input:-webkit-autofill:focus {
           -webkit-box-shadow: 0 0 0 1000px #0d1520 inset !important;
@@ -264,7 +264,7 @@ export default function ForgotPasswordPage() {
                   )}
 
                   <div className="space-y-1.5">
-                    <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>
+                    <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#8b95a3' }}>
                       Email address
                     </label>
                     <input
@@ -330,7 +330,7 @@ export default function ForgotPasswordPage() {
                   <span className="text-white font-medium">{email}</span>
                   , a reset link has been sent.
                 </p>
-                <p className="text-xs mt-5" style={{ color: '#333348' }}>
+                <p className="text-xs mt-5" style={{ color: '#6b7280' }}>
                   Didn&apos;t receive it? Check your spam folder or{' '}
                   <button onClick={() => setSent(false)} className="underline transition-colors hover:text-white" style={{ color: '#8fa0b0' }}>
                     try again
@@ -344,7 +344,7 @@ export default function ForgotPasswordPage() {
             <Link
               href="/auth/signin"
               className="inline-flex items-center gap-1.5 text-[13px] transition-colors hover:text-white"
-              style={{ color: '#44445a' }}
+              style={{ color: '#8b95a3' }}
             >
               <ArrowLeft size={13} /> Back to sign in
             </Link>

@@ -51,7 +51,7 @@ export function Footer() {
               </div>
               <span className="font-semibold text-white tracking-tight text-sm">Agency OS</span>
             </Link>
-            <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#555565' }}>
+            <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#7b8899' }}>
               Run your marketing agency from one system. Plans, clients, invoices, and deliverables — all connected.
             </p>
 
@@ -80,7 +80,7 @@ export function Footer() {
             <div key={section}>
               <h4
                 className="text-xs font-semibold uppercase tracking-widest mb-4"
-                style={{ color: '#3b3b4f' }}
+                style={{ color: '#6b7280' }}
               >
                 {section}
               </h4>
@@ -90,7 +90,7 @@ export function Footer() {
                     <Link
                       href={link.href}
                       className="text-sm transition-colors duration-200 hover:text-white"
-                      style={{ color: '#555565' }}
+                      style={{ color: '#7b8899' }}
                     >
                       {link.label}
                     </Link>
@@ -106,10 +106,10 @@ export function Footer() {
           className="mt-12 pt-7 flex flex-col md:flex-row items-center justify-between gap-4"
           style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
         >
-          <p className="text-xs" style={{ color: '#3b3b4f' }}>
+          <p className="text-xs" style={{ color: '#6b7280' }}>
             &copy; 2026 Agency OS. All rights reserved.
           </p>
-          <p className="text-xs" style={{ color: '#3b3b4f' }}>
+          <p className="text-xs" style={{ color: '#6b7280' }}>
             Built for agencies that ship.
           </p>
         </div>

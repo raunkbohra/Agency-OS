@@ -122,7 +122,7 @@ export function MetricsShowcase() {
                     <div className="text-sm font-semibold text-white mb-2">{metric.label}</div>
 
                     {/* Description */}
-                    <p className="text-xs leading-relaxed" style={{ color: '#555565' }}>
+                    <p className="text-xs leading-relaxed" style={{ color: '#7b8899' }}>
                       {metric.description}
                     </p>
                   </div>

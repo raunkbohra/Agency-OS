@@ -135,7 +135,7 @@ export function Pricing() {
                   >
                     {tier.name}
                   </h3>
-                  <p className="text-sm" style={{ color: '#555565' }}>{tier.description}</p>
+                  <p className="text-sm" style={{ color: '#7b8899' }}>{tier.description}</p>
                 </div>
 
                 {/* Price */}
@@ -147,7 +147,7 @@ export function Pricing() {
                     {tier.price}
                   </span>
                   {tier.period && (
-                    <span className="text-sm mb-1.5" style={{ color: '#555565' }}>{tier.period}</span>
+                    <span className="text-sm mb-1.5" style={{ color: '#7b8899' }}>{tier.period}</span>
                   )}
                 </div>
 

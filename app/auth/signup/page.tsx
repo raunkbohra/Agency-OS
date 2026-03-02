@@ -158,7 +158,7 @@ function ProductPanel() {
                 <cap.icon size={13} style={{ color: '#8fa4b8' }} />
               </div>
               <p className="text-[12px] font-semibold text-white mb-0.5">{cap.label}</p>
-              <p className="text-[10px] leading-snug" style={{ color: '#44445a' }}>{cap.desc}</p>
+              <p className="text-[10px] leading-snug" style={{ color: '#8b95a3' }}>{cap.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -176,7 +176,7 @@ function ProductPanel() {
               </div>
             ))}
           </div>
-          <p className="text-xs" style={{ color: '#44445a' }}>
+          <p className="text-xs" style={{ color: '#8b95a3' }}>
             Join <span style={{ color: '#8fa0b0' }}>500+ agencies</span> already running on Agency OS
           </p>
         </motion.div>
@@ -239,7 +239,7 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex" style={{ background: '#060609' }}>
       <style>{`
-        .auth-input::placeholder { color: #3a3a50; }
+        .auth-input::placeholder { color: #8b95a3; }
         .auth-input:-webkit-autofill,
         .auth-input:-webkit-autofill:focus {
           -webkit-box-shadow: 0 0 0 1000px #0d1520 inset !important;
@@ -301,7 +301,7 @@ export default function SignUpPage() {
 
           <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-            <span className="text-[11px] font-medium" style={{ color: '#333348' }}>or sign up with email</span>
+            <span className="text-[11px] font-medium" style={{ color: '#6b7280' }}>or sign up with email</span>
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
           </div>
 
@@ -314,22 +314,22 @@ export default function SignUpPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Your name</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#8b95a3' }}>Your name</label>
                 <input type="text" value={form.name} onChange={set('name')} onFocus={() => setFocused('name')} onBlur={() => setFocused(null)} placeholder="Jane Smith" required autoFocus className="auth-input" style={inputStyle('name')} />
               </div>
               <div className="space-y-1.5">
-                <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Agency</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#8b95a3' }}>Agency</label>
                 <input type="text" value={form.agencyName} onChange={set('agencyName')} onFocus={() => setFocused('agency')} onBlur={() => setFocused(null)} placeholder="Acme Agency" required className="auth-input" style={inputStyle('agency')} />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Email</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#8b95a3' }}>Email</label>
               <input type="email" value={form.email} onChange={set('email')} onFocus={() => setFocused('email')} onBlur={() => setFocused(null)} placeholder="you@agency.com" required className="auth-input" style={inputStyle('email')} />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#44445a' }}>Password</label>
+              <label className="block text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#8b95a3' }}>Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -346,7 +346,7 @@ export default function SignUpPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors hover:text-white"
-                  style={{ color: '#44445a' }}
+                  style={{ color: '#8b95a3' }}
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -376,15 +376,15 @@ export default function SignUpPage() {
               </span>
             </button>
 
-            <p className="text-[11px] text-center" style={{ color: '#333348' }}>
+            <p className="text-[11px] text-center" style={{ color: '#6b7280' }}>
               By creating an account you agree to our{' '}
-              <Link href="#" className="hover:text-white transition-colors" style={{ color: '#555568' }}>Terms</Link>
+              <Link href="#" className="hover:text-white transition-colors" style={{ color: '#8b95a3' }}>Terms</Link>
               {' '}and{' '}
-              <Link href="#" className="hover:text-white transition-colors" style={{ color: '#555568' }}>Privacy Policy</Link>
+              <Link href="#" className="hover:text-white transition-colors" style={{ color: '#8b95a3' }}>Privacy Policy</Link>
             </p>
           </form>
 
-          <p className="text-center text-[13px] mt-6" style={{ color: '#44445a' }}>
+          <p className="text-center text-[13px] mt-6" style={{ color: '#8b95a3' }}>
             Already have an account?{' '}
             <Link href="/auth/signin" className="font-semibold transition-colors hover:text-white" style={{ color: '#b0bec8' }}>
               Sign in
