@@ -7,6 +7,18 @@ const transporter = nodemailer.createTransport({
   ignoreTLS: true,
 });
 
+/**
+ * Escape HTML special characters to prevent XSS in email templates
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   await transporter.sendMail({
     from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
@@ -100,6 +112,10 @@ export async function sendClientEmail(options: {
   subject: string;
   body: string;
 }) {
+  const escapedClientName = escapeHtml(options.clientName);
+  const escapedAgencyName = escapeHtml(options.agencyName);
+  const escapedBody = escapeHtml(options.body);
+
   await transporter.sendMail({
     from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
     to: options.to,
@@ -115,15 +131,15 @@ export async function sendClientEmail(options: {
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
         <tr>
           <td align="center" style="padding-bottom:24px;">
-            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${escapedAgencyName}</span>
           </td>
         </tr>
         <tr>
           <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
-            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${options.clientName},</p>
-            <div style="margin:20px 0;font-size:14px;color:#4b5563;line-height:1.7;white-space:pre-wrap;">${options.body}</div>
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${escapedClientName},</p>
+            <div style="margin:20px 0;font-size:14px;color:#4b5563;line-height:1.7;white-space:pre-wrap;">${escapedBody}</div>
             <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
-            <p style="margin:0;font-size:12px;color:#9ca3af;">Sent via Agency OS · ${options.agencyName}</p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Sent via Agency OS · ${escapedAgencyName}</p>
           </td>
         </tr>
       </table>
@@ -146,6 +162,10 @@ export async function sendInvoiceEmail(options: {
   dueDate: string;
   payUrl: string;
 }): Promise<void> {
+  const escapedClientName = escapeHtml(options.clientName);
+  const escapedAgencyName = escapeHtml(options.agencyName);
+  const escapedBillingPeriod = escapeHtml(options.billingPeriod);
+
   await transporter.sendMail({
     from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
     to: options.to,
@@ -161,13 +181,13 @@ export async function sendInvoiceEmail(options: {
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
         <tr>
           <td align="center" style="padding-bottom:24px;">
-            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${escapedAgencyName}</span>
           </td>
         </tr>
         <tr>
           <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
-            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${options.clientName},</p>
-            <p style="margin:12px 0;font-size:14px;color:#4b5563;">You have a new invoice for <strong>${options.billingPeriod}</strong>.</p>
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${escapedClientName},</p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;">You have a new invoice for <strong>${escapedBillingPeriod}</strong>.</p>
 
             <div style="margin:24px 0;padding:16px;background:#f3f4f6;border-left:3px solid #0070f3;border-radius:4px;">
               <p style="margin:0 0 8px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Amount Due</p>
@@ -205,6 +225,10 @@ export async function sendSigningRequestEmail(options: {
   contractFileName: string;
   signingUrl: string;
 }): Promise<void> {
+  const escapedClientName = escapeHtml(options.clientName);
+  const escapedAgencyName = escapeHtml(options.agencyName);
+  const escapedContractFileName = escapeHtml(options.contractFileName);
+
   await transporter.sendMail({
     from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
     to: options.to,
@@ -220,17 +244,17 @@ export async function sendSigningRequestEmail(options: {
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
         <tr>
           <td align="center" style="padding-bottom:24px;">
-            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${escapedAgencyName}</span>
           </td>
         </tr>
         <tr>
           <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
-            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${options.clientName},</p>
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${escapedClientName},</p>
             <p style="margin:12px 0;font-size:14px;color:#4b5563;">Your contract is ready for signature. Please review and sign the document below.</p>
 
             <div style="margin:24px 0;padding:16px;background:#f3f4f6;border-left:3px solid #0070f3;border-radius:4px;">
               <p style="margin:0 0 8px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Contract</p>
-              <p style="margin:0;font-size:15px;font-weight:600;color:#0d1117;">${options.contractFileName}</p>
+              <p style="margin:0;font-size:15px;font-weight:600;color:#0d1117;">${escapedContractFileName}</p>
             </div>
 
             <table cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
@@ -245,7 +269,7 @@ export async function sendSigningRequestEmail(options: {
             </table>
 
             <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
-            <p style="margin:0;font-size:12px;color:#9ca3af;">Sent via Agency OS · ${options.agencyName}</p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Sent via Agency OS · ${escapedAgencyName}</p>
           </td>
         </tr>
       </table>
@@ -262,6 +286,10 @@ export async function sendSignatureConfirmationEmail(options: {
   agencyName: string;
   contractFileName: string;
 }): Promise<void> {
+  const escapedClientName = escapeHtml(options.clientName);
+  const escapedAgencyName = escapeHtml(options.agencyName);
+  const escapedContractFileName = escapeHtml(options.contractFileName);
+
   await transporter.sendMail({
     from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
     to: options.to,
@@ -277,7 +305,7 @@ export async function sendSignatureConfirmationEmail(options: {
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
         <tr>
           <td align="center" style="padding-bottom:24px;">
-            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${escapedAgencyName}</span>
           </td>
         </tr>
         <tr>
@@ -287,14 +315,14 @@ export async function sendSignatureConfirmationEmail(options: {
             </div>
 
             <p style="margin:0 0 8px;font-size:20px;font-weight:600;color:#0d1117;text-align:center;">Contract Signed</p>
-            <p style="margin:12px 0 0;font-size:14px;color:#4b5563;text-align:center;">Thank you for signing <strong>${options.contractFileName}</strong></p>
+            <p style="margin:12px 0 0;font-size:14px;color:#4b5563;text-align:center;">Thank you for signing <strong>${escapedContractFileName}</strong></p>
 
             <div style="margin:24px 0;padding:16px;background:#f0fdf4;border:1px solid #dcfce7;border-radius:8px;text-align:center;">
               <p style="margin:0;font-size:13px;color:#166534;line-height:1.6;">We've received your signature and your contract is now fully executed. A copy has been saved to your records.</p>
             </div>
 
             <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
-            <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">Sent via Agency OS · ${options.agencyName}</p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">Sent via Agency OS · ${escapedAgencyName}</p>
           </td>
         </tr>
       </table>
@@ -312,6 +340,10 @@ export async function sendSignatureNotificationEmail(options: {
   contractFileName: string;
   signedDate: Date;
 }): Promise<void> {
+  const escapedAgencyName = escapeHtml(options.agencyName);
+  const escapedClientName = escapeHtml(options.clientName);
+  const escapedContractFileName = escapeHtml(options.contractFileName);
+
   const formattedDate = options.signedDate.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -337,12 +369,12 @@ export async function sendSignatureNotificationEmail(options: {
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
         <tr>
           <td align="center" style="padding-bottom:24px;">
-            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${escapedAgencyName}</span>
           </td>
         </tr>
         <tr>
           <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
-            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;"><strong>${options.clientName}</strong> has signed <strong>${options.contractFileName}</strong></p>
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;"><strong>${escapedClientName}</strong> has signed <strong>${escapedContractFileName}</strong></p>
             <p style="margin:12px 0;font-size:14px;color:#4b5563;">Signed on <strong>${formattedDate}</strong></p>
 
             <table cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
@@ -417,13 +449,15 @@ export async function sendClientInviteEmail(options: {
   agencyName: string;
   setupUrl: string;
 }): Promise<void> {
-  try {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
-      to: options.to,
-      subject: `Welcome to ${options.agencyName}! Set up your account`,
-      text: `Hi ${options.clientName},\n\nYou have been invited to ${options.agencyName}. Please click below to set your password and access your client portal.\n\n${options.setupUrl}\n\nThis is an automated message. Please do not reply.`,
-      html: `
+  const escapedClientName = escapeHtml(options.clientName);
+  const escapedAgencyName = escapeHtml(options.agencyName);
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: `Welcome to ${options.agencyName}! Set up your account`,
+    text: `Hi ${options.clientName},\n\nYou have been invited to ${options.agencyName}. Please click below to set your password and access your client portal.\n\n${options.setupUrl}\n\nThis is an automated message. Please do not reply.`,
+    html: `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
@@ -433,13 +467,13 @@ export async function sendClientInviteEmail(options: {
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
         <tr>
           <td align="center" style="padding-bottom:24px;">
-            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${escapedAgencyName}</span>
           </td>
         </tr>
         <tr>
           <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
-            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${options.clientName},</p>
-            <p style="margin:12px 0;font-size:14px;color:#4b5563;line-height:1.6;">You have been invited to <strong>${options.agencyName}</strong>. Please click below to set your password and access your client portal.</p>
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${escapedClientName},</p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;line-height:1.6;">You have been invited to <strong>${escapedAgencyName}</strong>. Please click below to set your password and access your client portal.</p>
 
             <table cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
               <tr>
@@ -461,9 +495,5 @@ export async function sendClientInviteEmail(options: {
   </table>
 </body>
 </html>`.trim(),
-    });
-  } catch (error) {
-    console.error('Failed to send client invite email:', error);
-    // Don't throw - email failures shouldn't block the API
-  }
+  });
 }

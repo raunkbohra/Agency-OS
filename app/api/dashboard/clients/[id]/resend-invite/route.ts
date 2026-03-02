@@ -26,6 +26,14 @@ export async function POST(
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Check if client has already accepted invite
+    if (client.invite_accepted) {
+      return Response.json(
+        { error: 'This client has already accepted their invitation' },
+        { status: 409 }
+      );
+    }
+
     // Generate new invite token and expiry (72 hours)
     const newToken = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);

@@ -31,7 +31,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
   const { agencyId } = await params;
 
   const agencyResult = await db.query(
-    'SELECT id FROM agencies WHERE id = $1',
+    'SELECT id, name FROM agencies WHERE id = $1',
     [agencyId]
   );
   if (!agencyResult.rows[0]) return Response.json({ error: 'Agency not found' }, { status: 404 });
@@ -74,8 +74,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
     const setupUrl = `${baseUrl}/client-portal/setup/${inviteToken}`;
 
     // Send invite email (non-blocking)
-    const agencyResult = await db.query('SELECT name FROM agencies WHERE id = $1', [agencyId]);
-    const agencyName = agencyResult.rows[0]?.name || 'Agency';
+    const agencyName = agencyResult.rows[0].name || 'Agency';
     sendClientInviteEmail({
       to: email.toLowerCase().trim(),
       clientName: name.trim(),
@@ -117,7 +116,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
     }
 
     return Response.json(
-      { success: true, client: { id: client.id, name: client.name, setupUrl } },
+      { success: true, client: { id: client.id, email: client.email, name: client.name } },
       { status: 201 }
     );
   } catch (err) {
