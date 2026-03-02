@@ -34,7 +34,7 @@ export function Workflow() {
     <section
       id="workflow"
       className="py-28 px-6 relative overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #060609 0%, #0a0a14 50%, #060609 100%)' }}
+      style={{ background: 'var(--bg-primary)' }}
     >
       {/* Background accent */}
       <div
@@ -52,17 +52,17 @@ export function Workflow() {
         <div className="text-center mb-20">
           <div
             className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest mb-5"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
+            style={{ background: 'var(--landing-badge-bg)', border: '1px solid var(--landing-badge-border)', color: 'var(--text-secondary)' }}
           >
             How it works
           </div>
           <h2
-            className="text-4xl md:text-5xl font-black tracking-[-0.03em] text-white"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="text-4xl md:text-5xl font-black tracking-[-0.03em]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
           >
             Three steps to autopilot
           </h2>
-          <p className="mt-4 text-lg" style={{ color: '#6b7280' }}>
+          <p className="mt-4 text-lg" style={{ color: 'var(--text-secondary)' }}>
             From setup to getting paid, we've streamlined the entire workflow.
           </p>
         </div>
@@ -98,17 +98,17 @@ export function Workflow() {
                 <div
                   className="w-full rounded-2xl p-6 transition-all duration-300"
                   style={{
-                    background: 'rgba(12, 12, 20, 0.7)',
-                    border: '1px solid rgba(255,255,255,0.07)',
+                    background: 'var(--landing-card-bg)',
+                    border: '1px solid var(--landing-card-border)',
                   }}
                 >
                   <h3
-                    className="text-lg font-bold text-white mb-3"
-                    style={{ letterSpacing: '-0.02em' }}
+                    className="text-lg font-bold mb-3"
+                    style={{ letterSpacing: '-0.02em', color: 'var(--text-primary)' }}
                   >
                     {step.title}
                   </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     {step.description}
                   </p>
 

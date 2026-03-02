@@ -68,23 +68,23 @@ const features = [
 
 export function FeaturesGrid() {
   return (
-    <section id="features" className="py-28 px-6" style={{ background: '#060609' }}>
+    <section id="features" className="py-28 px-6" style={{ background: 'var(--bg-primary)' }}>
       <div className="mx-auto max-w-6xl">
         {/* Section header */}
         <div className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest mb-5"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
+            style={{ background: 'var(--landing-badge-bg)', border: '1px solid var(--landing-badge-border)', color: 'var(--text-secondary)' }}
           >
             Capabilities
           </div>
           <h2
-            className="text-4xl md:text-5xl font-black tracking-[-0.03em] text-white"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="text-4xl md:text-5xl font-black tracking-[-0.03em]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
           >
             Everything you need
           </h2>
-          <p className="mt-4 text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: '#6b7280' }}>
+          <p className="mt-4 text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             From plans to payments, manage every aspect of your agency in one unified platform.
           </p>
         </div>
@@ -96,22 +96,22 @@ export function FeaturesGrid() {
               <div
                 className="group relative h-full rounded-2xl p-6 transition-all duration-300 cursor-default"
                 style={{
-                  background: 'rgba(12, 12, 20, 0.8)',
-                  border: `1px solid rgba(255,255,255,0.07)`,
+                  background: 'var(--landing-card-bg)',
+                  border: `1px solid var(--landing-card-border)`,
                   backdropFilter: 'blur(10px)',
                   minHeight: feature.large ? '260px' : '180px',
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
                   el.style.border = `1px solid ${feature.accentBorder}`;
-                  el.style.background = `rgba(12, 12, 20, 0.95)`;
+                  el.style.background = `var(--landing-card-bg)`;
                   el.style.transform = 'translateY(-2px)';
                   el.style.boxShadow = `0 20px 60px -10px rgba(0,0,0,0.6), 0 0 40px -10px ${feature.accentBg}`;
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
-                  el.style.border = '1px solid rgba(255,255,255,0.07)';
-                  el.style.background = 'rgba(12, 12, 20, 0.8)';
+                  el.style.border = '1px solid var(--landing-card-border)';
+                  el.style.background = 'var(--landing-card-bg)';
                   el.style.transform = 'translateY(0)';
                   el.style.boxShadow = 'none';
                 }}
@@ -125,12 +125,12 @@ export function FeaturesGrid() {
                 </div>
 
                 <h3
-                  className="text-base font-bold text-white mb-2.5"
-                  style={{ letterSpacing: '-0.01em' }}
+                  className="text-base font-bold mb-2.5"
+                  style={{ letterSpacing: '-0.01em', color: 'var(--text-primary)' }}
                 >
                   {feature.title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   {feature.description}
                 </p>
 

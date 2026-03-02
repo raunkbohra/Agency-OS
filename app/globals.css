@@ -53,6 +53,15 @@
   --glass-bg: rgba(10, 10, 10, 0.6);
   --glass-border: rgba(255, 255, 255, 0.06);
 
+  /* Landing-specific (dark defaults) */
+  --landing-card-bg: rgba(12, 12, 20, 0.8);
+  --landing-card-border: rgba(255, 255, 255, 0.07);
+  --landing-badge-bg: rgba(255, 255, 255, 0.04);
+  --landing-badge-border: rgba(255, 255, 255, 0.08);
+  --landing-divider: rgba(255, 255, 255, 0.06);
+  --navbar-scrolled-bg: rgba(0, 0, 0, 0.8);
+  --landing-secondary-btn-color: #b8cad4;
+
   /* Radius */
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -79,6 +88,7 @@ html.light {
 }
 
 .light {
+  /* Base */
   --bg-primary: #f6f7f9;
   --bg-secondary: #ffffff;
   --bg-tertiary: #eef0f4;
@@ -98,6 +108,39 @@ html.light {
   --accent-red: #dc2626;
   --glass-bg: rgba(255, 255, 255, 0.75);
   --glass-border: rgba(0, 0, 0, 0.07);
+
+  /* Tailwind v4 utility overrides */
+  --color-bg-primary: #f6f7f9;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #eef0f4;
+  --color-bg-hover: #e8ebf0;
+  --color-bg-elevated: #ffffff;
+  --color-text-primary: #0d1117;
+  --color-text-secondary: #4b5563;
+  --color-text-tertiary: #9ca3af;
+  --color-text-quaternary: #d1d5db;
+  --color-border-default: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  --color-border-active: #0d1117;
+  --color-accent-blue: #4a6278;
+  --color-accent-purple: #6b85a0;
+  --color-accent-green: #059669;
+  --color-accent-amber: #d97706;
+  --color-accent-red: #dc2626;
+  --color-glass-bg: rgba(255, 255, 255, 0.75);
+  --color-glass-border: rgba(0, 0, 0, 0.07);
+
+  /* Landing-specific */
+  --landing-card-bg: rgba(255, 255, 255, 0.9);
+  --landing-card-border: rgba(0, 0, 0, 0.07);
+  --landing-card-border-hover: rgba(107, 126, 147, 0.25);
+  --landing-badge-bg: rgba(107, 126, 147, 0.08);
+  --landing-badge-border: rgba(107, 126, 147, 0.15);
+  --landing-divider: rgba(0, 0, 0, 0.06);
+  --navbar-scrolled-bg: rgba(246, 247, 249, 0.9);
+  --landing-secondary-btn-bg: rgba(107, 126, 147, 0.1);
+  --landing-secondary-btn-border: rgba(107, 126, 147, 0.25);
+  --landing-secondary-btn-color: #4a6278;
 }
 
 /* ===== Base Styles ===== */

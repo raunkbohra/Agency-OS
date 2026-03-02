@@ -7,7 +7,7 @@ import { SparkleButton } from '@/components/ui/sparkle-button';
 
 export function CtaSection() {
   return (
-    <section className="py-28 px-6 relative overflow-hidden" style={{ background: '#060609' }}>
+    <section className="py-28 px-6 relative overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
       {/* Background effects */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -40,8 +40,8 @@ export function CtaSection() {
 
           {/* Headline */}
           <h2
-            className="text-4xl md:text-6xl font-black tracking-[-0.04em] text-white leading-[1.05]"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="text-4xl md:text-6xl font-black tracking-[-0.04em] leading-[1.05]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
           >
             Ready to run your
             <br />
@@ -57,7 +57,7 @@ export function CtaSection() {
             </span>
           </h2>
 
-          <p className="mt-6 text-lg md:text-xl leading-relaxed" style={{ color: '#6b7280' }}>
+          <p className="mt-6 text-lg md:text-xl leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             Join agencies that run their business on Agency OS.
             <br className="hidden md:block" />
             Start free today — no credit card required.
@@ -74,10 +74,9 @@ export function CtaSection() {
               href="#features"
               className="inline-flex items-center gap-2 px-8 py-4 text-base font-medium rounded-2xl transition-all duration-200 hover:-translate-y-0.5"
               style={{
-                color: '#b8cad4',
-                border: '1px solid rgba(180,200,220,0.25)',
-                background: 'linear-gradient(135deg, rgba(160,180,200,0.12) 0%, rgba(100,120,145,0.07) 100%)',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                background: 'var(--landing-card-bg)',
+                border: '1px solid var(--landing-card-border)',
+                color: 'var(--landing-secondary-btn-color)',
               }}
             >
               Learn more
@@ -85,7 +84,7 @@ export function CtaSection() {
           </div>
 
           {/* Trust note */}
-          <p className="mt-7 text-sm" style={{ color: '#444455' }}>
+          <p className="mt-7 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Free plan includes 3 clients · No setup fees · Cancel anytime
           </p>
         </div>

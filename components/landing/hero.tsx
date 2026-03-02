@@ -242,7 +242,7 @@ export function Hero() {
   return (
     <section
       className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden"
-      style={{ background: '#060609' }}
+      style={{ background: 'var(--bg-primary)' }}
     >
       {/* Background orbs */}
       <div
@@ -288,8 +288,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <h1
-            className="text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em] text-white"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
           >
             Run your agency
           </h1>
@@ -310,7 +310,7 @@ export function Hero() {
         {/* Subheadline */}
         <motion.p
           className="mt-7 text-lg md:text-xl max-w-xl mx-auto leading-relaxed"
-          style={{ color: '#8b8b9a' }}
+          style={{ color: 'var(--text-secondary)' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.35 }}
@@ -333,10 +333,9 @@ export function Hero() {
             href="#features"
             className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 hover:-translate-y-0.5"
             style={{
-              color: '#b8cad4',
-              border: '1px solid rgba(180,200,220,0.25)',
-              background: 'linear-gradient(135deg, rgba(160,180,200,0.12) 0%, rgba(100,120,145,0.07) 100%)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+              background: 'var(--landing-card-bg)',
+              border: '1px solid var(--landing-card-border)',
+              color: 'var(--landing-secondary-btn-color)',
             }}
           >
             See how it works
@@ -346,7 +345,7 @@ export function Hero() {
         {/* Social proof */}
         <motion.div
           className="mt-6 flex items-center justify-center gap-1.5 text-xs"
-          style={{ color: '#7b8899' }}
+          style={{ color: 'var(--text-secondary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}

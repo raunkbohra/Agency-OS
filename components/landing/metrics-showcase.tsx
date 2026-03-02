@@ -36,14 +36,14 @@ const metrics = [
 
 export function MetricsShowcase() {
   return (
-    <section className="py-28 px-6" style={{ background: '#060609' }}>
+    <section className="py-28 px-6" style={{ background: 'var(--bg-primary)' }}>
       <div className="mx-auto max-w-6xl">
         <ScrollReveal>
           <div
             className="relative rounded-3xl overflow-hidden"
             style={{
-              background: 'rgba(10, 10, 18, 0.95)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'var(--landing-card-bg)',
+              border: '1px solid var(--landing-card-border)',
             }}
           >
             {/* Background glows */}
@@ -77,13 +77,13 @@ export function MetricsShowcase() {
               <div className="text-center mb-14">
                 <p
                   className="text-sm font-semibold uppercase tracking-widest mb-3"
-                  style={{ color: '#6b7280' }}
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   By the numbers
                 </p>
                 <h2
-                  className="text-3xl md:text-4xl font-black tracking-[-0.03em] text-white"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                  className="text-3xl md:text-4xl font-black tracking-[-0.03em]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
                 >
                   Built to move fast
                 </h2>
@@ -97,8 +97,8 @@ export function MetricsShowcase() {
                     <div
                       className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-4"
                       style={{
-                        background: 'rgba(160, 175, 190, 0.08)',
-                        border: '1px solid rgba(160, 175, 190, 0.18)',
+                        background: 'var(--landing-badge-bg)',
+                        border: '1px solid var(--landing-badge-border)',
                       }}
                     >
                       <metric.icon size={16} style={{ color: metric.accent }} />
@@ -119,10 +119,10 @@ export function MetricsShowcase() {
                     </div>
 
                     {/* Label */}
-                    <div className="text-sm font-semibold text-white mb-2">{metric.label}</div>
+                    <div className="text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{metric.label}</div>
 
                     {/* Description */}
-                    <p className="text-xs leading-relaxed" style={{ color: '#7b8899' }}>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                       {metric.description}
                     </p>
                   </div>

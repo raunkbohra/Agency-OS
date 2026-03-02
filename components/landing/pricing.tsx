@@ -79,23 +79,23 @@ const tiers: PricingTier[] = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-28 px-6" style={{ background: 'linear-gradient(180deg, #060609 0%, #08080f 100%)' }}>
+    <section id="pricing" className="py-28 px-6" style={{ background: 'var(--bg-primary)' }}>
       <div className="mx-auto max-w-6xl">
         {/* Section header */}
         <div className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest mb-5"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
+            style={{ background: 'var(--landing-badge-bg)', border: '1px solid var(--landing-badge-border)', color: 'var(--text-secondary)' }}
           >
             Pricing
           </div>
           <h2
-            className="text-4xl md:text-5xl font-black tracking-[-0.03em] text-white"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="text-4xl md:text-5xl font-black tracking-[-0.03em]"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
           >
             Simple, honest pricing
           </h2>
-          <p className="mt-4 text-lg" style={{ color: '#6b7280' }}>
+          <p className="mt-4 text-lg" style={{ color: 'var(--text-secondary)' }}>
             Start free. Upgrade when you need to. No surprises.
           </p>
         </div>
@@ -106,10 +106,10 @@ export function Pricing() {
               <div
                 className="relative flex flex-col h-full rounded-2xl p-7 transition-all duration-300"
                 style={{
-                  background: tier.featured ? 'rgba(107, 126, 147, 0.06)' : 'rgba(12, 12, 20, 0.8)',
+                  background: tier.featured ? 'rgba(107, 126, 147, 0.06)' : 'var(--landing-card-bg)',
                   border: tier.featured
                     ? '1px solid rgba(107, 126, 147, 0.35)'
-                    : '1px solid rgba(255,255,255,0.07)',
+                    : '1px solid var(--landing-card-border)',
                   boxShadow: tier.featured
                     ? '0 0 60px rgba(107, 126, 147, 0.08), inset 0 1px 0 rgba(255,255,255,0.06)'
                     : 'none',
@@ -135,7 +135,7 @@ export function Pricing() {
                   >
                     {tier.name}
                   </h3>
-                  <p className="text-sm" style={{ color: '#7b8899' }}>{tier.description}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{tier.description}</p>
                 </div>
 
                 {/* Price */}
@@ -147,7 +147,7 @@ export function Pricing() {
                     {tier.price}
                   </span>
                   {tier.period && (
-                    <span className="text-sm mb-1.5" style={{ color: '#7b8899' }}>{tier.period}</span>
+                    <span className="text-sm mb-1.5" style={{ color: 'var(--text-secondary)' }}>{tier.period}</span>
                   )}
                 </div>
 
@@ -190,10 +190,9 @@ export function Pricing() {
                     href={tier.ctaHref}
                     className="block text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(160,180,200,0.12) 0%, rgba(100,120,145,0.07) 100%)',
-                      border: '1px solid rgba(180,200,220,0.25)',
-                      color: '#b8cad4',
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                      background: 'var(--landing-card-bg)',
+                      border: '1px solid var(--landing-card-border)',
+                      color: 'var(--landing-secondary-btn-color)',
                     }}
                   >
                     {tier.cta}

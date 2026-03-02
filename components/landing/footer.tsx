@@ -33,8 +33,8 @@ export function Footer() {
     <footer
       className="relative"
       style={{
-        background: '#060609',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        background: 'var(--bg-primary)',
+        borderTop: '1px solid var(--landing-divider)',
       }}
     >
       <div className="mx-auto max-w-6xl px-6 py-16">
@@ -49,9 +49,9 @@ export function Footer() {
               >
                 <span className="text-white font-bold text-[11px] tracking-tight">A</span>
               </div>
-              <span className="font-semibold text-white tracking-tight text-sm">Agency OS</span>
+              <span className="font-semibold tracking-tight text-sm" style={{ color: 'var(--text-primary)' }}>Agency OS</span>
             </Link>
-            <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#7b8899' }}>
+            <p className="text-sm leading-relaxed max-w-xs" style={{ color: 'var(--text-secondary)' }}>
               Run your marketing agency from one system. Plans, clients, invoices, and deliverables — all connected.
             </p>
 
@@ -63,9 +63,9 @@ export function Footer() {
                   href={social.href}
                   className="flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
                   style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    color: '#6b7280',
+                    background: 'var(--landing-badge-bg)',
+                    border: '1px solid var(--landing-badge-border)',
+                    color: 'var(--text-secondary)',
                   }}
                   aria-label={social.label}
                 >
@@ -80,7 +80,7 @@ export function Footer() {
             <div key={section}>
               <h4
                 className="text-xs font-semibold uppercase tracking-widest mb-4"
-                style={{ color: '#6b7280' }}
+                style={{ color: 'var(--text-secondary)' }}
               >
                 {section}
               </h4>
@@ -89,8 +89,8 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm transition-colors duration-200 hover:text-white"
-                      style={{ color: '#7b8899' }}
+                      className="text-sm transition-colors duration-200 hover:text-text-primary"
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       {link.label}
                     </Link>
@@ -104,12 +104,12 @@ export function Footer() {
         {/* Bottom bar */}
         <div
           className="mt-12 pt-7 flex flex-col md:flex-row items-center justify-between gap-4"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+          style={{ borderTop: '1px solid var(--landing-divider)' }}
         >
-          <p className="text-xs" style={{ color: '#6b7280' }}>
+          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
             &copy; 2026 Agency OS. All rights reserved.
           </p>
-          <p className="text-xs" style={{ color: '#6b7280' }}>
+          <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
             Built for agencies that ship.
           </p>
         </div>

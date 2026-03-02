@@ -30,9 +30,10 @@ export function Navbar() {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
         scrolled
-          ? 'bg-black/80 backdrop-blur-2xl border-b border-white/[0.06]'
+          ? 'backdrop-blur-2xl'
           : 'bg-transparent'
       )}
+      style={scrolled ? { background: 'var(--navbar-scrolled-bg)', borderBottom: '1px solid var(--landing-divider)' } : {}}
     >
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
         {/* Logo */}
@@ -43,7 +44,7 @@ export function Navbar() {
           >
             <span className="text-white font-bold text-[11px] tracking-tight">A</span>
           </div>
-          <span className="font-semibold text-white tracking-tight text-sm">Agency OS</span>
+          <span className="font-semibold tracking-tight text-sm" style={{ color: 'var(--text-primary)' }}>Agency OS</span>
         </Link>
 
         {/* Nav links */}
@@ -63,7 +64,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           {status === 'loading' ? (
-            <div className="w-20 h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.04)' }} />
+            <div className="w-20 h-8 rounded-lg animate-pulse" style={{ background: 'var(--landing-badge-bg)' }} />
           ) : isSignedIn ? (
             <Link
               href="/dashboard"
