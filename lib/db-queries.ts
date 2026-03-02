@@ -1655,19 +1655,16 @@ export async function getClientPasswordResetToken(
 
 export async function consumeClientPasswordResetToken(token: string): Promise<boolean> {
   try {
-    // First verify the token exists, is not expired, and is not already used
-    const checkResult = await db.query(
-      'SELECT id FROM client_password_reset_tokens WHERE token = $1 AND expires_at > NOW() AND used = false',
+    // Atomic UPDATE with RETURNING - prevents race condition where two concurrent
+    // requests could both see the token as valid and both mark it as used
+    const result = await db.query(
+      'UPDATE client_password_reset_tokens SET used = true WHERE token = $1 AND expires_at > NOW() AND used = false RETURNING id',
       [token]
     );
 
-    if (!checkResult.rows.length) {
-      return false; // Token is invalid, expired, or already used
-    }
-
-    // Only mark as used if it's valid
-    await db.query('UPDATE client_password_reset_tokens SET used = true WHERE token = $1', [token]);
-    return true;
+    // If a row was returned, the token was valid and is now consumed
+    // If no rows were returned, token was invalid/expired/already-used
+    return result.rows.length > 0;
   } catch (err) {
     console.error('Failed to consume client password reset token:', err);
     throw new Error(
