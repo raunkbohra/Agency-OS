@@ -40,8 +40,7 @@ export async function uploadToR2(
     await s3Client.send(command);
 
     // Return public URL (R2 public bucket format)
-    // Adjust domain if you're using a custom domain
-    const publicUrl = `${process.env.R2_ENDPOINT}/${BUCKET_NAME}/${key}`;
+    const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
     return publicUrl;
   } catch (error) {
     console.error(`Failed to upload file to R2: ${key}`, error);
