@@ -65,34 +65,11 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
     let y = height - margin;
 
     // ─── HEADER SECTION ───
-    // Company info on left
-    page.drawText(data.agencyName, {
-      x: margin,
-      y: y,
-      size: 18,
-      color: COLORS.black,
-    });
-
-    y -= 22;
-
-    if (data.agencyAddress) {
-      const addressLines = data.agencyAddress.split('\n').slice(0, 2);
-      for (const line of addressLines) {
-        page.drawText(line.trim(), {
-          x: margin,
-          y: y,
-          size: 10,
-          color: COLORS.mediumGray,
-        });
-        y -= 12;
-      }
-    }
-
-    // Logo on right
-    const logoX = width - margin - 100;
-    const logoY = height - margin - 20;
-    let logoHeight = 60;
-    let logoWidth = 100;
+    // Logo on top left
+    let logoHeight = 50;
+    let logoWidth = 50;
+    const logoX = margin;
+    const logoY = y;
 
     if (data.agencyLogoUrl) {
       try {
@@ -100,11 +77,8 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
         if (logoResponse.ok) {
           const logoBuffer = await logoResponse.arrayBuffer();
           const logoImage = await pdfDoc.embedPng(Buffer.from(logoBuffer));
-          const logoDims = logoImage.scale(0.15);
-          logoWidth = logoDims.width;
-          logoHeight = logoDims.height;
           page.drawImage(logoImage, {
-            x: logoX - logoWidth / 2,
+            x: logoX,
             y: logoY - logoHeight,
             width: logoWidth,
             height: logoHeight,
@@ -113,16 +87,34 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
       } catch (err) {
         console.warn('Failed to load logo:', err);
       }
-    } else {
-      // Logo placeholder
-      drawRectangle(page, logoX - 50, logoY, 100, 60, COLORS.lightGray);
-      page.drawText('Logo', {
-        x: logoX - 20,
-        y: logoY - 30,
-        size: 10,
-        color: COLORS.mediumGray,
-      });
     }
+
+    // Company info on left (next to logo)
+    const companyX = logoX + logoWidth + 15;
+    const companyY = logoY - 10;
+
+    page.drawText(data.agencyName, {
+      x: companyX,
+      y: companyY,
+      size: 18,
+      color: COLORS.black,
+    });
+
+    let addressY = companyY - 20;
+    if (data.agencyAddress) {
+      const addressLines = data.agencyAddress.split('\n').slice(0, 2);
+      for (const line of addressLines) {
+        page.drawText(line.trim(), {
+          x: companyX,
+          y: addressY,
+          size: 9,
+          color: COLORS.mediumGray,
+        });
+        addressY -= 11;
+      }
+    }
+
+    y -= 65;
 
     // INVOICE title on right
     page.drawText('INVOICE', {
