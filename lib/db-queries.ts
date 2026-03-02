@@ -553,6 +553,23 @@ export async function getClientByPortalToken(token: string): Promise<Client | nu
   }
 }
 
+export async function getDeliverablesByClient(clientId: string): Promise<Array<any>> {
+  try {
+    const result = await db.query(
+      `SELECT d.id, d.title, d.status, d.month_year, d.due_date
+       FROM deliverables d
+       JOIN client_plans cp ON d.client_plan_id = cp.id
+       WHERE cp.client_id = $1
+       ORDER BY d.month_year DESC, d.due_date DESC`,
+      [clientId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get deliverables by client:', err);
+    throw new Error(`Failed to get deliverables by client: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 // Client plans (subscriptions) queries
 export async function createClientPlan(
   clientId: string,
