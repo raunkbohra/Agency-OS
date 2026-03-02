@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Plus } from 'lucide-react';
+import { ArrowRight, Plus, LayoutList, CalendarDays } from 'lucide-react';
 import NewDeliverableModal from './NewDeliverableModal';
 import DeliverableStats from './DeliverableStats';
 import { DeliverableGroupedList } from './DeliverableGroupedList';
+import DeliverableCalendar from './DeliverableCalendar';
 import { toast } from '@/components/ui/use-toast';
 
 interface Deliverable {
@@ -47,6 +48,7 @@ export default function DeliverablesList() {
   const [selectedBulk, setSelectedBulk] = useState<string[]>([]);
   const [bulkStatus, setBulkStatus] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [activeView, setActiveView] = useState<'list' | 'calendar'>('list');
 
   useEffect(() => {
     const fetchDeliverables = async () => {
@@ -247,7 +249,36 @@ export default function DeliverablesList() {
 
       <NewDeliverableModal isOpen={showModal} onClose={() => setShowModal(false)} onCreated={handleCreated} />
 
-      {deliverables.length === 0 ? (
+      {/* View toggle: List/Calendar */}
+      <div className="mb-4 inline-flex rounded-lg border border-border-default bg-bg-secondary p-0.5">
+        <button
+          onClick={() => setActiveView('list')}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+            activeView === 'list'
+              ? 'bg-bg-primary text-text-primary shadow-sm'
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <LayoutList className="h-3.5 w-3.5" /> List
+        </button>
+        <button
+          onClick={() => setActiveView('calendar')}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+            activeView === 'calendar'
+              ? 'bg-bg-primary text-text-primary shadow-sm'
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          <CalendarDays className="h-3.5 w-3.5" /> Calendar
+        </button>
+      </div>
+
+      {/* Stats and main content */}
+      <DeliverableStats deliverables={deliverables} />
+
+      {activeView === 'calendar' ? (
+        <DeliverableCalendar deliverables={deliverables} />
+      ) : deliverables.length === 0 ? (
         <div className="text-center py-16 text-text-tertiary text-sm bg-bg-secondary rounded-xl border border-border-default">
           No deliverables{statusFilter !== 'all' ? ` with status "${statusFilter.replace('_', ' ')}"` : ''}.
         </div>
