@@ -135,12 +135,13 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         />
       </div>
 
-      {/* Summary cards: 2×2 on mobile, 4 in a row on sm+ */}
+      {/* Summary cards: 2×2 on mobile, responsive on sm+ */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
           { label: 'Invoice ID', value: invoice.id.substring(0, 8).toUpperCase() },
           { label: 'Amount', value: `₹${(totalAmount || 0).toLocaleString(currencyLocale)}` },
           { label: 'Status', value: invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1) },
+          ...(invoice.billing_period ? [{ label: 'Billing Period', value: invoice.billing_period }] : []),
           { label: 'Due Date', value: invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-IN') : 'Not set' },
         ].map(({ label, value }) => (
           <div key={label} className="bg-bg-secondary border border-border-default rounded-xl p-4">
@@ -167,6 +168,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
                 {[
                   { key: 'Invoice ID', val: invoice.id.substring(0, 8).toUpperCase() },
                   { key: 'Date', val: new Date(invoice.created_at).toLocaleDateString('en-IN') },
+                  ...(invoice.billing_period ? [{ key: 'Billing Period', val: invoice.billing_period }] : []),
                   { key: 'Due Date', val: invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-IN') : 'Not set' },
                 ].map(({ key, val }) => (
                   <div key={key} className="flex justify-between text-sm">

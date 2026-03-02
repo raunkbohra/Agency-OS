@@ -94,9 +94,15 @@ export default async function InvoicesPage() {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-text-primary truncate">{invoice.client_name || 'Unknown Client'}</p>
-                    <p className="text-xs text-text-tertiary mt-0.5">
-                      Due {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-IN') : 'not set'}
-                    </p>
+                    <div className="flex items-center gap-2 text-xs text-text-tertiary mt-0.5">
+                      {invoice.billing_period && (
+                        <>
+                          <span>{invoice.billing_period}</span>
+                          <span>•</span>
+                        </>
+                      )}
+                      <span>Due {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-IN') : 'not set'}</span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <p className="text-sm font-semibold text-text-primary">
