@@ -1932,3 +1932,34 @@ export async function removeUserFromAgency(userId: string, agencyId: string): Pr
     );
   }
 }
+
+// Check if user can edit deliverable based on roles
+export async function canUserEditDeliverable(
+  userId: string,
+  deliverableId: string,
+  agencyId: string
+): Promise<boolean> {
+  try {
+    // Get deliverable
+    const delivRes = await db.query(
+      `SELECT required_roles FROM deliverables WHERE id = $1 AND agency_id = $2`,
+      [deliverableId, agencyId]
+    );
+
+    if (!delivRes.rows[0]) return false;
+
+    const requiredRoles = delivRes.rows[0].required_roles || [];
+
+    // If no roles required, anyone can edit
+    if (!requiredRoles || requiredRoles.length === 0) return true;
+
+    // Get user roles
+    const userRoles = await getUserRolesInAgency(userId, agencyId);
+
+    // Check if user has at least one required role
+    return userRoles.some(role => requiredRoles.includes(role));
+  } catch (err) {
+    console.error('Failed to check deliverable permissions:', err);
+    return false;
+  }
+}
