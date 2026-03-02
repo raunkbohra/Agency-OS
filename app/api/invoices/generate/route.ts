@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
           }
         : undefined;
 
-    // Generate PDF
+    // Generate PDF (pdf-lib returns Promise<Readable>)
     const pdfStream = await generateInvoicePDF({
       invoiceNumber: `INV-${invoiceId.slice(0, 8).toUpperCase()}`,
       agencyName: agency.name,
