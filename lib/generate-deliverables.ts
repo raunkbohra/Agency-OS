@@ -111,7 +111,16 @@ export async function generateDeliverablesForClientPlan(
     0
   );
 
-  let created = 0;
+  // Batch collect all deliverables to insert
+  const deliverablesToInsert: Array<{
+    agency_id: string;
+    client_id: string;
+    plan_id: string;
+    title: string;
+    month_year: string;
+    due_date: Date;
+  }> = [];
+
   for (const item of planItems) {
     const qty =
       policy === 'prorated' && isFirstPartialMonth
@@ -124,19 +133,37 @@ export async function generateDeliverablesForClientPlan(
           ? `${item.deliverable_type} #${i + 1}`
           : item.deliverable_type;
 
-      await createDeliverable({
-        agencyId: clientPlan.agency_id,
-        clientId: clientPlan.client_id,
-        planId: clientPlan.plan_id,
+      deliverablesToInsert.push({
+        agency_id: clientPlan.agency_id,
+        client_id: clientPlan.client_id,
+        plan_id: clientPlan.plan_id,
         title,
-        monthYear,
-        dueDate,
+        month_year: monthYear,
+        due_date: dueDate,
       });
-      created++;
     }
   }
 
-  return created;
+  // Batch insert all deliverables at once
+  if (deliverablesToInsert.length > 0) {
+    const values: string[] = [];
+    const params: any[] = [];
+    let paramCount = 1;
+
+    deliverablesToInsert.forEach((d) => {
+      values.push(`($${paramCount}, $${paramCount + 1}, $${paramCount + 2}, $${paramCount + 3}, $${paramCount + 4}, $${paramCount + 5})`);
+      params.push(d.agency_id, d.client_id, d.plan_id, d.title, d.month_year, d.due_date.toISOString());
+      paramCount += 6;
+    });
+
+    await db.query(
+      `INSERT INTO deliverables (agency_id, client_id, plan_id, title, month_year, due_date)
+       VALUES ${values.join(', ')}`,
+      params
+    );
+  }
+
+  return deliverablesToInsert.length;
 }
 
 /**

@@ -1,8 +1,6 @@
 import { auth } from '@/lib/auth';
 import {
   getInvoicesByAgency,
-  getAgenciesByOwnerId,
-  createAgency,
   getAgencyById,
   Invoice,
 } from '@/lib/db-queries';
@@ -23,34 +21,22 @@ export default async function InvoicesPage() {
     redirect('/auth/signin');
   }
 
-  let agencyId: string | null = null;
+  let agencyId = session.user.agencyId;
   let invoices: Invoice[] = [];
   let error: string | null = null;
   let currencyLocale = 'en-IN'; // default to INR
 
   try {
-    // Get user's agencies
-    const agencies = await getAgenciesByOwnerId(session.user.id);
+    // Get agency details for currency setting and invoices
+    const [agency, agencyInvoices] = await Promise.all([
+      getAgencyById(agencyId),
+      getInvoicesByAgency(agencyId),
+    ]);
 
-    // If no agencies exist, create a default one
-    if (agencies.length === 0) {
-      const newAgency = await createAgency(
-        `Agency for ${session.user.email}`,
-        session.user.id
-      );
-      agencyId = newAgency.id;
-    } else {
-      agencyId = agencies[0].id;
+    if (agency?.currency === 'NPR') {
+      currencyLocale = 'ne-NP';
     }
-
-    // Get agency details for currency setting
-    if (agencyId) {
-      const agency = await getAgencyById(agencyId);
-      if (agency?.currency === 'NPR') {
-        currencyLocale = 'ne-NP';
-      }
-      invoices = await getInvoicesByAgency(agencyId);
-    }
+    invoices = agencyInvoices;
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load invoices';
   }

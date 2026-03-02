@@ -15,8 +15,8 @@ import { validateAndCompressImage } from '@/lib/image-compression';
 export async function POST(request: NextRequest) {
   const session = await auth();
 
-  // For testing: allow uploads without auth by using a test agency ID
-  const agencyId = session?.user?.agencyId || 'test-agency-upload';
+  // Require valid session and agency ID
+  const agencyId = session?.user?.agencyId;
 
   if (!agencyId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

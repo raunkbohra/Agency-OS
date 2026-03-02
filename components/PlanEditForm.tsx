@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Plan, ClientPlan } from '@/lib/db-queries';
 import { Edit2, X } from 'lucide-react';
 
@@ -11,6 +12,7 @@ interface PlanEditFormProps {
 }
 
 export default function PlanEditForm({ clientPlan, currentPlan, clientId }: PlanEditFormProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,10 +66,11 @@ export default function PlanEditForm({ clientPlan, currentPlan, clientId }: Plan
       }
 
       setSuccess(true);
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setIsOpen(false);
-        window.location.reload();
+        router.refresh();
       }, 1000);
+      return () => clearTimeout(t);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update plan');
     } finally {

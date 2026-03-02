@@ -113,18 +113,8 @@ export async function createAgency(
   }
 }
 
-export async function getAgencyById(id: string, requestingAgencyId?: string): Promise<Agency | null> {
+export async function getAgencyById(id: string): Promise<Agency | null> {
   try {
-    // If requestingAgencyId is provided, verify multi-tenant isolation
-    if (requestingAgencyId) {
-      const result = await db.query(
-        'SELECT * FROM agencies WHERE id = $1 AND id = $2',
-        [id, requestingAgencyId]
-      );
-      return result.rows[0] || null;
-    }
-
-    // Otherwise, return agency without isolation check
     const result = await db.query('SELECT * FROM agencies WHERE id = $1', [id]);
     return result.rows[0] || null;
   } catch (err) {
@@ -454,14 +444,14 @@ export async function getClientsByAgency(agencyId: string): Promise<Client[]> {
 export async function getClientsWithPlans(agencyId: string): Promise<(Client & { planName?: string })[]> {
   try {
     const result = await db.query(`
-      SELECT
+      SELECT DISTINCT ON (c.id)
         c.id, c.agency_id, c.name, c.email, c.company_name, c.phone, c.created_at,
         p.name as plan_name
       FROM clients c
       LEFT JOIN client_plans cp ON c.id = cp.client_id
       LEFT JOIN plans p ON cp.plan_id = p.id
       WHERE c.agency_id = $1
-      ORDER BY c.created_at DESC
+      ORDER BY c.id, c.created_at DESC
     `, [agencyId]);
 
     return result.rows.map(row => ({

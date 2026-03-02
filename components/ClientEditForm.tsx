@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Client } from '@/lib/db-queries';
 import { Edit2, X } from 'lucide-react';
 
@@ -10,6 +11,7 @@ interface ClientEditFormProps {
 }
 
 export default function ClientEditForm({ client, agencyId }: ClientEditFormProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,11 +49,11 @@ export default function ClientEditForm({ client, agencyId }: ClientEditFormProps
       }
 
       setSuccess(true);
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setIsOpen(false);
-        // Reload the page to reflect changes
-        window.location.reload();
+        router.refresh();
       }, 1000);
+      return () => clearTimeout(t);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update client');
     } finally {

@@ -1,8 +1,6 @@
 import { auth } from '@/lib/auth';
 import {
   getClientsWithPlans,
-  getAgenciesByOwnerId,
-  createAgency,
   Client,
 } from '@/lib/db-queries';
 import Link from 'next/link';
@@ -22,29 +20,13 @@ export default async function ClientsPage() {
     redirect('/auth/signin');
   }
 
-  let agencyId: string | null = null;
+  let agencyId = session.user.agencyId;
   let clients: (Client & { planName?: string })[] = [];
   let error: string | null = null;
 
   try {
-    // Get user's agencies
-    const agencies = await getAgenciesByOwnerId(session.user.id);
-
-    // If no agencies exist, create a default one
-    if (agencies.length === 0) {
-      const newAgency = await createAgency(
-        `Agency for ${session.user.email}`,
-        session.user.id
-      );
-      agencyId = newAgency.id;
-    } else {
-      agencyId = agencies[0].id;
-    }
-
-    // Now get clients for this agency with their plan information
-    if (agencyId) {
-      clients = await getClientsWithPlans(agencyId);
-    }
+    // Get clients for this agency with their plan information
+    clients = await getClientsWithPlans(agencyId);
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load clients';
   }

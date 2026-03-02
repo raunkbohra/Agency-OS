@@ -9,7 +9,8 @@ export default function CopyOnboardingLink({ agencyId }: { agencyId: string }) {
     const url = `${window.location.origin}/onboard/${agencyId}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const t = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(t);
   };
 
   return (

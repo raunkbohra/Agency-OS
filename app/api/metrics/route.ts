@@ -17,8 +17,11 @@ export async function GET(request: Request) {
       return Response.json({ error: 'No agency found' }, { status: 404 });
     }
 
-    const financialMetrics = await calculateFinancialMetrics(agencyId);
-    const operationalMetrics = await calculateOperationalMetrics(agencyId);
+    // Parallelize financial and operational metrics calculations
+    const [financialMetrics, operationalMetrics] = await Promise.all([
+      calculateFinancialMetrics(agencyId),
+      calculateOperationalMetrics(agencyId),
+    ]);
 
     return Response.json({
       ...financialMetrics,

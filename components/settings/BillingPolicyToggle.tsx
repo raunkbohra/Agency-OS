@@ -40,7 +40,8 @@ export default function BillingPolicyToggle({ initialPolicy }: Props) {
       });
       if (!res.ok) throw new Error('Failed to save');
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      const t = setTimeout(() => setSaved(false), 2000);
+      return () => clearTimeout(t);
     } catch {
       setError('Failed to save. Please try again.');
       setPolicy(initialPolicy);

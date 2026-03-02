@@ -28,20 +28,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
     }
 
-    // Fetch client details
-    const client = await getClientById(invoice.client_id, session.user.agencyId);
+    // Fetch client, agency, and items in parallel
+    const [client, agency, items] = await Promise.all([
+      getClientById(invoice.client_id, session.user.agencyId),
+      getAgencyById(session.user.agencyId),
+      getInvoiceItems(invoiceId, session.user.agencyId),
+    ]);
+
     if (!client) {
       return NextResponse.json({ error: 'Client not found' }, { status: 404 });
     }
 
-    // Fetch agency details
-    const agency = await getAgencyById(session.user.agencyId);
     if (!agency) {
       return NextResponse.json({ error: 'Agency not found' }, { status: 404 });
     }
-
-    // Fetch invoice items
-    const items = await getInvoiceItems(invoiceId, session.user.agencyId);
 
     // Determine currency symbol
     const currencySymbol = agency.currency === 'NPR' ? 'Rs.' : '$';

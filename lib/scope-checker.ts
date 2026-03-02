@@ -25,8 +25,11 @@ export async function checkForScopeCreep(
     const planId = planResult.rows[0].id;
     const planItems = await getPlanItems(planId);
 
-    // Get actual deliverables
-    const deliverables = await getDeliverablesByClient(clientId, agencyId);
+    // Get actual deliverables and existing alerts (in parallel)
+    const [deliverables, existingAlerts] = await Promise.all([
+      getDeliverablesByClient(clientId, agencyId),
+      getScopeAlertsByClient(clientId, agencyId, false),
+    ]);
 
     // For each plan item, count actual deliverables
     for (const planItem of planItems) {
@@ -40,8 +43,7 @@ export async function checkForScopeCreep(
 
       if (overage > 0.5) {
         // Check if alert already exists
-        const existing = await getScopeAlertsByClient(clientId, agencyId, false);
-        const alertExists = existing.some(
+        const alertExists = existingAlerts.some(
           a => a.deliverable_id === planItem.id && a.status === 'active'
         );
 

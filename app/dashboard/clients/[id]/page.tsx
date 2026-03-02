@@ -46,8 +46,11 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
       if (plan) planItems = await getPlanItemsByPlan(plan.id);
     }
 
-    invoices = await getInvoicesByClient(clientId, agencyId);
-    contracts = await getContractsByClient(clientId, agencyId);
+    // Parallelize independent queries
+    [invoices, contracts] = await Promise.all([
+      getInvoicesByClient(clientId, agencyId),
+      getContractsByClient(clientId, agencyId),
+    ]);
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load client details';
   }

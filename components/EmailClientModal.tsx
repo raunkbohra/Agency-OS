@@ -32,7 +32,8 @@ export default function EmailClientModal({ clientId, clientName, clientEmail, is
       });
       if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Failed to send'); }
       setSent(true);
-      setTimeout(() => { setSent(false); setSubject(''); setBody(''); onClose(); }, 2000);
+      const t = setTimeout(() => { setSent(false); setSubject(''); setBody(''); onClose(); }, 2000);
+      return () => clearTimeout(t);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send');
     } finally {

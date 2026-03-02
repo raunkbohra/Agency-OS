@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
     for (const row of result.rows) {
       try {
-        const invoiceId = await generateInvoiceForClientPlan(
+        const invoiceResult = await generateInvoiceForClientPlan(
           {
             client_id: row.client_id,
             plan_id: row.plan_id,
@@ -57,7 +57,7 @@ export async function GET(request: Request) {
           now
         );
 
-        if (invoiceId) {
+        if (invoiceResult) {
           created++;
 
           // Fetch agency for email
@@ -68,35 +68,26 @@ export async function GET(request: Request) {
           try {
             const currencySymbol = agency.currency === 'NPR' ? 'Rs.' : '$';
             const billingPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            const payUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/invoices/${invoiceId}/pay`;
-
-            // Get invoice details
-            const invoiceResult = await db.query(
-              'SELECT due_date, amount FROM invoices WHERE id = $1',
-              [invoiceId]
-            );
-            const invoice = invoiceResult.rows[0];
+            const payUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/invoices/${invoiceResult.invoiceId}/pay`;
 
             await sendInvoiceEmail({
               to: row.client_email,
               clientName: row.client_name,
               agencyName: agency.name,
-              invoiceId,
-              invoiceNumber: `INV-${invoiceId.slice(0, 8).toUpperCase()}`,
-              amount: parseFloat(invoice.amount),
+              invoiceId: invoiceResult.invoiceId,
+              invoiceNumber: `INV-${invoiceResult.invoiceId.slice(0, 8).toUpperCase()}`,
+              amount: invoiceResult.amount,
               currencySymbol,
               billingPeriod,
-              dueDate: invoice.due_date
-                ? new Date(invoice.due_date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
-                : 'Not specified',
+              dueDate: new Date(invoiceResult.dueDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              }),
               payUrl,
             });
           } catch (emailErr) {
-            console.error(`Failed to send invoice email for ${invoiceId}:`, emailErr);
+            console.error(`Failed to send invoice email for ${invoiceResult.invoiceId}:`, emailErr);
             // Don't fail the whole cron job if email fails
           }
         } else {
