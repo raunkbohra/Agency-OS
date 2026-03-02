@@ -33,15 +33,15 @@ const invoiceRows = [
 ];
 
 const statusConfig: Record<string, { color: string; bg: string; dot: string }> = {
-  paid: { color: '#22c55e', bg: 'rgba(34,197,94,0.1)', dot: '#22c55e' },
-  pending: { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', dot: '#f59e0b' },
-  overdue: { color: '#ef4444', bg: 'rgba(239,68,68,0.1)', dot: '#ef4444' },
+  paid: { color: '#22c55e', bg: 'rgba(34,197,94,0.12)', dot: '#22c55e' },
+  pending: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', dot: '#f59e0b' },
+  overdue: { color: '#ef4444', bg: 'rgba(239,68,68,0.12)', dot: '#ef4444' },
 };
 
+// ─── Desktop mockup (md+) ───────────────────────────────────────────
 function DashboardMockup() {
   return (
     <div className="relative mx-auto max-w-5xl px-4 lg:px-0">
-      {/* Main browser window */}
       <div
         className="relative rounded-2xl overflow-hidden"
         style={{
@@ -54,10 +54,7 @@ function DashboardMockup() {
         {/* Browser chrome */}
         <div
           className="flex items-center gap-3 px-4 py-3"
-          style={{
-            background: 'rgba(10, 10, 18, 0.95)',
-            borderBottom: '1px solid rgba(255,255,255,0.05)',
-          }}
+          style={{ background: 'rgba(10, 10, 18, 0.95)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
         >
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
@@ -111,7 +108,6 @@ function DashboardMockup() {
 
           {/* Main content */}
           <div className="flex-1 p-4 overflow-hidden">
-            {/* Page header */}
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-[13px] font-semibold text-white">Invoices</h2>
@@ -119,16 +115,12 @@ function DashboardMockup() {
               </div>
               <div
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer"
-                style={{
-                  background: 'rgba(107, 126, 147, 0.15)',
-                  border: '1px solid rgba(107, 126, 147, 0.3)',
-                }}
+                style={{ background: 'rgba(107, 126, 147, 0.15)', border: '1px solid rgba(107, 126, 147, 0.3)' }}
               >
                 <span className="text-[11px] font-semibold" style={{ color: '#b0bec8' }}>+ New Invoice</span>
               </div>
             </div>
 
-            {/* Metrics row */}
             <div className="grid grid-cols-3 gap-2.5 mb-4">
               {[
                 { label: 'MRR', value: '$24,800', change: '+12%', icon: TrendingUp },
@@ -138,10 +130,7 @@ function DashboardMockup() {
                 <div
                   key={m.label}
                   className="rounded-xl p-3"
-                  style={{
-                    background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                  }}
+                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
                 >
                   <div className="text-[9px] text-gray-500 uppercase tracking-wider mb-1.5">{m.label}</div>
                   <div className="text-[15px] font-bold text-white">{m.value}</div>
@@ -150,7 +139,6 @@ function DashboardMockup() {
               ))}
             </div>
 
-            {/* Invoice table */}
             <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
               <div
                 className="grid grid-cols-4 px-3.5 py-2"
@@ -188,7 +176,7 @@ function DashboardMockup() {
         </div>
       </div>
 
-      {/* Floating stat cards */}
+      {/* Floating stat cards — desktop only */}
       <motion.div
         className="absolute -left-4 lg:-left-16 top-1/4 rounded-2xl p-3.5 hidden lg:block"
         style={{
@@ -238,6 +226,185 @@ function DashboardMockup() {
   );
 }
 
+// ─── Mobile mockup (< md) ────────────────────────────────────────────
+function MobileMockup() {
+  const metrics = [
+    { label: 'MRR', value: '$24.8K', change: '↑ 12%', color: '#22c55e' },
+    { label: 'Clients', value: '18', change: '↑ 2 new', color: '#22c55e' },
+    { label: 'Collection', value: '94.2%', change: '↑ 3%', color: '#22c55e' },
+  ];
+
+  const mobileRows = invoiceRows.slice(0, 3);
+
+  return (
+    <div className="relative mx-auto max-w-sm px-4">
+      {/* Phone outer shell */}
+      <div
+        className="relative rounded-[2rem] overflow-hidden"
+        style={{
+          background: 'rgba(6, 6, 12, 0.96)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 30px 80px -10px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.07)',
+        }}
+      >
+        {/* Status bar */}
+        <div
+          className="flex items-center justify-between px-6 pt-4 pb-2"
+          style={{ background: 'rgba(8, 8, 16, 0.98)' }}
+        >
+          <span className="text-[11px] font-semibold text-white">9:41</span>
+          <div
+            className="w-20 h-4 rounded-full"
+            style={{ background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}
+          />
+          <div className="flex items-center gap-1">
+            <div className="flex gap-0.5 items-end h-3">
+              {[2, 3, 4, 5].map((h, i) => (
+                <div key={i} className="w-0.5 rounded-sm" style={{ height: `${h * 2}px`, background: i < 3 ? '#fff' : 'rgba(255,255,255,0.3)' }} />
+              ))}
+            </div>
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none" className="ml-1">
+              <rect x="0.5" y="0.5" width="11" height="9" rx="1.5" stroke="white" strokeOpacity="0.5"/>
+              <rect x="1.5" y="1.5" width="9" height="7" rx="1" fill="white"/>
+              <path d="M12.5 3.5v3a1.5 1.5 0 000-3z" fill="white" fillOpacity="0.4"/>
+            </svg>
+          </div>
+        </div>
+
+        {/* App header */}
+        <div
+          className="flex items-center justify-between px-5 py-3"
+          style={{ background: 'rgba(8, 8, 16, 0.98)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        >
+          <div className="flex items-center gap-2">
+            <div
+              className="w-6 h-6 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}
+            >
+              <span className="text-white text-[9px] font-bold">A</span>
+            </div>
+            <span className="text-[13px] font-semibold text-white">Agency OS</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6h8M2 3h8M2 9h5" stroke="rgba(255,255,255,0.5)" strokeWidth="1.3" strokeLinecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-4 py-4" style={{ background: 'rgba(6, 6, 12, 0.98)' }}>
+
+          {/* Page title */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-[15px] font-bold text-white">Invoices</p>
+              <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>18 total · Mar 2026</p>
+            </div>
+            <div
+              className="px-3 py-1.5 rounded-lg"
+              style={{ background: 'rgba(107, 126, 147, 0.15)', border: '1px solid rgba(107, 126, 147, 0.3)' }}
+            >
+              <span className="text-[11px] font-semibold" style={{ color: '#b0bec8' }}>+ New</span>
+            </div>
+          </div>
+
+          {/* Metrics row */}
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {metrics.map((m) => (
+              <div
+                key={m.label}
+                className="rounded-xl p-3 text-center"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+              >
+                <div className="text-[9px] uppercase tracking-wider mb-1" style={{ color: '#6b7280' }}>{m.label}</div>
+                <div className="text-[16px] font-black text-white leading-none mb-1">{m.value}</div>
+                <div className="text-[9px] font-medium" style={{ color: m.color }}>{m.change}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Invoice list */}
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            {mobileRows.map((row, i) => {
+              const s = statusConfig[row.status];
+              return (
+                <div
+                  key={i}
+                  className="flex items-center justify-between px-3.5 py-3"
+                  style={{ borderBottom: i < mobileRows.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-white truncate">{row.client}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>{row.plan} · {row.date}</p>
+                  </div>
+                  <div className="flex items-center gap-2.5 ml-3">
+                    <div
+                      className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize"
+                      style={{ background: s.bg, color: s.color }}
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: s.dot }} />
+                      {row.status}
+                    </div>
+                    <span className="text-[12px] font-bold text-white" style={{ fontFamily: 'monospace' }}>
+                      {row.amount}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom nav */}
+          <div
+            className="flex items-center justify-around mt-4 pt-3 pb-1"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            {[
+              { icon: LayoutDashboard, label: 'Home' },
+              { icon: Users, label: 'Clients' },
+              { icon: FileText, label: 'Invoices', active: true },
+              { icon: BarChart3, label: 'Metrics' },
+            ].map((item) => (
+              <div key={item.label} className="flex flex-col items-center gap-1">
+                <div
+                  className="w-8 h-8 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: item.active ? 'rgba(143, 160, 176, 0.15)' : 'transparent',
+                    border: item.active ? '1px solid rgba(143, 160, 176, 0.25)' : '1px solid transparent',
+                  }}
+                >
+                  <item.icon size={15} style={{ color: item.active ? '#b0bec8' : '#4b5563' }} />
+                </div>
+                <span className="text-[9px]" style={{ color: item.active ? '#8fa0b0' : '#4b5563' }}>
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Home indicator */}
+        <div className="flex justify-center pb-3 pt-1" style={{ background: 'rgba(6, 6, 12, 0.98)' }}>
+          <div className="w-24 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.2)' }} />
+        </div>
+      </div>
+
+      {/* Glow under phone */}
+      <div
+        className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-2/3 h-24 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse, rgba(160,175,190,0.1), transparent)', filter: 'blur(30px)' }}
+      />
+    </div>
+  );
+}
+
+// ─── Hero ────────────────────────────────────────────────────────────
 export function Hero() {
   return (
     <section
@@ -279,7 +446,6 @@ export function Hero() {
       />
 
       <div className="relative z-10 text-center max-w-4xl mx-auto">
-        {/* Badge */}
         {/* Headline */}
         <motion.div
           className="mt-8 space-y-2"
@@ -309,7 +475,7 @@ export function Hero() {
 
         {/* Subheadline */}
         <motion.p
-          className="mt-7 text-lg md:text-xl max-w-xl mx-auto leading-relaxed"
+          className="mt-6 text-base sm:text-lg md:text-xl max-w-xl mx-auto leading-relaxed"
           style={{ color: 'var(--text-secondary)' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -320,7 +486,7 @@ export function Hero() {
 
         {/* CTAs */}
         <motion.div
-          className="mt-8 flex items-center justify-center gap-3 flex-wrap"
+          className="mt-7 flex items-center justify-center gap-3 flex-wrap"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.45 }}
@@ -344,7 +510,7 @@ export function Hero() {
 
         {/* Social proof */}
         <motion.div
-          className="mt-6 flex items-center justify-center gap-1.5 text-xs"
+          className="mt-5 flex items-center justify-center gap-1.5 text-xs flex-wrap"
           style={{ color: 'var(--text-secondary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -358,14 +524,19 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Dashboard mockup */}
+      {/* Mockup — phone on mobile, desktop browser on md+ */}
       <motion.div
-        className="relative z-10 w-full mt-16"
+        className="relative z-10 w-full mt-12 md:mt-16"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
       >
-        <DashboardMockup />
+        <div className="md:hidden">
+          <MobileMockup />
+        </div>
+        <div className="hidden md:block">
+          <DashboardMockup />
+        </div>
       </motion.div>
     </section>
   );
