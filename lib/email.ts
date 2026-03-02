@@ -197,3 +197,216 @@ export async function sendInvoiceEmail(options: {
 </html>`.trim(),
   });
 }
+
+export async function sendSigningRequestEmail(options: {
+  to: string;
+  clientName: string;
+  agencyName: string;
+  contractFileName: string;
+  signingUrl: string;
+}): Promise<void> {
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: `Sign your contract — ${options.contractFileName}`,
+    text: `Hi ${options.clientName},\n\nYour contract "${options.contractFileName}" is ready for signature. Please review and sign it at:\n\n${options.signingUrl}`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <tr>
+          <td align="center" style="padding-bottom:24px;">
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">Hi ${options.clientName},</p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;">Your contract is ready for signature. Please review and sign the document below.</p>
+
+            <div style="margin:24px 0;padding:16px;background:#f3f4f6;border-left:3px solid #0070f3;border-radius:4px;">
+              <p style="margin:0 0 8px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Contract</p>
+              <p style="margin:0;font-size:15px;font-weight:600;color:#0d1117;">${options.contractFileName}</p>
+            </div>
+
+            <table cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
+              <tr>
+                <td align="center">
+                  <a href="${options.signingUrl}"
+                    style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#0070f3,#7c3aed);color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;letter-spacing:0.01em;">
+                    Review &amp; Sign Contract
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Sent via Agency OS · ${options.agencyName}</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim(),
+  });
+}
+
+export async function sendSignatureConfirmationEmail(options: {
+  to: string;
+  clientName: string;
+  agencyName: string;
+  contractFileName: string;
+}): Promise<void> {
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: 'Contract signed successfully',
+    text: `Hi ${options.clientName},\n\nThank you for signing ${options.contractFileName}. We've received your signature and your contract is now fully executed.`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <tr>
+          <td align="center" style="padding-bottom:24px;">
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
+            <div style="margin:0 0 24px;text-align:center;">
+              <span style="font-size:48px;line-height:48px;">✓</span>
+            </div>
+
+            <p style="margin:0 0 8px;font-size:20px;font-weight:600;color:#0d1117;text-align:center;">Contract Signed</p>
+            <p style="margin:12px 0 0;font-size:14px;color:#4b5563;text-align:center;">Thank you for signing <strong>${options.contractFileName}</strong></p>
+
+            <div style="margin:24px 0;padding:16px;background:#f0fdf4;border:1px solid #dcfce7;border-radius:8px;text-align:center;">
+              <p style="margin:0;font-size:13px;color:#166534;line-height:1.6;">We've received your signature and your contract is now fully executed. A copy has been saved to your records.</p>
+            </div>
+
+            <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
+            <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">Sent via Agency OS · ${options.agencyName}</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim(),
+  });
+}
+
+export async function sendSignatureNotificationEmail(options: {
+  to: string;
+  agencyName: string;
+  clientName: string;
+  contractFileName: string;
+  signedDate: Date;
+}): Promise<void> {
+  const formattedDate = options.signedDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/dashboard/clients`;
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: `Contract signed: ${options.clientName} — ${options.contractFileName}`,
+    text: `${options.clientName} has signed ${options.contractFileName} on ${formattedDate}.\n\nView the signed contract in your dashboard:\n${dashboardUrl}`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <tr>
+          <td align="center" style="padding-bottom:24px;">
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${options.agencyName}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;"><strong>${options.clientName}</strong> has signed <strong>${options.contractFileName}</strong></p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;">Signed on <strong>${formattedDate}</strong></p>
+
+            <table cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
+              <tr>
+                <td align="center">
+                  <a href="${dashboardUrl}"
+                    style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#0070f3,#7c3aed);color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;letter-spacing:0.01em;">
+                    View in Dashboard
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Sent via Agency OS</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim(),
+  });
+}
+
+export async function sendVerificationCodeEmail(options: {
+  to: string;
+  code: string;
+}): Promise<void> {
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: 'Your verification code',
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+          <tr>
+            <td style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:40px 36px;text-align:center;">
+              <p style="margin:0 0 24px;font-size:14px;color:#666;">Your verification code is:</p>
+              <div style="background:#f3f4f6;padding:24px;border-radius:8px;margin-bottom:24px;">
+                <p style="margin:0;font-size:32px;font-weight:600;color:#1a1a1a;font-family:monospace;letter-spacing:8px;">
+                  ${options.code}
+                </p>
+              </div>
+              <p style="margin:0;font-size:12px;color:#999;">
+                This code expires in 10 minutes.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `.trim(),
+  });
+}
