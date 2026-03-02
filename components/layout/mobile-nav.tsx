@@ -11,9 +11,11 @@ export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Derive a clean page title from the current path
-  const segment = pathname.split('/').filter(Boolean).pop() ?? 'dashboard';
-  const pageTitle = segment.charAt(0).toUpperCase() + segment.slice(1);
+  // Derive a clean page title — skip dynamic ID segments (UUIDs / numeric IDs)
+  const segments = pathname.split('/').filter(Boolean);
+  const isId = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(s) || /^\d+$/.test(s);
+  const relevant = [...segments].reverse().find((s) => !isId(s)) ?? 'dashboard';
+  const pageTitle = relevant.charAt(0).toUpperCase() + relevant.slice(1);
 
   return (
     <>

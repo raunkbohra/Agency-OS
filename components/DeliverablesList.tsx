@@ -73,7 +73,7 @@ export default function DeliverablesList() {
   return (
     <div>
       {/* Status filter pills + New Deliverable button */}
-      <div className="mb-5 flex items-center justify-between gap-3">
+      <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex flex-wrap gap-2">
           {STATUS_OPTIONS.map(status => (
             <button
@@ -91,7 +91,7 @@ export default function DeliverablesList() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-blue text-white hover:bg-accent-blue/90 transition-colors flex items-center gap-1.5 flex-shrink-0"
+          className="w-full sm:w-auto px-3 py-2 sm:py-1.5 rounded-lg text-xs font-semibold bg-accent-blue text-white hover:bg-accent-blue/90 transition-colors flex items-center justify-center gap-1.5 flex-shrink-0"
         >
           <Plus className="h-3.5 w-3.5" /> New Deliverable
         </button>
