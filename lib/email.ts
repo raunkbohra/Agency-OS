@@ -367,3 +367,46 @@ export async function sendSignatureNotificationEmail(options: {
 </html>`.trim(),
   });
 }
+
+export async function sendVerificationCodeEmail(options: {
+  to: string;
+  code: string;
+}): Promise<void> {
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: 'Your verification code',
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+          <tr>
+            <td style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:40px 36px;text-align:center;">
+              <p style="margin:0 0 24px;font-size:14px;color:#666;">Your verification code is:</p>
+              <div style="background:#f3f4f6;padding:24px;border-radius:8px;margin-bottom:24px;">
+                <p style="margin:0;font-size:32px;font-weight:600;color:#1a1a1a;font-family:monospace;letter-spacing:8px;">
+                  ${options.code}
+                </p>
+              </div>
+              <p style="margin:0;font-size:12px;color:#999;">
+                This code expires in 10 minutes.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `.trim(),
+  });
+}
