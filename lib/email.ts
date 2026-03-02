@@ -497,3 +497,75 @@ export async function sendClientInviteEmail(options: {
 </html>`.trim(),
   });
 }
+
+export async function sendTeamInviteEmail(options: {
+  to: string;
+  memberName: string;
+  agencyName: string;
+  roles: string[];
+  inviteUrl: string;
+}): Promise<void> {
+  const escapedMemberName = escapeHtml(options.memberName);
+  const escapedAgencyName = escapeHtml(options.agencyName);
+  const escapedInviteUrl = escapeHtml(options.inviteUrl);
+
+  const rolesHtml = options.roles
+    .map(role => `<div style="margin:4px 0;">• ${escapeHtml(role)}</div>`)
+    .join('');
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: options.to,
+    subject: `You're invited to join ${options.agencyName}`,
+    text: `Hi ${options.memberName},\n\nYou've been invited to join ${options.agencyName} as:\n\n${options.roles.map(r => `• ${r}`).join('\n')}\n\nClick the link below to accept the invitation:\n\n${options.inviteUrl}\n\nThis invitation link doesn't expire, so you can accept it anytime.`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:0;background:#f6f7f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f7f9;padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <tr>
+          <td align="center" style="padding-bottom:24px;">
+            <span style="font-size:20px;font-weight:700;color:#0d1117;">${escapedAgencyName}</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;padding:36px 32px;">
+            <p style="margin:0 0 8px;font-size:18px;font-weight:600;color:#0d1117;">You're invited!</p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;line-height:1.6;">Hi ${escapedMemberName},</p>
+            <p style="margin:12px 0;font-size:14px;color:#4b5563;line-height:1.6;">You've been invited to join <strong>${escapedAgencyName}</strong> as:</p>
+
+            <div style="margin:16px 0;padding:16px;background:#f3f4f6;border-left:3px solid #0070f3;border-radius:4px;">
+              ${rolesHtml}
+            </div>
+
+            <p style="margin:16px 0;font-size:14px;color:#4b5563;">Click the button below to accept the invitation:</p>
+
+            <table cellpadding="0" cellspacing="0" width="100%" style="margin:24px 0;">
+              <tr>
+                <td align="center">
+                  <a href="${options.inviteUrl}"
+                    style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#0070f3,#7c3aed);color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;letter-spacing:0.01em;">
+                    Accept Invitation
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:12px 0;font-size:12px;color:#666;">Or copy this link: <code style="background:#f3f4f6;padding:2px 6px;border-radius:3px;">${escapedInviteUrl}</code></p>
+
+            <p style="margin:12px 0;font-size:12px;color:#666;">This invitation link doesn't expire, so you can accept it anytime.</p>
+
+            <hr style="margin:28px 0;border:none;border-top:1px solid #e5e7eb;" />
+            <p style="margin:0;font-size:12px;color:#9ca3af;">If you have questions, contact ${escapedAgencyName}. Sent via Agency OS</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim(),
+  });
+}
