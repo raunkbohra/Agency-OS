@@ -947,14 +947,6 @@ export async function createDeliverable(data: {
   return result.rows[0];
 }
 
-export async function getDeliverablesByClient(clientId: string, agencyId: string): Promise<Deliverable[]> {
-  const result = await db.query(
-    `SELECT * FROM deliverables WHERE client_id = $1 AND agency_id = $2 ORDER BY due_date ASC`,
-    [clientId, agencyId]
-  );
-  return result.rows;
-}
-
 export async function getDeliverablesByAgency(agencyId: string): Promise<(Deliverable & { client_name?: string })[]> {
   const result = await db.query(
     `SELECT d.*, c.name as client_name FROM deliverables d
