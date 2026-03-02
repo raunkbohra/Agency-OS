@@ -86,48 +86,53 @@ export default async function ClientsPage() {
           </StaggerItem>
         ) : (
           <StaggerItem>
-            <Card>
+            {/* Mobile: card list */}
+            <div className="sm:hidden space-y-2">
+              {clients.map((client) => (
+                <Card key={client.id}>
+                  <Link href={`/dashboard/clients/${client.id}`} className="block p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-text-primary truncate">{client.name}</p>
+                        <p className="text-sm text-text-secondary truncate mt-0.5">{client.email}</p>
+                        {client.company_name && (
+                          <p className="text-xs text-text-tertiary mt-1">{client.company_name}</p>
+                        )}
+                      </div>
+                      {client.planName && (
+                        <span className="text-xs font-medium px-2 py-1 rounded-md bg-bg-tertiary text-text-secondary border border-border-default flex-shrink-0">
+                          {client.planName}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                </Card>
+              ))}
+            </div>
+
+            {/* Desktop: table */}
+            <Card className="hidden sm:block">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border-default">
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
-                        Client Name
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
-                        Email
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
-                        Company
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
-                        Plan
-                      </th>
-                      <th className="px-6 py-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wide">
-                        Actions
-                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Client Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Email</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Company</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Plan</th>
+                      <th className="px-6 py-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wide">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border-default">
                     {clients.map((client) => (
                       <tr key={client.id} className="hover:bg-bg-hover transition-colors duration-fast">
-                        <td className="px-6 py-4 text-sm font-medium text-text-primary">
-                          {client.name}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-text-secondary">
-                          {client.email}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-text-secondary">
-                          {client.company_name || '-'}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-text-secondary">
-                          {client.planName || '-'}
-                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-text-primary">{client.name}</td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">{client.email}</td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">{client.company_name || '-'}</td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">{client.planName || '-'}</td>
                         <td className="px-6 py-4 text-sm text-right">
                           <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/dashboard/clients/${client.id}`}>
-                              View
-                            </Link>
+                            <Link href={`/dashboard/clients/${client.id}`}>View</Link>
                           </Button>
                         </td>
                       </tr>

@@ -89,41 +89,35 @@ export default async function InvoicesPage() {
             <div className="space-y-4">
               {invoices.map((invoice) => (
                 <Card key={invoice.id} interactive>
-                  <div className="flex items-center justify-between p-5">
-                    <div className="flex-1 grid grid-cols-3 gap-8">
+                  <div className="p-4 sm:p-5">
+                    {/* Top row: client + status badge */}
+                    <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-1">
-                          Client
-                        </p>
-                        <p className="font-medium text-text-primary">
-                          {invoice.client_name || 'Unknown Client'}
-                        </p>
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-0.5">Client</p>
+                        <p className="font-medium text-text-primary">{invoice.client_name || 'Unknown Client'}</p>
                       </div>
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-1">
-                          Amount
-                        </p>
-                        <p className="font-medium text-text-primary">
-                          ₹{(invoice.amount ? Number(invoice.amount) : 0).toLocaleString(currencyLocale)}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-1">
-                          Due Date
-                        </p>
-                        <p className="font-medium text-text-primary">
-                          {invoice.due_date
-                            ? new Date(invoice.due_date).toLocaleDateString('en-IN')
-                            : 'Not set'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 ml-8">
                       <StatusBadge status={invoice.status} />
+                    </div>
+                    {/* Details row */}
+                    <div className="flex items-end justify-between gap-4">
+                      <div className="flex gap-6 sm:gap-8">
+                        <div>
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-0.5">Amount</p>
+                          <p className="font-medium text-text-primary">
+                            ₹{(invoice.amount ? Number(invoice.amount) : 0).toLocaleString(currencyLocale)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-0.5">Due Date</p>
+                          <p className="font-medium text-text-primary">
+                            {invoice.due_date
+                              ? new Date(invoice.due_date).toLocaleDateString('en-IN')
+                              : 'Not set'}
+                          </p>
+                        </div>
+                      </div>
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/dashboard/invoices/${invoice.id}`}>
-                          View Details
-                        </Link>
+                        <Link href={`/dashboard/invoices/${invoice.id}`}>View</Link>
                       </Button>
                     </div>
                   </div>

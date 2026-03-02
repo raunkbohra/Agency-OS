@@ -31,7 +31,7 @@ const bottomItems = [
   { href: '/dashboard/settings/payments', icon: Settings, label: 'Settings', color: '#8fa0b0' },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-sidebar flex-col border-r border-border-default bg-bg-primary">
       {/* Logo */}
@@ -52,7 +52,7 @@ export function Sidebar() {
           Workspace
         </p>
         {navItems.map((item) => (
-          <SidebarNavItem key={item.href} {...item} />
+          <SidebarNavItem key={item.href} {...item} onClick={onNavClick} />
         ))}
       </nav>
 
@@ -63,7 +63,7 @@ export function Sidebar() {
           <ThemeToggle />
         </div>
         {bottomItems.map((item) => (
-          <SidebarNavItem key={item.href} {...item} />
+          <SidebarNavItem key={item.href} {...item} onClick={onNavClick} />
         ))}
         <button
           onClick={() => signOut({ callbackUrl: '/auth/signin' })}

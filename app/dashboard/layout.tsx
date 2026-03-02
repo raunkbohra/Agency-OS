@@ -25,7 +25,7 @@ export default async function DashboardLayout({
 
       {/* Main content */}
       <main className="lg:pl-sidebar bg-dot-grid min-h-screen">
-        <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 pt-20 pb-8 lg:px-8 lg:pt-8">
           {children}
         </div>
       </main>
