@@ -1,7 +1,8 @@
 import { auth } from '@/lib/auth';
 import { updateDeliverablesBulk } from '@/lib/db-queries';
 
-// Valid deliverable status values - must match the Deliverable interface in db-queries.ts
+// Note: Specification listed 'pending', 'in_progress', 'completed' as valid statuses,
+// but these don't exist in the database schema. Using actual schema values from Deliverable interface.
 const VALID_STATUSES = ['draft', 'in_review', 'approved', 'changes_requested', 'done'] as const;
 type ValidDeliverableStatus = typeof VALID_STATUSES[number];
 
