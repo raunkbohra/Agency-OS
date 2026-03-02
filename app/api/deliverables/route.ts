@@ -1,6 +1,14 @@
 import { auth } from '@/lib/auth';
 import { getDeliverablesByAgency, getDeliverablesFiltered, createDeliverable } from '@/lib/db-queries';
 
+// Valid status values
+const VALID_STATUSES = ['all', 'draft', 'in_review', 'approved', 'changes_requested', 'done'] as const;
+type ValidStatus = typeof VALID_STATUSES[number];
+
+// Valid sort values
+const VALID_SORTS = ['due_date', 'due_date_desc', 'client', 'status'] as const;
+type ValidSort = typeof VALID_SORTS[number];
+
 export async function GET(request: Request) {
   const session = await auth();
 
@@ -14,6 +22,22 @@ export async function GET(request: Request) {
     const urgent = url.searchParams.get('urgent') === 'true';
     const sort = url.searchParams.get('sort') || 'due_date';
 
+    // Validate status parameter
+    if (!VALID_STATUSES.includes(status as ValidStatus)) {
+      return Response.json(
+        { error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Validate sort parameter
+    if (!VALID_SORTS.includes(sort as ValidSort)) {
+      return Response.json(
+        { error: `Invalid sort. Must be one of: ${VALID_SORTS.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
     // Check if any filters are applied
     const hasFilters = status !== 'all' || urgent || sort !== 'due_date';
 
@@ -21,9 +45,9 @@ export async function GET(request: Request) {
     if (hasFilters) {
       // Use filtered query if any filters are applied
       deliverables = await getDeliverablesFiltered(session.user.agencyId, {
-        statusFilter: status,
+        statusFilter: status as ValidStatus,
         urgent,
-        sort,
+        sort: sort as ValidSort,
       });
     } else {
       // Use the basic query if no filters

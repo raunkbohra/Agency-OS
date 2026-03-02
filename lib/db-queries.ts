@@ -911,7 +911,7 @@ export async function getDeliverablesByClient(clientId: string, agencyId: string
   return result.rows;
 }
 
-export async function getDeliverablesByAgency(agencyId: string): Promise<Deliverable[]> {
+export async function getDeliverablesByAgency(agencyId: string): Promise<(Deliverable & { client_name?: string })[]> {
   const result = await db.query(
     `SELECT d.*, c.name as client_name FROM deliverables d
      JOIN clients c ON d.client_id = c.id
@@ -925,9 +925,9 @@ export async function getDeliverablesByAgency(agencyId: string): Promise<Deliver
 export async function getDeliverablesFiltered(
   agencyId: string,
   options: {
-    statusFilter?: string;
+    statusFilter?: 'all' | 'draft' | 'in_review' | 'approved' | 'changes_requested' | 'done';
     urgent?: boolean;
-    sort?: string;
+    sort?: 'due_date' | 'due_date_desc' | 'client' | 'status';
   } = {}
 ): Promise<(Deliverable & { client_name?: string })[]> {
   const { statusFilter = 'all', urgent = false, sort = 'due_date' } = options;
@@ -936,7 +936,7 @@ export async function getDeliverablesFiltered(
                JOIN clients c ON d.client_id = c.id
                WHERE d.agency_id = $1`;
 
-  const params: any[] = [agencyId];
+  const params: (string | boolean)[] = [agencyId];
   let paramCount = 2;
 
   // Apply status filter
