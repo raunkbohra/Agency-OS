@@ -63,16 +63,19 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
 
   return (
     <PageTransition className="space-y-6">
+      <Link
+        href="/dashboard/clients"
+        className="inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Back to Clients
+      </Link>
+
       <PageHeader
         title={client.name}
         description="Client profile"
         actions={
-          <div className="flex items-center gap-2">
-            <EmailClientButton clientId={client.id} clientName={client.name} clientEmail={client.email} />
-            <Link href="/dashboard/clients" className="inline-flex items-center gap-1.5 text-sm text-accent-blue hover:text-accent-blue/80 font-medium">
-              <ChevronLeft className="h-4 w-4" /> Clients
-            </Link>
-          </div>
+          <EmailClientButton clientId={client.id} clientName={client.name} clientEmail={client.email} />
         }
       />
 
