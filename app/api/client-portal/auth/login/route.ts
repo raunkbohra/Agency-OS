@@ -21,20 +21,10 @@ export async function POST(request: NextRequest) {
 
     // Try to find a matching client with valid password
     for (const client of clients) {
-      // Check if invite not accepted
-      if (!client.invite_accepted) {
-        return NextResponse.json(
-          { error: 'Please accept your invitation first' },
-          { status: 400 }
-        );
-      }
-
-      // Check if password_hash exists
-      if (!client.password_hash) {
-        return NextResponse.json(
-          { error: 'Please accept your invitation first' },
-          { status: 400 }
-        );
+      // Skip clients without accepted invites or password set
+      // Don't reveal whether account exists or is pending
+      if (!client.invite_accepted || !client.password_hash) {
+        continue;
       }
 
       // Verify password
@@ -54,6 +44,7 @@ export async function POST(request: NextRequest) {
 
         return response;
       }
+      // Password didn't match this client, try next one
     }
 
     // No matching client or password doesn't match any
