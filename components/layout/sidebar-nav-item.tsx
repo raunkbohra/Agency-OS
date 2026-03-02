@@ -10,9 +10,10 @@ interface SidebarNavItemProps {
   href: string;
   icon: LucideIcon;
   label: string;
+  color?: string;
 }
 
-export function SidebarNavItem({ href, icon: Icon, label }: SidebarNavItemProps) {
+export function SidebarNavItem({ href, icon: Icon, label, color }: SidebarNavItemProps) {
   const pathname = usePathname();
   const isActive = pathname === href || pathname.startsWith(href + '/');
 
@@ -29,11 +30,12 @@ export function SidebarNavItem({ href, icon: Icon, label }: SidebarNavItemProps)
       {isActive && (
         <motion.div
           layoutId="sidebar-active"
-          className="absolute inset-0 rounded-md bg-bg-tertiary border border-border-default shadow-[0_0_12px_rgba(0,112,243,0.08)]"
+          className="absolute inset-0 rounded-md bg-bg-tertiary border border-border-default"
+          style={{ boxShadow: '0 0 12px rgba(143,160,176,0.12)' }}
           transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
         />
       )}
-      <Icon className="relative z-10 h-4 w-4" />
+      <Icon className="relative z-10 h-4 w-4" style={{ color: color ?? undefined }} />
       <span className="relative z-10">{label}</span>
     </Link>
   );

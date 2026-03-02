@@ -17,17 +17,17 @@ import {
 import { signOut } from 'next-auth/react';
 
 const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/dashboard/clients', icon: Users, label: 'Clients' },
-  { href: '/dashboard/plans', icon: Package, label: 'Plans' },
-  { href: '/dashboard/invoices', icon: FileText, label: 'Invoices' },
-  { href: '/dashboard/deliverables', icon: CreditCard, label: 'Deliverables' },
-  { href: '/dashboard/contracts', icon: FileSignature, label: 'Contracts' },
-  { href: '/dashboard/metrics', icon: BarChart3, label: 'Metrics' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', color: '#8fa0b0' },
+  { href: '/dashboard/clients', icon: Users, label: 'Clients', color: '#8fa0b0' },
+  { href: '/dashboard/plans', icon: Package, label: 'Plans', color: '#8fa0b0' },
+  { href: '/dashboard/invoices', icon: FileText, label: 'Invoices', color: '#8fa0b0' },
+  { href: '/dashboard/deliverables', icon: CreditCard, label: 'Deliverables', color: '#8fa0b0' },
+  { href: '/dashboard/contracts', icon: FileSignature, label: 'Contracts', color: '#8fa0b0' },
+  { href: '/dashboard/metrics', icon: BarChart3, label: 'Metrics', color: '#8fa0b0' },
 ];
 
 const bottomItems = [
-  { href: '/dashboard/settings/payments', icon: Settings, label: 'Settings' },
+  { href: '/dashboard/settings/payments', icon: Settings, label: 'Settings', color: '#8fa0b0' },
 ];
 
 export function Sidebar() {
@@ -64,7 +64,7 @@ export function Sidebar() {
           onClick={() => signOut({ callbackUrl: '/auth/signin' })}
           className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-all duration-fast"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-4 w-4" style={{ color: '#8fa0b0' }} />
           <span>Sign out</span>
         </button>
       </div>
