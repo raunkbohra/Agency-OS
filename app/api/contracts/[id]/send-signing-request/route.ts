@@ -35,8 +35,8 @@ export async function POST(
 
     const contract = contractResult.rows[0];
 
-    // 4. Call createSigningToken(contractId, client_email) → { token, code }
-    const { token, code } = await createSigningToken(contract.id, contract.client_email);
+    // 4. Call createSigningToken(contractId, client_email) → token
+    const token = await createSigningToken(contract.id, contract.client_email);
 
     // 5. Build signingUrl
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';

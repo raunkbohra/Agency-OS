@@ -27,7 +27,7 @@ export async function checkForScopeCreep(
 
     // Get actual deliverables and existing alerts (in parallel)
     const [deliverables, existingAlerts] = await Promise.all([
-      getDeliverablesByClient(clientId, agencyId),
+      getDeliverablesByClient(clientId),
       getScopeAlertsByClient(clientId, agencyId, false),
     ]);
 

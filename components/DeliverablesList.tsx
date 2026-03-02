@@ -134,7 +134,7 @@ export default function DeliverablesList() {
   return (
     <div>
       {/* Stats widget */}
-      <DeliverableStats deliverables={deliverables} />
+      <DeliverableStats deliverables={deliverables as any} />
 
       {/* Filters + Sort + New Deliverable */}
       <div className="mb-5 space-y-3">
@@ -274,7 +274,7 @@ export default function DeliverablesList() {
       </div>
 
       {/* Stats and main content */}
-      <DeliverableStats deliverables={deliverables} />
+      <DeliverableStats deliverables={deliverables as any} />
 
       {activeView === 'calendar' ? (
         <DeliverableCalendar deliverables={deliverables} />

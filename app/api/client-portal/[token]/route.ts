@@ -2,11 +2,12 @@ import { getClientByPortalToken, getDeliverablesByClient } from '@/lib/db-querie
 
 export async function GET(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
+    const { token } = await params;
     // Get client by portal token (no session auth required)
-    const client = await getClientByPortalToken(params.token);
+    const client = await getClientByPortalToken(token);
 
     if (!client) {
       return Response.json({ error: 'Invalid or expired token' }, { status: 404 });

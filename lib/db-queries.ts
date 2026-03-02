@@ -1552,6 +1552,19 @@ export async function getClientByEmail(email: string, agencyId: string): Promise
   }
 }
 
+export async function getClientsByEmailAny(email: string): Promise<Client[]> {
+  try {
+    const result = await db.query(
+      'SELECT * FROM clients WHERE email = $1 ORDER BY created_at DESC',
+      [email]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Failed to get clients by email:', err);
+    throw new Error(`Failed to fetch clients: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 export async function setClientPassword(clientId: string, passwordHash: string): Promise<void> {
   try {
     await db.query('UPDATE clients SET password_hash = $1 WHERE id = $2', [passwordHash, clientId]);

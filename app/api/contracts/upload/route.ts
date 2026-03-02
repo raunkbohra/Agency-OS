@@ -44,7 +44,7 @@ export async function POST(request: Request) {
           clientName: client.name,
           contractFileName: file.name,
           signingUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/sign/contracts/${signingToken}`,
-          agencyName: session.user.agencyName || 'Agency OS'
+          agencyName: 'Agency OS'
         });
       }
     } catch (emailError) {

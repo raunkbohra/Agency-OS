@@ -22,6 +22,7 @@ export async function sendRevisionRequestNotification(
     // Try to use Resend if available
     if (process.env.RESEND_API_KEY) {
       try {
+        // @ts-ignore - resend is optional dependency
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({

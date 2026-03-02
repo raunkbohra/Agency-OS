@@ -12,7 +12,7 @@ export default async function ClientDeliverablesPage({
     return <div className="p-8">Access denied</div>;
   }
 
-  const deliverables = await getDeliverablesByClient(client.id, client.agency_id);
+  const deliverables = await getDeliverablesByClient(client.id);
 
   return (
     <div className="p-8">
