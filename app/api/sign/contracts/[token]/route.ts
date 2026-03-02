@@ -40,6 +40,7 @@ export async function GET(
     return NextResponse.json({
       contractId: data.contract_id,
       fileName: data.file_name,
+      fileUrl: data.file_url,
       clientName: data.client_name,
       email: data.email,
       verified: data.verified,

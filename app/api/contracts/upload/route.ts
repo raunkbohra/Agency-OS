@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { uploadContract, getClientById, createSigningToken } from '@/lib/db-queries';
 import { sendSigningRequestEmail } from '@/lib/email';
-import { v4 as uuidv4 } from 'uuid';
+import { uploadFileToR2 } from '@/lib/r2-upload';
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -20,9 +20,8 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Missing fields' }, { status: 400 });
     }
 
-    // TODO: Upload to Vercel Blob
-    // For now, generate a mock URL
-    const fileUrl = `https://blob.vercel.com/${uuidv4()}`;
+    // Upload file to R2 bucket
+    const fileUrl = await uploadFileToR2(file, 'contracts');
 
     const contract = await uploadContract({
       agencyId: session.user.agencyId,

@@ -181,12 +181,26 @@ export default function ContractSigningPage() {
         <div className="bg-bg-secondary border border-border-default rounded-xl p-6 md:p-8">
           {contractData && (
             <>
-              <h1 className="text-2xl font-bold text-text-primary mb-1">
-                {contractData.fileName}
-              </h1>
-              <p className="text-sm text-text-secondary mb-8">
-                Signing request for {contractData.clientName}
-              </p>
+              <div className="flex items-start justify-between gap-4 mb-8">
+                <div className="flex-1">
+                  <h1 className="text-2xl font-bold text-text-primary mb-1">
+                    {contractData.fileName}
+                  </h1>
+                  <p className="text-sm text-text-secondary">
+                    Signing request for {contractData.clientName}
+                  </p>
+                </div>
+                {contractData.fileUrl && (
+                  <a
+                    href={contractData.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-accent-blue/10 text-accent-blue hover:bg-accent-blue/20 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap"
+                  >
+                    View Contract
+                  </a>
+                )}
+              </div>
             </>
           )}
 

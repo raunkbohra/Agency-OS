@@ -1141,6 +1141,7 @@ export async function getSigningTokenData(token: string): Promise<any | null> {
       cst.verified,
       cst.signed,
       c.file_name,
+      c.file_url,
       cl.name as client_name
     FROM contract_signing_tokens cst
     JOIN contracts c ON cst.contract_id = c.id
@@ -1208,17 +1209,33 @@ export async function submitSignature(
 
     const contractId = tokenResult.rows[0].contract_id;
 
-    // Insert signature record
+    // Upload signature to R2 and get the URL
+    const { uploadSignatureToR2 } = await import('./r2-upload');
+    let signatureUrl: string | null = null;
+    try {
+      signatureUrl = await uploadSignatureToR2(signatureImage, contractId);
+    } catch (err) {
+      console.error('Failed to upload signature to R2, proceeding with database storage:', err);
+      // Continue with database storage as fallback
+    }
+
+    // Insert signature record with R2 URL
     await db.query(
-      `INSERT INTO contract_signatures (id, contract_id, signer_name, signature_image, created_at)
-       VALUES ($1, $2, $3, $4, NOW())`,
-      [require('uuid').v4(), contractId, signerName, signatureImage]
+      `INSERT INTO contract_signatures (id, contract_id, signer_name, signature_image, signature_url, signed_date, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`,
+      [require('uuid').v4(), contractId, signerName, signatureUrl ? null : signatureImage, signatureUrl]
     );
 
     // Mark token as signed
     await db.query(
       `UPDATE contract_signing_tokens SET signed = true WHERE token = $1`,
       [token]
+    );
+
+    // Update contract to mark as signed
+    await db.query(
+      `UPDATE contracts SET signed = true, signed_at = NOW(), updated_at = NOW() WHERE id = $1`,
+      [contractId]
     );
 
     return true;

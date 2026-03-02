@@ -52,7 +52,7 @@ export default function ContractsList({ agencyId }: { agencyId: string }) {
         {contracts.map(contract => (
           <Link
             key={contract.id}
-            href={`/contracts/${contract.id}`}
+            href={`/dashboard/contracts/${contract.id}`}
             className="flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-bg-hover transition-colors"
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -103,7 +103,7 @@ export default function ContractsList({ agencyId }: { agencyId: string }) {
                   {contract.signed_at ? new Date(contract.signed_at).toLocaleDateString() : 'N/A'}
                 </td>
                 <td className="px-6 py-4">
-                  <Link href={`/contracts/${contract.id}`} className="text-accent-blue hover:underline text-sm">View</Link>
+                  <Link href={`/dashboard/contracts/${contract.id}`} className="text-accent-blue hover:underline text-sm">View</Link>
                 </td>
               </tr>
             ))}
