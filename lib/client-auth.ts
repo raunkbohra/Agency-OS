@@ -56,6 +56,8 @@ export async function createClientSession(
     name: client.name,
   })
     .setProtectedHeader({ alg: 'HS256' })
+    .setAudience('client-portal')
+    .setIssuedAt()
     .setExpirationTime(Math.floor(Date.now() / 1000) + expiresIn)
     .sign(secret);
 
@@ -95,16 +97,28 @@ export async function getClientSession(
     }
 
     const secret = getSecret();
-    const verified = await jwtVerify(token, secret);
+    const verified = await jwtVerify(token, secret, {
+      audience: 'client-portal',
+    });
 
     // Extract payload and ensure it has the expected structure
     const payload = verified.payload as Record<string, unknown>;
 
+    // Validate payload has all required fields with correct types
+    if (
+      typeof payload.clientId !== 'string' ||
+      typeof payload.agencyId !== 'string' ||
+      typeof payload.email !== 'string' ||
+      typeof payload.name !== 'string'
+    ) {
+      return null; // Payload shape is invalid
+    }
+
     return {
-      clientId: payload.clientId as string,
-      agencyId: payload.agencyId as string,
-      email: payload.email as string,
-      name: payload.name as string,
+      clientId: payload.clientId,
+      agencyId: payload.agencyId,
+      email: payload.email,
+      name: payload.name,
     };
   } catch {
     // Cookie doesn't exist, is invalid, or signature verification failed
