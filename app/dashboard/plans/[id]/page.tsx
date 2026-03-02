@@ -44,14 +44,17 @@ export default async function PlanDetailPage({ params }: PlanDetailPageProps) {
 
   return (
     <PageTransition>
+      <Link
+        href="/dashboard/plans"
+        className="inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors mb-4"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Back to Plans
+      </Link>
+
       <PageHeader
         title={plan.name}
         description="Plan details"
-        actions={
-          <Link href="/dashboard/plans" className="inline-flex items-center gap-1.5 text-sm text-accent-blue hover:text-accent-blue/80 font-medium">
-            <ChevronLeft className="h-4 w-4" /> Plans
-          </Link>
-        }
       />
 
       <ScrollReveal>
