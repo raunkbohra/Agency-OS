@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { SparkleButtonSm } from '@/components/ui/sparkle-button';
 
@@ -13,12 +14,15 @@ const navLinks = [
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const isSignedIn = status === 'authenticated' && !!session;
 
   return (
     <nav
@@ -56,15 +60,42 @@ export function Navbar() {
 
         {/* CTA */}
         <div className="flex items-center gap-2">
-          <Link
-            href="/auth/signin"
-            className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors duration-200"
-          >
-            Sign in
-          </Link>
-          <SparkleButtonSm href="/auth/signin">
-            Get Started
-          </SparkleButtonSm>
+          {status === 'loading' ? (
+            <div className="w-20 h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.04)' }} />
+          ) : isSignedIn ? (
+            <Link
+              href="/dashboard"
+              className="group flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#e2eaf0',
+              }}
+            >
+              <div
+                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)', color: '#fff' }}
+              >
+                {session.user?.name?.[0]?.toUpperCase() ?? session.user?.email?.[0]?.toUpperCase() ?? 'A'}
+              </div>
+              <span>Open app</span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: '#8fa0b0' }} className="group-hover:translate-x-0.5 transition-transform duration-200">
+                <path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/auth/signin"
+                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors duration-200"
+              >
+                Sign in
+              </Link>
+              <SparkleButtonSm href="/auth/signup">
+                Get Started
+              </SparkleButtonSm>
+            </>
+          )}
         </div>
       </div>
     </nav>

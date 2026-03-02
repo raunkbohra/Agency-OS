@@ -90,19 +90,41 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.email = user.email;
         token.agencyId = user.agencyId;
       }
-      // Handle Google sign-in: populate id + agencyId from DB
+      // Handle Google sign-in: find or auto-provision user + agency
       if (account?.provider === 'google' && token.email) {
         const userId = generateIdFromEmail(token.email as string);
         token.id = userId;
         try {
           const pool = getPool();
-          const result = await pool.query(
+
+          // Check if agency already exists
+          const existing = await pool.query(
             'SELECT id FROM agencies WHERE owner_id = $1 LIMIT 1',
             [userId]
           );
-          token.agencyId = result.rows[0]?.id;
+
+          if (existing.rows[0]) {
+            token.agencyId = existing.rows[0].id;
+          } else {
+            // First Google sign-in — auto-provision user + agency
+            const name = (token.name as string) ?? (token.email as string).split('@')[0];
+            const agencyName = `${name}'s Agency`;
+
+            const agencyResult = await pool.query(
+              'INSERT INTO agencies (name, owner_id, currency) VALUES ($1, $2, $3) RETURNING id',
+              [agencyName, userId, 'USD']
+            );
+            const agencyId = agencyResult.rows[0].id;
+
+            await pool.query(
+              'INSERT INTO users (id, agency_id, email, name, role) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO NOTHING',
+              [userId, agencyId, token.email, name, 'owner']
+            );
+
+            token.agencyId = agencyId;
+          }
         } catch (err) {
-          // If database lookup fails, token.agencyId remains undefined
+          console.error('Google sign-in provisioning error:', err);
         }
       }
       return token;
