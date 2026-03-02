@@ -1152,6 +1152,82 @@ export async function getSigningTokenData(token: string): Promise<any | null> {
   return result.rows[0] || null;
 }
 
+export async function verifySigningCode(
+  token: string,
+  email: string,
+  code: string
+): Promise<{ success: boolean; error?: string }> {
+  // Check if token, email, and code are valid
+  const result = await db.query(
+    `SELECT verification_code, code_expires_at, verified FROM contract_signing_tokens
+     WHERE token = $1 AND email = $2`,
+    [token, email]
+  );
+
+  if (result.rows.length === 0) {
+    return { success: false, error: 'Invalid token or email' };
+  }
+
+  const record = result.rows[0];
+
+  // Check if code has expired
+  if (record.code_expires_at && new Date(record.code_expires_at) < new Date()) {
+    return { success: false, error: 'Verification code has expired' };
+  }
+
+  // Check if code matches
+  if (record.verification_code !== code) {
+    return { success: false, error: 'Invalid verification code' };
+  }
+
+  // Mark as verified
+  await db.query(
+    `UPDATE contract_signing_tokens SET verified = true WHERE token = $1`,
+    [token]
+  );
+
+  return { success: true };
+}
+
+export async function submitSignature(
+  token: string,
+  email: string,
+  signatureImage: string,
+  signerName: string
+): Promise<boolean> {
+  try {
+    // Get contract_id from the token
+    const tokenResult = await db.query(
+      `SELECT contract_id FROM contract_signing_tokens WHERE token = $1 AND email = $2`,
+      [token, email]
+    );
+
+    if (tokenResult.rows.length === 0) {
+      return false;
+    }
+
+    const contractId = tokenResult.rows[0].contract_id;
+
+    // Insert signature record
+    await db.query(
+      `INSERT INTO contract_signatures (id, contract_id, signer_name, signature_image, created_at)
+       VALUES ($1, $2, $3, $4, NOW())`,
+      [require('uuid').v4(), contractId, signerName, signatureImage]
+    );
+
+    // Mark token as signed
+    await db.query(
+      `UPDATE contract_signing_tokens SET signed = true WHERE token = $1`,
+      [token]
+    );
+
+    return true;
+  } catch (error) {
+    console.error('Error submitting signature:', error);
+    return false;
+  }
+}
+
 // ============================================================
 // Payment Transaction queries
 // ============================================================

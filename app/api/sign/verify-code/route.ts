@@ -13,14 +13,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Call verifySigningCode - returns true if valid and updates verified=true in DB
-    const isValid = await verifySigningCode(token, email, code);
+    // Call verifySigningCode - validates code and marks as verified
+    const result = await verifySigningCode(token, email, code);
 
-    if (isValid) {
+    if (result.success) {
       return NextResponse.json({ success: true });
     } else {
       return NextResponse.json(
-        { error: 'Invalid or expired code' },
+        { error: result.error || 'Invalid or expired code' },
         { status: 400 }
       );
     }
