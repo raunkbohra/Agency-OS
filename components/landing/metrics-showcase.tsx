@@ -72,7 +72,7 @@ export function MetricsShowcase() {
               }}
             />
 
-            <div className="relative z-10 p-10 md:p-16">
+            <div className="relative z-10 p-6 sm:p-10 md:p-16">
               {/* Header */}
               <div className="text-center mb-14">
                 <p

@@ -40,7 +40,7 @@ export function CtaSection() {
 
           {/* Headline */}
           <h2
-            className="text-4xl md:text-6xl font-black tracking-[-0.04em] leading-[1.05]"
+            className="text-3xl sm:text-4xl md:text-6xl font-black tracking-[-0.04em] leading-[1.05]"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
           >
             Ready to run your

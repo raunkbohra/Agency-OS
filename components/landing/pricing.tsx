@@ -141,8 +141,8 @@ export function Pricing() {
                 {/* Price */}
                 <div className="mb-7 flex items-end gap-1">
                   <span
-                    className="text-5xl font-black tracking-tight text-white"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    className="text-5xl font-black tracking-tight"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
                   >
                     {tier.price}
                   </span>
@@ -165,14 +165,14 @@ export function Pricing() {
                       ) : (
                         <div
                           className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
-                          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+                          style={{ background: 'var(--landing-badge-bg)', border: '1px solid var(--landing-badge-border)' }}
                         >
-                          <Minus size={9} style={{ color: '#444455' }} />
+                          <Minus size={9} style={{ color: 'var(--text-tertiary)' }} />
                         </div>
                       )}
                       <span
                         className="text-sm"
-                        style={{ color: feature.included ? '#d1d5db' : '#444455' }}
+                        style={{ color: feature.included ? 'var(--text-primary)' : 'var(--text-tertiary)' }}
                       >
                         {feature.text}
                       </span>

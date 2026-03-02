@@ -68,7 +68,7 @@ export function Workflow() {
         </div>
 
         {/* Steps */}
-        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {/* Connecting line */}
           <div
             className="hidden md:block absolute top-[52px] left-[calc(16.67%+24px)] right-[calc(16.67%+24px)] h-px pointer-events-none"

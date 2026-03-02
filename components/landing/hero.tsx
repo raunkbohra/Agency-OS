@@ -288,13 +288,13 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <h1
-            className="text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em]"
+            className="text-4xl sm:text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em]"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
           >
             Run your agency
           </h1>
           <h1
-            className="text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em]"
+            className="text-4xl sm:text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em]"
             style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               background: 'linear-gradient(135deg, #8fa4b8 0%, #dde6ed 50%, #a8bbc8 100%)',

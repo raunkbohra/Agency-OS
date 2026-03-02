@@ -99,7 +99,7 @@ export function FeaturesGrid() {
                   background: 'var(--landing-card-bg)',
                   border: `1px solid var(--landing-card-border)`,
                   backdropFilter: 'blur(10px)',
-                  minHeight: feature.large ? '260px' : '180px',
+                  minHeight: feature.large ? '200px' : '140px',
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
