@@ -56,6 +56,10 @@ export interface Client {
   address: string | null;
   billing_address: string | null;
   token: string | null;
+  password_hash?: string | null;
+  invite_token?: string | null;
+  invite_expires_at?: Date | null;
+  invite_accepted?: boolean;
   created_at: string;
 }
 
@@ -1523,4 +1527,126 @@ export async function calculateClientRiskScore(clientId: string, agencyId: strin
   // Risk score: (alert count * 10) + (avg overage * 100)
   const risk = Math.min((alertCount * 10) + (avgOverage * 100), 100);
   return Math.round(risk);
+}
+
+// Client authentication queries
+export interface ClientPasswordResetToken {
+  id: string;
+  client_id: string;
+  token: string;
+  expires_at: Date;
+  used: boolean;
+  created_at: Date;
+}
+
+export async function getClientByEmail(email: string, agencyId?: string): Promise<Client | null> {
+  try {
+    if (agencyId) {
+      const result = await db.query(
+        'SELECT * FROM clients WHERE email = $1 AND agency_id = $2',
+        [email, agencyId]
+      );
+      return result.rows[0] || null;
+    }
+    const result = await db.query('SELECT * FROM clients WHERE email = $1', [email]);
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get client by email:', err);
+    throw new Error(`Failed to fetch client: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function setClientPassword(clientId: string, passwordHash: string): Promise<void> {
+  try {
+    await db.query('UPDATE clients SET password_hash = $1 WHERE id = $2', [passwordHash, clientId]);
+  } catch (err) {
+    console.error('Failed to set client password:', err);
+    throw new Error(`Failed to set client password: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function setClientInviteToken(
+  clientId: string,
+  token: string,
+  expiresAt: Date
+): Promise<void> {
+  try {
+    await db.query(
+      'UPDATE clients SET invite_token = $1, invite_expires_at = $2 WHERE id = $3',
+      [token, expiresAt, clientId]
+    );
+  } catch (err) {
+    console.error('Failed to set client invite token:', err);
+    throw new Error(`Failed to set client invite token: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function getClientByInviteToken(token: string): Promise<Client | null> {
+  try {
+    const result = await db.query(
+      'SELECT * FROM clients WHERE invite_token = $1 AND invite_expires_at > NOW() AND invite_accepted = false',
+      [token]
+    );
+    return result.rows[0] || null;
+  } catch (err) {
+    console.error('Failed to get client by invite token:', err);
+    throw new Error(`Failed to fetch client: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function acceptClientInvite(clientId: string): Promise<void> {
+  try {
+    await db.query(
+      'UPDATE clients SET invite_accepted = true, invite_token = NULL, invite_expires_at = NULL WHERE id = $1',
+      [clientId]
+    );
+  } catch (err) {
+    console.error('Failed to accept client invite:', err);
+    throw new Error(`Failed to accept client invite: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function createClientPasswordResetToken(
+  clientId: string,
+  token: string,
+  expiresAt: Date
+): Promise<void> {
+  try {
+    await db.query(
+      'INSERT INTO client_password_reset_tokens (client_id, token, expires_at) VALUES ($1, $2, $3)',
+      [clientId, token, expiresAt]
+    );
+  } catch (err) {
+    console.error('Failed to create client password reset token:', err);
+    throw new Error(
+      `Failed to create password reset token: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function getClientPasswordResetToken(
+  token: string
+): Promise<{ clientId: string } | null> {
+  try {
+    const result = await db.query(
+      'SELECT client_id FROM client_password_reset_tokens WHERE token = $1 AND expires_at > NOW() AND used = false',
+      [token]
+    );
+    if (result.rows.length === 0) return null;
+    return { clientId: result.rows[0].client_id };
+  } catch (err) {
+    console.error('Failed to get client password reset token:', err);
+    throw new Error(`Failed to fetch password reset token: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
+export async function consumeClientPasswordResetToken(token: string): Promise<void> {
+  try {
+    await db.query('UPDATE client_password_reset_tokens SET used = true WHERE token = $1', [token]);
+  } catch (err) {
+    console.error('Failed to consume client password reset token:', err);
+    throw new Error(
+      `Failed to consume password reset token: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
 }
