@@ -7,7 +7,7 @@ import { SparkleButton } from '@/components/ui/sparkle-button';
 
 export function CtaSection() {
   return (
-    <section className="py-28 px-6 relative overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+    <section className="py-20 px-6 relative overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
       {/* Background effects */}
       <div
         className="absolute inset-0 pointer-events-none"

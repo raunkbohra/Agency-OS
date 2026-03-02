@@ -42,17 +42,8 @@ const statusConfig: Record<string, { color: string; bg: string; dot: string }> =
 function DashboardMockup() {
   return (
     <div className="relative mx-auto max-w-5xl px-4 lg:px-0">
-      {/* Spotlight effect */}
       <div
-        className="absolute inset-0 pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{
-          background: 'var(--spotlight)',
-          filter: 'blur(60px)',
-          zIndex: 0,
-        }}
-      />
-      <div
-        className="relative rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl group"
+        className="relative rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
         style={{
           transform: 'perspective(1400px) rotateX(4deg)',
           background: 'var(--shell-bg)',
@@ -124,17 +115,12 @@ function DashboardMockup() {
                 <p className="text-[10px] mt-0.5" style={{ color: 'var(--app-heading-secondary)' }}>18 total · Mar 2026</p>
               </div>
               <div
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
                 style={{
                   background: 'var(--app-button-bg)',
                   border: '1px solid var(--app-button-border)',
                   backdropFilter: 'blur(10px)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = 'var(--neon-glow)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = 'none';
+                  boxShadow: 'var(--neon-glow)',
                 }}
               >
                 <span className="text-[11px] font-semibold" style={{ color: 'var(--app-button-text)' }}>+ New Invoice</span>
@@ -149,17 +135,12 @@ function DashboardMockup() {
               ].map((m) => (
                 <div
                   key={m.label}
-                  className="rounded-xl p-3 transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer group/metric"
+                  className="rounded-xl p-3 transition-all duration-300 hover:scale-110 hover:shadow-lg cursor-pointer"
                   style={{
                     background: 'var(--app-card-bg)',
                     border: '1px solid var(--app-border)',
                     backdropFilter: 'blur(10px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = 'var(--neon-glow)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = 'none';
+                    boxShadow: 'var(--neon-glow)',
                   }}
                 >
                   <div className="text-[9px] uppercase tracking-wider mb-1.5" style={{ color: 'var(--app-heading-secondary)' }}>{m.label}</div>
@@ -183,31 +164,28 @@ function DashboardMockup() {
                 return (
                   <div
                     key={i}
-                    className="grid grid-cols-4 px-3.5 py-2.5 items-center transition-all duration-300 hover:bg-opacity-80 group/row cursor-pointer"
+                    className="grid grid-cols-4 px-3.5 py-2.5 items-center transition-all duration-300 hover:bg-opacity-100 cursor-pointer"
                     style={{
                       borderBottom: i < invoiceRows.length - 1 ? '1px solid var(--app-border)' : 'none',
                       backgroundColor: 'var(--app-bg)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--app-card-bg)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--app-bg)';
                     }}
                   >
                     <span className="text-[11px] font-medium" style={{ color: 'var(--app-text-primary)' }}>{row.client}</span>
                     <span className="text-[10px]" style={{ color: 'var(--app-heading-secondary)' }}>{row.plan}</span>
                     <div
-                      className="flex items-center gap-1.5 w-fit px-2 py-0.5 rounded-full text-[9px] font-semibold capitalize transition-all duration-300 hover:shadow-lg"
+                      className="flex items-center gap-1.5 w-fit px-2 py-0.5 rounded-full text-[9px] font-semibold capitalize transition-all duration-300"
                       style={{
                         background: s.bg,
                         color: s.color,
-                        boxShadow: `0 0 12px ${s.color}20`,
+                        boxShadow: `0 0 15px ${s.color}30`,
                       }}
                     >
                       <div
-                        className="w-1.5 h-1.5 rounded-full animate-pulse"
-                        style={{ background: s.dot }}
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{
+                          background: s.dot,
+                          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        }}
                       />
                       {row.status}
                     </div>
@@ -224,14 +202,13 @@ function DashboardMockup() {
 
       {/* Floating stat cards — desktop only */}
       <motion.div
-        className="absolute -left-4 lg:-left-16 top-1/4 rounded-2xl p-3.5 hidden lg:block transition-all duration-500 hover:scale-105 hover:-translate-y-1 group/card"
+        className="absolute -left-4 lg:-left-16 top-1/4 rounded-2xl p-3.5 hidden lg:block transition-all duration-500 hover:scale-110 hover:-translate-y-2"
         style={{
           background: 'var(--float-card-bg)',
           border: '1px solid var(--float-card-border)',
           backdropFilter: 'var(--glass-blur)',
           boxShadow: 'var(--float-card-shadow), var(--tint-shadow)',
           width: '150px',
-          animation: 'float-glow 3s ease-in-out infinite',
         }}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -245,14 +222,13 @@ function DashboardMockup() {
       </motion.div>
 
       <motion.div
-        className="absolute -right-4 lg:-right-16 bottom-1/3 rounded-2xl p-3.5 hidden lg:block transition-all duration-500 hover:scale-105 hover:-translate-y-1 group/card"
+        className="absolute -right-4 lg:-right-16 bottom-1/3 rounded-2xl p-3.5 hidden lg:block transition-all duration-500 hover:scale-110 hover:-translate-y-2"
         style={{
           background: 'var(--float-card-bg)',
           border: '1px solid var(--float-card-border)',
           backdropFilter: 'var(--glass-blur)',
           boxShadow: 'var(--float-card-shadow), var(--tint-shadow)',
           width: '150px',
-          animation: 'float-glow 3s ease-in-out infinite 0.5s',
         }}
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -288,7 +264,7 @@ function MobileMockup() {
     <div className="relative mx-auto max-w-sm px-4">
       {/* Phone outer shell */}
       <div
-        className="relative rounded-[2rem] overflow-hidden transition-all duration-500 hover:shadow-2xl group"
+        className="relative rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
         style={{
           background: 'var(--shell-bg)',
           border: '1px solid var(--shell-border)',
@@ -353,17 +329,12 @@ function MobileMockup() {
               <p className="text-[11px] mt-0.5" style={{ color: 'var(--app-heading-secondary)' }}>18 total · Mar 2026</p>
             </div>
             <div
-              className="px-3 py-1.5 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-md active:scale-95 cursor-pointer"
+              className="px-3 py-1.5 rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
               style={{
                 background: 'var(--app-button-bg)',
                 border: '1px solid var(--app-button-border)',
                 backdropFilter: 'blur(10px)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = 'var(--neon-glow)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
+                boxShadow: 'var(--neon-glow)',
               }}
             >
               <span className="text-[11px] font-semibold" style={{ color: 'var(--app-button-text)' }}>+ New</span>
@@ -375,17 +346,12 @@ function MobileMockup() {
             {metrics.map((m) => (
               <div
                 key={m.label}
-                className="rounded-xl p-3 text-center transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer"
+                className="rounded-xl p-3 text-center transition-all duration-300 hover:scale-110 hover:shadow-lg cursor-pointer"
                 style={{
                   background: 'var(--app-card-bg)',
                   border: '1px solid var(--app-border)',
                   backdropFilter: 'blur(10px)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = 'var(--neon-glow)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = 'none';
+                  boxShadow: 'var(--neon-glow)',
                 }}
               >
                 <div className="text-[9px] uppercase tracking-wider mb-1" style={{ color: 'var(--app-heading-secondary)' }}>{m.label}</div>
@@ -405,16 +371,10 @@ function MobileMockup() {
               return (
                 <div
                   key={i}
-                  className="flex items-center justify-between px-3.5 py-3 transition-all duration-300 hover:bg-opacity-80 cursor-pointer"
+                  className="flex items-center justify-between px-3.5 py-3 transition-all duration-300 cursor-pointer"
                   style={{
                     borderBottom: i < mobileRows.length - 1 ? '1px solid var(--app-border)' : 'none',
                     backgroundColor: 'var(--app-bg)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--app-card-bg)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--app-bg)';
                   }}
                 >
                   <div className="flex-1 min-w-0">
@@ -423,16 +383,19 @@ function MobileMockup() {
                   </div>
                   <div className="flex items-center gap-2.5 ml-3">
                     <div
-                      className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize transition-all duration-300 hover:shadow-lg"
+                      className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize transition-all duration-300"
                       style={{
                         background: s.bg,
                         color: s.color,
-                        boxShadow: `0 0 12px ${s.color}20`,
+                        boxShadow: `0 0 15px ${s.color}30`,
                       }}
                     >
                       <div
-                        className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse"
-                        style={{ background: s.dot }}
+                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{
+                          background: s.dot,
+                          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        }}
                       />
                       {row.status}
                     </div>

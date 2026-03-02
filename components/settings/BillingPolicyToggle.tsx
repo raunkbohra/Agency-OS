@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Props {
   initialPolicy: 'next_month' | 'prorated';
@@ -27,6 +27,13 @@ export default function BillingPolicyToggle({ initialPolicy }: Props) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (saved) {
+      const t = setTimeout(() => setSaved(false), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [saved]);
+
   async function handleChange(value: 'next_month' | 'prorated') {
     setPolicy(value);
     setSaving(true);
@@ -40,8 +47,6 @@ export default function BillingPolicyToggle({ initialPolicy }: Props) {
       });
       if (!res.ok) throw new Error('Failed to save');
       setSaved(true);
-      const t = setTimeout(() => setSaved(false), 2000);
-      return () => clearTimeout(t);
     } catch {
       setError('Failed to save. Please try again.');
       setPolicy(initialPolicy);

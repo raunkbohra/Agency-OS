@@ -33,7 +33,7 @@ export function Workflow() {
   return (
     <section
       id="workflow"
-      className="py-28 px-6 relative overflow-hidden"
+      className="py-20 px-6 relative overflow-hidden"
       style={{ background: 'var(--bg-primary)' }}
     >
       {/* Background accent */}

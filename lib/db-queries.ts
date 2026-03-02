@@ -113,8 +113,17 @@ export async function createAgency(
   }
 }
 
-export async function getAgencyById(id: string): Promise<Agency | null> {
+export async function getAgencyById(id: string, requestingUserId?: string): Promise<Agency | null> {
   try {
+    // Security: If requestingUserId is provided, verify they own this agency before returning data
+    if (requestingUserId) {
+      const ownerResult = await db.query(
+        'SELECT id FROM users WHERE agency_id = $1 AND id = $2 LIMIT 1',
+        [id, requestingUserId]
+      );
+      if (ownerResult.rows.length === 0) return null;
+    }
+
     const result = await db.query('SELECT * FROM agencies WHERE id = $1', [id]);
     return result.rows[0] || null;
   } catch (err) {
@@ -451,7 +460,7 @@ export async function getClientsWithPlans(agencyId: string): Promise<(Client & {
       LEFT JOIN client_plans cp ON c.id = cp.client_id
       LEFT JOIN plans p ON cp.plan_id = p.id
       WHERE c.agency_id = $1
-      ORDER BY c.id, c.created_at DESC
+      ORDER BY c.id ASC, c.created_at DESC
     `, [agencyId]);
 
     return result.rows.map(row => ({

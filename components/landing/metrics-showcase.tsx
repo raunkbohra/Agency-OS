@@ -36,7 +36,7 @@ const metrics = [
 
 export function MetricsShowcase() {
   return (
-    <section className="py-28 px-6" style={{ background: 'var(--bg-primary)' }}>
+    <section className="py-20 px-6" style={{ background: 'var(--bg-primary)' }}>
       <div className="mx-auto max-w-6xl">
         <ScrollReveal>
           <div

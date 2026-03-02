@@ -1,16 +1,21 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link2, Check } from 'lucide-react';
 
 export default function CopyOnboardingLink({ agencyId }: { agencyId: string }) {
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    if (copied) {
+      const t = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [copied]);
+
   const handleCopy = () => {
     const url = `${window.location.origin}/onboard/${agencyId}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
-    const t = setTimeout(() => setCopied(false), 2000);
-    return () => clearTimeout(t);
   };
 
   return (

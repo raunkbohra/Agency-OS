@@ -68,7 +68,7 @@ const features = [
 
 export function FeaturesGrid() {
   return (
-    <section id="features" className="py-28 px-6" style={{ background: 'var(--bg-primary)' }}>
+    <section id="features" className="py-20 px-6" style={{ background: 'var(--bg-primary)' }}>
       <div className="mx-auto max-w-6xl">
         {/* Section header */}
         <div className="text-center mb-16">
@@ -94,52 +94,48 @@ export function FeaturesGrid() {
           {features.map((feature) => (
             <ScrollStaggerItem key={feature.title} className={feature.className}>
               <div
-                className="group relative h-full rounded-2xl p-6 transition-all duration-300 cursor-default"
+                className="group relative h-full rounded-2xl p-6 transition-all duration-500 cursor-pointer hover:scale-105 hover:-translate-y-3"
                 style={{
                   background: 'var(--landing-card-bg)',
                   border: `1px solid var(--landing-card-border)`,
-                  backdropFilter: 'blur(10px)',
+                  backdropFilter: 'var(--glass-blur)',
                   minHeight: feature.large ? '200px' : '140px',
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.border = `1px solid ${feature.accentBorder}`;
-                  el.style.background = `var(--landing-card-bg)`;
-                  el.style.transform = 'translateY(-2px)';
-                  el.style.boxShadow = `0 20px 60px -10px rgba(0,0,0,0.6), 0 0 40px -10px ${feature.accentBg}`;
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.border = '1px solid var(--landing-card-border)';
-                  el.style.background = 'var(--landing-card-bg)';
-                  el.style.transform = 'translateY(0)';
-                  el.style.boxShadow = 'none';
+                  boxShadow: `var(--shell-shadow), 0 0 20px ${feature.accentBg}`,
                 }}
               >
                 {/* Icon */}
                 <div
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-4"
-                  style={{ background: feature.accentBg, border: `1px solid ${feature.accentBorder}` }}
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-xl mb-4 transition-all duration-500 group-hover:scale-125 group-hover:shadow-lg"
+                  style={{
+                    background: feature.accentBg,
+                    border: `1px solid ${feature.accentBorder}`,
+                    boxShadow: `0 0 15px ${feature.accentBg}40`,
+                  }}
                 >
                   <feature.icon size={18} style={{ color: feature.accent }} />
                 </div>
 
                 <h3
-                  className="text-base font-bold mb-2.5"
-                  style={{ letterSpacing: '-0.01em', color: 'var(--text-primary)' }}
+                  className="text-base font-bold mb-2.5 transition-all duration-500 group-hover:text-opacity-100"
+                  style={{
+                    letterSpacing: '-0.01em',
+                    color: 'var(--text-primary)',
+                    textShadow: `0 0 20px ${feature.accentBg}40`,
+                  }}
                 >
                   {feature.title}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-sm leading-relaxed transition-all duration-500" style={{ color: 'var(--text-secondary)' }}>
                   {feature.description}
                 </p>
 
                 {/* Subtle corner accent for large card */}
                 {feature.large && (
                   <div
-                    className="absolute bottom-0 right-0 w-40 h-40 rounded-2xl pointer-events-none opacity-30"
+                    className="absolute bottom-0 right-0 w-40 h-40 rounded-2xl pointer-events-none opacity-30 group-hover:opacity-60 transition-all duration-500 group-hover:scale-110"
                     style={{
                       background: `radial-gradient(circle at bottom right, ${feature.accentBg}, transparent)`,
+                      filter: 'blur(20px)',
                     }}
                   />
                 )}

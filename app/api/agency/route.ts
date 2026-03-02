@@ -14,12 +14,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Agency ID is required' }, { status: 400 });
     }
 
-    // Verify user can access this agency (must match their session agency)
-    if (id !== session.user.agencyId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-
-    const agency = await getAgencyById(id);
+    // Fetch and verify ownership in single query for defense in depth
+    const agency = await getAgencyById(id, session.user.id);
     if (!agency) {
       return NextResponse.json({ error: 'Agency not found' }, { status: 404 });
     }
