@@ -102,7 +102,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
 
     let addressY = companyY - 20;
     if (data.agencyAddress) {
-      const addressLines = data.agencyAddress.split('\n').slice(0, 2);
+      const addressLines = data.agencyAddress.split('\n').slice(0, 3);
       for (const line of addressLines) {
         page.drawText(line.trim(), {
           x: companyX,
@@ -149,7 +149,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Readable> {
     y -= 14;
 
     if (data.clientAddress) {
-      const addressLines = data.clientAddress.split('\n').slice(0, 2);
+      const addressLines = data.clientAddress.split('\n').slice(0, 3);
       for (const line of addressLines) {
         page.drawText(line.trim(), {
           x: margin,
