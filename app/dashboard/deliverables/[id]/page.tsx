@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { getDeliverableById } from '@/lib/db-queries';
 import DeliverableDetail from '@/components/DeliverableDetail';
 import { redirect } from 'next/navigation';
+import { PageTransition } from '@/components/motion/page-transition';
 
 export default async function DeliverableDetailPage({
   params,
@@ -17,12 +18,16 @@ export default async function DeliverableDetailPage({
   const deliverable = await getDeliverableById(params.id, session.user.agencyId);
 
   if (!deliverable) {
-    return <div className="p-8">Deliverable not found</div>;
+    return (
+      <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded-lg text-sm">
+        Deliverable not found
+      </div>
+    );
   }
 
   return (
-    <div className="p-8">
+    <PageTransition>
       <DeliverableDetail deliverable={deliverable} deliverableId={params.id} />
-    </div>
+    </PageTransition>
   );
 }

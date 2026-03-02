@@ -8,7 +8,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-8">
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5 sm:mb-8">
       <div className="min-w-0">
         <h1 className="text-xl font-semibold tracking-tight text-text-primary leading-snug" style={{ textWrap: 'balance' }}>
           {title}

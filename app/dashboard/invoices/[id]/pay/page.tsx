@@ -75,52 +75,54 @@ export default function PaymentPage() {
 
   if (success) {
     return (
-      <div className="p-8 max-w-2xl mx-auto">
-        <div className="bg-accent-green/10 border-2 border-accent-green/20 rounded-lg p-8 text-center">
-          <div className="text-5xl mb-4">✓</div>
-          <h1 className="text-3xl font-bold text-accent-green mb-2">Payment Submitted</h1>
-          <p className="text-accent-green mb-4">
-            Your payment has been submitted for verification. We will confirm the transaction shortly.
+      <div className="max-w-lg mx-auto">
+        <div className="bg-accent-green/10 border border-accent-green/20 rounded-xl p-8 text-center">
+          <div className="w-14 h-14 rounded-full bg-accent-green/20 flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl text-accent-green">✓</span>
+          </div>
+          <h1 className="text-xl font-bold text-accent-green mb-2">Payment Submitted</h1>
+          <p className="text-sm text-accent-green/80 mb-1">
+            Your payment has been submitted for verification.
           </p>
-          <p className="text-sm text-accent-green/80">Redirecting to invoices...</p>
+          <p className="text-xs text-accent-green/60">Redirecting to invoices...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <div className="mb-8">
-        <Link href={`/dashboard/invoices/${invoiceId}`} className="text-accent-blue hover:text-accent-blue/90 font-medium">
-          ← Back to Invoice
-        </Link>
-      </div>
+    <div className="max-w-lg mx-auto space-y-5">
+      <Link href={`/dashboard/invoices/${invoiceId}`} className="inline-flex items-center gap-1 text-sm text-accent-blue hover:text-accent-blue/80 font-medium">
+        ← Back to Invoice
+      </Link>
 
-      <h1 className="text-3xl font-bold mb-8">Submit Payment</h1>
+      <h1 className="text-xl font-bold text-text-primary">Submit Payment</h1>
 
-      <div className="bg-accent-blue/10 border-l-4 border-accent-blue p-6 rounded mb-8">
-        <h3 className="font-semibold text-accent-blue mb-2">Bank Transfer Instructions</h3>
-        <p className="text-sm text-accent-blue/80 mb-4">
-          Please transfer the amount below to the agency bank account. Use your transaction ID or bank reference number as the reference ID below.
+      <div className="bg-accent-blue/[0.06] border border-accent-blue/20 rounded-xl p-4">
+        <h3 className="text-sm font-semibold text-accent-blue mb-1.5">Bank Transfer Instructions</h3>
+        <p className="text-xs text-accent-blue/70 mb-3">
+          Transfer the amount below to the agency bank account, then enter your transaction reference ID.
         </p>
-        <div className="bg-bg-secondary p-4 rounded mt-4 space-y-2 text-sm text-text-secondary">
-          <p><strong>Bank:</strong> Your Bank Name</p>
-          <p><strong>Account Number:</strong> Account Number</p>
-          <p><strong>Routing Number:</strong> Routing Code</p>
-          <p><strong>Account Name:</strong> Your Agency Name</p>
-          <p className="pt-2 text-lg font-bold text-text-primary">Amount Due: ₹{parseFloat(amount).toLocaleString('en-IN')}</p>
+        <div className="bg-bg-secondary rounded-lg p-3 space-y-1.5 text-sm text-text-secondary">
+          <p><span className="font-medium text-text-primary">Bank:</span> Your Bank Name</p>
+          <p><span className="font-medium text-text-primary">Account:</span> Account Number</p>
+          <p><span className="font-medium text-text-primary">Routing:</span> Routing Code</p>
+          <p><span className="font-medium text-text-primary">Name:</span> Your Agency Name</p>
+          <p className="pt-2 text-base font-bold text-text-primary border-t border-border-default mt-2">
+            Amount Due: ₹{parseFloat(amount).toLocaleString('en-IN')}
+          </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-bg-secondary p-8 rounded-lg border border-border-default space-y-6">
+      <form onSubmit={handleSubmit} className="bg-bg-secondary rounded-xl border border-border-default p-5 space-y-5">
         {error && (
-          <div className="p-4 bg-accent-red/10 border border-accent-red/20 text-accent-red rounded-lg text-sm">
+          <div className="p-3 bg-accent-red/10 border border-accent-red/20 text-accent-red rounded-lg text-sm">
             {error}
           </div>
         )}
 
         <div>
-          <label htmlFor="referenceId" className="block font-semibold mb-2 text-text-secondary">
+          <label htmlFor="referenceId" className="block text-sm font-medium text-text-secondary mb-1.5">
             Transaction Reference ID <span className="text-accent-red">*</span>
           </label>
           <input
@@ -128,35 +130,34 @@ export default function PaymentPage() {
             type="text"
             value={referenceId}
             onChange={(e) => setReferenceId(e.target.value)}
-            placeholder="e.g., TXN12345 or Bank Confirmation Number"
-            className="w-full px-4 py-2 border border-border-default bg-bg-tertiary text-text-primary rounded-lg focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 transition-colors"
+            placeholder="e.g., TXN12345"
+            className="w-full px-3 py-2.5 border border-border-default bg-bg-tertiary text-text-primary rounded-lg text-sm focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 transition-colors"
             required
             disabled={loading}
             autoFocus
           />
-          <p className="text-sm text-text-secondary mt-1">The reference ID from your bank transfer confirmation</p>
+          <p className="text-xs text-text-tertiary mt-1">Reference ID from your bank transfer confirmation</p>
         </div>
 
         <div>
-          <label htmlFor="receipt" className="block font-semibold mb-2 text-text-secondary">
-            Upload Receipt <span className="text-text-tertiary">(optional)</span>
+          <label htmlFor="receipt" className="block text-sm font-medium text-text-secondary mb-1.5">
+            Upload Receipt <span className="text-text-tertiary font-normal">(optional)</span>
           </label>
           <input
             id="receipt"
             type="file"
             accept="image/*,.pdf"
             onChange={(e) => setReceipt(e.target.files?.[0] || null)}
-            className="w-full px-4 py-2 border border-border-default bg-bg-tertiary text-text-primary rounded-lg focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 transition-colors"
+            className="w-full px-3 py-2 border border-border-default bg-bg-tertiary text-text-primary rounded-lg text-sm focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 transition-colors"
             disabled={loading}
           />
-          <p className="text-sm text-text-secondary mt-1">Bank transfer receipt or confirmation (image or PDF)</p>
-          {receipt && <p className="text-sm text-accent-green mt-2">File selected: {receipt.name}</p>}
+          {receipt && <p className="text-xs text-accent-green mt-1.5">Selected: {receipt.name}</p>}
         </div>
 
         <button
           type="submit"
           disabled={loading || !referenceId.trim()}
-          className="w-full px-6 py-3 bg-accent-green text-white rounded-lg font-semibold disabled:opacity-50 hover:bg-accent-green/90 transition-colors"
+          className="w-full px-4 py-3 bg-accent-green text-white rounded-lg text-sm font-semibold disabled:opacity-50 hover:bg-accent-green/90 transition-colors"
         >
           {loading ? 'Submitting...' : 'Submit Payment for Verification'}
         </button>
@@ -164,7 +165,7 @@ export default function PaymentPage() {
 
       <button
         onClick={() => router.back()}
-        className="mt-4 w-full px-6 py-3 border-2 border-border-default text-text-secondary rounded-lg font-semibold hover:bg-bg-hover transition-colors"
+        className="w-full px-4 py-2.5 border border-border-default text-sm text-text-secondary rounded-lg font-medium hover:bg-bg-hover transition-colors"
       >
         Cancel
       </button>

@@ -28,6 +28,9 @@
   --color-glass-border: rgba(255, 255, 255, 0.06);
   --font-display: 'Plus Jakarta Sans', sans-serif;
   --font-sans: 'Inter Variable', system-ui, -apple-system, sans-serif;
+
+  /* Spacing */
+  --spacing-sidebar: 240px;
 }
 
 /* ===== CSS Design Tokens ===== */

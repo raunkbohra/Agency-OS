@@ -118,27 +118,27 @@ export default async function NewClientPage() {
   }
 
   return (
-    <PageTransition className="max-w-2xl">
+    <PageTransition className="max-w-lg">
       <PageHeader title="Add New Client" description="Create a new client and assign a plan" />
 
       {error && (
-        <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded mb-6">
+        <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded-lg text-sm mb-5">
           {error}
         </div>
       )}
 
       {plans.length === 0 ? (
-        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
-          <p className="text-text-secondary mb-4">You need to create at least one plan before adding a client.</p>
+        <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
+          <p className="text-sm text-text-secondary mb-4">You need to create at least one plan before adding a client.</p>
           <a
             href="/dashboard/plans/new"
-            className="inline-block bg-accent-blue text-white py-2 px-4 rounded-md font-medium hover:bg-accent-blue/90 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-accent-blue text-white text-sm rounded-lg font-medium hover:bg-accent-blue/90 transition-colors"
           >
             Create a Plan
           </a>
         </div>
       ) : (
-        <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+        <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
           <SimpleClientForm action={handleCreateClient} plans={plans} />
         </div>
       )}

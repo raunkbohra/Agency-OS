@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { ScrollReveal } from '@/components/motion/scroll-reveal';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { ChevronLeft, Mail, Building2, Phone, Package, CheckSquare } from 'lucide-react';
+import EmailClientButton from '@/components/EmailClientButton';
 
 interface ClientDetailPageProps {
   params: Promise<{ id: string }>;
@@ -66,9 +67,12 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
         title={client.name}
         description="Client profile"
         actions={
-          <Link href="/dashboard/clients" className="inline-flex items-center gap-1.5 text-sm text-accent-blue hover:text-accent-blue/80 font-medium">
-            <ChevronLeft className="h-4 w-4" /> Clients
-          </Link>
+          <div className="flex items-center gap-2">
+            <EmailClientButton clientId={client.id} clientName={client.name} clientEmail={client.email} />
+            <Link href="/dashboard/clients" className="inline-flex items-center gap-1.5 text-sm text-accent-blue hover:text-accent-blue/80 font-medium">
+              <ChevronLeft className="h-4 w-4" /> Clients
+            </Link>
+          </div>
         }
       />
 

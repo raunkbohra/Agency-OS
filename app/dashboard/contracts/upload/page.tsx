@@ -47,47 +47,47 @@ export default function ContractUploadPage() {
   };
 
   return (
-    <PageTransition className="p-8 max-w-2xl mx-auto">
+    <PageTransition className="max-w-lg">
       <PageHeader title="Upload Contract" description="Upload a contract PDF for a client" />
 
-      <form onSubmit={handleUpload} className="bg-bg-secondary rounded-lg p-6 border border-border-default">
+      <form onSubmit={handleUpload} className="bg-bg-secondary rounded-xl p-5 border border-border-default space-y-4">
         {error && (
-          <div className="mb-4 p-4 bg-accent-red/10 border border-accent-red/20 text-accent-red rounded">
+          <div className="p-3 bg-accent-red/10 border border-accent-red/20 text-accent-red rounded-lg text-sm">
             {error}
           </div>
         )}
 
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Contract PDF</label>
+        <div>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Contract PDF</label>
           <input
             type="file"
             accept=".pdf"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
-            className="border border-border-default bg-bg-tertiary text-text-primary rounded p-2 w-full"
+            className="w-full border border-border-default bg-bg-tertiary text-text-primary rounded-lg px-3 py-2 text-sm"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block font-semibold mb-2">Client</label>
+        <div>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Client ID</label>
           <input
             type="text"
             placeholder="Client ID"
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
-            className="border border-border-default bg-bg-tertiary text-text-primary rounded p-2 w-full"
+            className="w-full border border-border-default bg-bg-tertiary text-text-primary rounded-lg px-3 py-2.5 text-sm focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 transition-colors"
             required
           />
         </div>
 
-        <div className="mb-6">
-          <label className="block font-semibold mb-2">Client Plan</label>
+        <div>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Client Plan ID</label>
           <input
             type="text"
             placeholder="Client Plan ID"
             value={clientPlanId}
             onChange={(e) => setClientPlanId(e.target.value)}
-            className="border border-border-default bg-bg-tertiary text-text-primary rounded p-2 w-full"
+            className="w-full border border-border-default bg-bg-tertiary text-text-primary rounded-lg px-3 py-2.5 text-sm focus:border-border-active focus:ring-1 focus:ring-accent-blue/30 transition-colors"
             required
           />
         </div>
@@ -95,7 +95,7 @@ export default function ContractUploadPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full px-4 py-2 bg-accent-blue text-white rounded-lg font-medium disabled:opacity-50"
+          className="w-full px-4 py-2.5 bg-accent-blue text-white rounded-lg text-sm font-semibold disabled:opacity-50 hover:bg-accent-blue/90 transition-colors"
         >
           {loading ? 'Uploading...' : 'Upload Contract'}
         </button>

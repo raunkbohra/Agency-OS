@@ -14,17 +14,17 @@ interface MetricCardProps {
 
 export function MetricCard({ label, value, format = 'integer', prefix, trend, className }: MetricCardProps) {
   return (
-    <div className={`group relative rounded-lg border border-border-default bg-bg-secondary p-5 transition-all duration-200 hover:border-border-hover hover:-translate-y-px overflow-hidden ${className || ''}`}>
+    <div className={`group relative rounded-xl border border-border-default bg-bg-secondary p-3.5 sm:p-5 transition-all duration-200 hover:border-border-hover hover:-translate-y-px overflow-hidden ${className || ''}`}>
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-blue/40 to-transparent" />
-      <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-2">
+      <p className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-1.5 sm:mb-2 leading-tight">
         {label}
       </p>
-      <div className="flex items-baseline gap-3">
+      <div className="flex items-baseline gap-2 sm:gap-3">
         <AnimatedNumber
           value={value}
           format={format}
           prefix={prefix}
-          className="text-2xl font-semibold tracking-tight text-text-primary"
+          className="text-lg sm:text-2xl font-semibold tracking-tight text-text-primary"
         />
         {trend && (
           <span className={`flex items-center gap-0.5 text-xs font-medium ${

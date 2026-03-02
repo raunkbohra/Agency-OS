@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { PageHeader } from '@/components/layout/page-header';
 import { PageTransition } from '@/components/motion/page-transition';
-import { Button } from '@/components/ui/button';
+
 
 export default async function ContractsPage() {
   const session = await auth();
@@ -31,9 +31,9 @@ export default async function ContractsPage() {
         title="Contracts"
         description="Manage client contracts and signatures"
         actions={
-          <Button variant="primary" asChild>
-            <Link href="/dashboard/contracts/upload">Upload Contract</Link>
-          </Button>
+          <Link href="/dashboard/contracts/upload" className="inline-flex items-center px-3 py-2 text-sm bg-accent-blue text-white rounded-lg font-medium hover:bg-accent-blue/90 transition-colors">
+            Upload Contract
+          </Link>
         }
       />
 

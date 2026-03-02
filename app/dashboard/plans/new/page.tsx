@@ -48,10 +48,10 @@ export default async function NewPlanPage() {
   }
 
   return (
-    <PageTransition className="max-w-2xl">
+    <PageTransition className="max-w-lg">
       <PageHeader title="Create New Plan" description="Add a new service plan to your offerings" />
 
-      <div className="bg-bg-secondary border border-border-default rounded-lg p-6">
+      <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
         <PlanForm onSubmit={handleCreatePlan} />
       </div>
     </PageTransition>

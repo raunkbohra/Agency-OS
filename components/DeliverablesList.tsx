@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Plus } from 'lucide-react';
+import NewDeliverableModal from './NewDeliverableModal';
 
 interface Deliverable {
   id: string;
@@ -29,6 +30,7 @@ export default function DeliverablesList() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchDeliverables = async () => {
@@ -45,6 +47,12 @@ export default function DeliverablesList() {
     };
     fetchDeliverables();
   }, []);
+
+  const handleCreated = (deliverable: any) => {
+    // Prepend the new deliverable with a placeholder client_name
+    // The full client_name will show on next fetch; for now use what we have
+    setDeliverables(prev => [{ ...deliverable, client_name: deliverable.client_name ?? '' }, ...prev]);
+  };
 
   const filtered = statusFilter === 'all'
     ? deliverables
@@ -64,22 +72,36 @@ export default function DeliverablesList() {
 
   return (
     <div>
-      {/* Status filter pills */}
-      <div className="mb-5 flex flex-wrap gap-2">
-        {STATUS_OPTIONS.map(status => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-3 py-1.5 rounded-lg capitalize text-xs font-semibold transition-colors ${
-              statusFilter === status
-                ? 'bg-accent-blue text-white'
-                : 'bg-bg-secondary text-text-secondary border border-border-default hover:bg-bg-hover'
-            }`}
-          >
-            {status.replace('_', ' ')}
-          </button>
-        ))}
+      {/* Status filter pills + New Deliverable button */}
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
+          {STATUS_OPTIONS.map(status => (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`px-3 py-1.5 rounded-lg capitalize text-xs font-semibold transition-colors ${
+                statusFilter === status
+                  ? 'bg-accent-blue text-white'
+                  : 'bg-bg-secondary text-text-secondary border border-border-default hover:bg-bg-hover'
+              }`}
+            >
+              {status.replace('_', ' ')}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-blue text-white hover:bg-accent-blue/90 transition-colors flex items-center gap-1.5 flex-shrink-0"
+        >
+          <Plus className="h-3.5 w-3.5" /> New Deliverable
+        </button>
       </div>
+
+      <NewDeliverableModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onCreated={handleCreated}
+      />
 
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-text-tertiary text-sm bg-bg-secondary rounded-xl border border-border-default">

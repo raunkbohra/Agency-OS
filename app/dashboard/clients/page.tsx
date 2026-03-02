@@ -10,10 +10,10 @@ import { redirect } from 'next/navigation';
 import { PageHeader } from '@/components/layout/page-header';
 import { PageTransition } from '@/components/motion/page-transition';
 import { StaggerChildren, StaggerItem } from '@/components/motion/stagger-children';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Users } from 'lucide-react';
+import CopyOnboardingLink from '@/components/CopyOnboardingLink';
 
 export default async function ClientsPage() {
   const session = await auth();
@@ -55,9 +55,12 @@ export default async function ClientsPage() {
         title="Clients"
         description="Manage your clients and their plans"
         actions={
-          <Button variant="primary" asChild>
-            <Link href="/dashboard/clients/new">Add Client</Link>
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <CopyOnboardingLink agencyId={agencyId!} />
+            <Link href="/dashboard/clients/new" className="inline-flex items-center px-3 py-2 text-sm bg-accent-blue text-white rounded-lg font-medium hover:bg-accent-blue/90 transition-colors">
+              Add Client
+            </Link>
+          </div>
         }
       />
 
@@ -86,27 +89,20 @@ export default async function ClientsPage() {
           </StaggerItem>
         ) : (
           <StaggerItem>
-            {/* Mobile: card list */}
-            <div className="sm:hidden space-y-2">
+            {/* Mobile: compact divided list */}
+            <div className="sm:hidden bg-bg-secondary border border-border-default rounded-xl overflow-hidden divide-y divide-border-default">
               {clients.map((client) => (
-                <Card key={client.id}>
-                  <Link href={`/dashboard/clients/${client.id}`} className="block p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-text-primary truncate">{client.name}</p>
-                        <p className="text-sm text-text-secondary truncate mt-0.5">{client.email}</p>
-                        {client.company_name && (
-                          <p className="text-xs text-text-tertiary mt-1">{client.company_name}</p>
-                        )}
-                      </div>
-                      {client.planName && (
-                        <span className="text-xs font-medium px-2 py-1 rounded-md bg-bg-tertiary text-text-secondary border border-border-default flex-shrink-0">
-                          {client.planName}
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                </Card>
+                <Link key={client.id} href={`/dashboard/clients/${client.id}`} className="flex items-center justify-between px-4 py-3.5 hover:bg-bg-hover transition-colors gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-text-primary truncate">{client.name}</p>
+                    <p className="text-xs text-text-tertiary truncate mt-0.5">{client.email}</p>
+                  </div>
+                  {client.planName && (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-bg-tertiary text-text-secondary border border-border-default flex-shrink-0">
+                      {client.planName}
+                    </span>
+                  )}
+                </Link>
               ))}
             </div>
 
@@ -120,21 +116,17 @@ export default async function ClientsPage() {
                       <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Email</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Company</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">Plan</th>
-                      <th className="px-6 py-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wide">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border-default">
                     {clients.map((client) => (
-                      <tr key={client.id} className="hover:bg-bg-hover transition-colors duration-fast">
-                        <td className="px-6 py-4 text-sm font-medium text-text-primary">{client.name}</td>
-                        <td className="px-6 py-4 text-sm text-text-secondary">{client.email}</td>
-                        <td className="px-6 py-4 text-sm text-text-secondary">{client.company_name || '-'}</td>
-                        <td className="px-6 py-4 text-sm text-text-secondary">{client.planName || '-'}</td>
-                        <td className="px-6 py-4 text-sm text-right">
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/dashboard/clients/${client.id}`}>View</Link>
-                          </Button>
+                      <tr key={client.id} className="hover:bg-bg-hover transition-colors duration-fast cursor-pointer" onClick={() => {}}>
+                        <td className="px-6 py-4 text-sm font-medium text-text-primary">
+                          <Link href={`/dashboard/clients/${client.id}`} className="hover:text-accent-blue transition-colors">{client.name}</Link>
                         </td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">{client.email}</td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">{client.company_name || '—'}</td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">{client.planName || '—'}</td>
                       </tr>
                     ))}
                   </tbody>

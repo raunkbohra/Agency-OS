@@ -34,7 +34,7 @@ function MetricTile({ label, value, sub, icon: Icon, accent }: {
         </div>
       </div>
       <div>
-        <p className="text-2xl font-bold text-text-primary tracking-tight">{value}</p>
+        <p className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">{value}</p>
         {sub && <p className="text-xs text-text-tertiary mt-1">{sub}</p>}
       </div>
     </div>
@@ -81,10 +81,10 @@ export default function MetricsDashboard({ agencyId }: { agencyId: string }) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Financial */}
       <div>
-        <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">Financial</h2>
+        <h2 className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-3">Financial</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <MetricTile
             label="Monthly Recurring Revenue"
@@ -119,7 +119,7 @@ export default function MetricsDashboard({ agencyId }: { agencyId: string }) {
 
       {/* Operational */}
       <div>
-        <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">Operational</h2>
+        <h2 className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-3">Operational</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <MetricTile
             label="Deliverable Completion"

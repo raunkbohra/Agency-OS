@@ -12,7 +12,6 @@ import { PageHeader } from '@/components/layout/page-header';
 import { PageTransition } from '@/components/motion/page-transition';
 import { StaggerChildren, StaggerItem } from '@/components/motion/stagger-children';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { EmptyState } from '@/components/shared/empty-state';
 import { FileText } from 'lucide-react';
@@ -86,42 +85,26 @@ export default async function InvoicesPage() {
           </StaggerItem>
         ) : (
           <StaggerItem>
-            <div className="space-y-4">
+            <div className="bg-bg-secondary border border-border-default rounded-xl overflow-hidden divide-y divide-border-default">
               {invoices.map((invoice) => (
-                <Card key={invoice.id} interactive>
-                  <div className="p-4 sm:p-5">
-                    {/* Top row: client + status badge */}
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-0.5">Client</p>
-                        <p className="font-medium text-text-primary">{invoice.client_name || 'Unknown Client'}</p>
-                      </div>
-                      <StatusBadge status={invoice.status} />
-                    </div>
-                    {/* Details row */}
-                    <div className="flex items-end justify-between gap-4">
-                      <div className="flex gap-6 sm:gap-8">
-                        <div>
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-0.5">Amount</p>
-                          <p className="font-medium text-text-primary">
-                            ₹{(invoice.amount ? Number(invoice.amount) : 0).toLocaleString(currencyLocale)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[11px] font-medium uppercase tracking-wide text-text-tertiary mb-0.5">Due Date</p>
-                          <p className="font-medium text-text-primary">
-                            {invoice.due_date
-                              ? new Date(invoice.due_date).toLocaleDateString('en-IN')
-                              : 'Not set'}
-                          </p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/dashboard/invoices/${invoice.id}`}>View</Link>
-                      </Button>
-                    </div>
+                <Link
+                  key={invoice.id}
+                  href={`/dashboard/invoices/${invoice.id}`}
+                  className="flex items-center justify-between px-4 py-3.5 sm:px-5 sm:py-4 hover:bg-bg-hover transition-colors gap-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-text-primary truncate">{invoice.client_name || 'Unknown Client'}</p>
+                    <p className="text-xs text-text-tertiary mt-0.5">
+                      Due {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString('en-IN') : 'not set'}
+                    </p>
                   </div>
-                </Card>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <p className="text-sm font-semibold text-text-primary">
+                      ₹{(invoice.amount ? Number(invoice.amount) : 0).toLocaleString(currencyLocale)}
+                    </p>
+                    <StatusBadge status={invoice.status} />
+                  </div>
+                </Link>
               ))}
             </div>
           </StaggerItem>

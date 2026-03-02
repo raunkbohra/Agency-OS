@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FileSignature, ArrowRight } from 'lucide-react';
+import { FileSignature } from 'lucide-react';
 
 interface Contract {
   id: string;
@@ -47,40 +47,31 @@ export default function ContractsList({ agencyId }: { agencyId: string }) {
 
   return (
     <>
-      {/* Mobile: card list */}
-      <div className="sm:hidden space-y-2">
+      {/* Mobile: compact divided list */}
+      <div className="sm:hidden bg-bg-secondary border border-border-default rounded-xl overflow-hidden divide-y divide-border-default">
         {contracts.map(contract => (
-          <div
+          <Link
             key={contract.id}
-            className="flex items-start justify-between gap-3 p-4 bg-bg-secondary rounded-xl border border-border-default"
+            href={`/contracts/${contract.id}`}
+            className="flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-bg-hover transition-colors"
           >
-            <div className="flex items-start gap-3 min-w-0">
-              <div className="p-2 rounded-lg bg-bg-tertiary border border-border-default flex-shrink-0 mt-0.5">
-                <FileSignature className="h-4 w-4 text-text-secondary" />
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-1.5 rounded-lg bg-bg-tertiary border border-border-default flex-shrink-0">
+                <FileSignature className="h-3.5 w-3.5 text-text-secondary" />
               </div>
               <div className="min-w-0">
-                <p className="font-medium text-text-primary truncate">{contract.file_name}</p>
+                <p className="text-sm font-medium text-text-primary truncate">{contract.file_name}</p>
                 <p className="text-xs text-text-tertiary mt-0.5">
                   {new Date(contract.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
-                {contract.signed_at && (
-                  <p className="text-xs text-accent-green mt-0.5">
-                    Signed {new Date(contract.signed_at).toLocaleDateString()}
-                  </p>
-                )}
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
-              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                contract.signed ? 'bg-accent-green/10 text-accent-green' : 'bg-accent-amber/10 text-accent-amber'
-              }`}>
-                {contract.signed ? 'Signed' : 'Pending'}
-              </span>
-              <Link href={`/contracts/${contract.id}`}>
-                <ArrowRight className="h-4 w-4 text-text-tertiary" />
-              </Link>
-            </div>
-          </div>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-semibold flex-shrink-0 ${
+              contract.signed ? 'bg-accent-green/10 text-accent-green' : 'bg-accent-amber/10 text-accent-amber'
+            }`}>
+              {contract.signed ? 'Signed' : 'Pending'}
+            </span>
+          </Link>
         ))}
       </div>
 
