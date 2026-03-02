@@ -99,6 +99,26 @@ export interface AgencyPaymentMethod {
   updated_at: Date;
 }
 
+export interface AgencyInvite {
+  id: string;
+  agency_id: string;
+  email: string;
+  roles: string[];
+  token: string;
+  accepted: boolean;
+  accepted_by_user_id: string | null;
+  expires_at: string;
+  created_at: string;
+}
+
+export interface UserRole {
+  id: string;
+  user_id: string;
+  agency_id: string;
+  role: string;
+  created_at: string;
+}
+
 // Agency queries
 export async function createAgency(
   name: string,
@@ -1689,6 +1709,232 @@ export async function consumeClientPasswordResetToken(token: string): Promise<bo
     console.error('Failed to consume client password reset token:', err);
     throw new Error(
       `Failed to consume password reset token: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+// Agency Invite queries
+
+export async function createAgencyInvite(
+  agencyId: string,
+  email: string,
+  roles: string[],
+  token: string
+): Promise<AgencyInvite> {
+  try {
+    const result = await db.query(
+      `INSERT INTO agency_invites (agency_id, email, roles, token, expires_at)
+       VALUES ($1, $2, $3, $4, NOW() + INTERVAL '7 days')
+       ON CONFLICT (agency_id, email) DO UPDATE
+       SET roles = $3, token = $4, accepted = false, expires_at = NOW() + INTERVAL '7 days'
+       RETURNING *`,
+      [agencyId, email, JSON.stringify(roles), token]
+    );
+    const invite = result.rows[0];
+    return {
+      ...invite,
+      roles: typeof invite.roles === 'string' ? JSON.parse(invite.roles) : invite.roles,
+    };
+  } catch (err) {
+    console.error('Failed to create agency invite:', err);
+    throw new Error(
+      `Failed to create agency invite: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function getAgencyInviteByToken(token: string): Promise<AgencyInvite | null> {
+  try {
+    const result = await db.query(
+      `SELECT * FROM agency_invites
+       WHERE token = $1 AND accepted = false AND expires_at > NOW()`,
+      [token]
+    );
+    if (result.rows.length === 0) return null;
+    const invite = result.rows[0];
+    return {
+      ...invite,
+      roles: typeof invite.roles === 'string' ? JSON.parse(invite.roles) : invite.roles,
+    };
+  } catch (err) {
+    console.error('Failed to get agency invite:', err);
+    throw new Error(
+      `Failed to get agency invite: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function acceptAgencyInvite(token: string, userId: string): Promise<void> {
+  try {
+    await db.query(
+      `UPDATE agency_invites
+       SET accepted = true, accepted_by_user_id = $2
+       WHERE token = $1`,
+      [token, userId]
+    );
+  } catch (err) {
+    console.error('Failed to accept invite:', err);
+    throw new Error(
+      `Failed to accept invite: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function getAgencyInvites(agencyId: string): Promise<AgencyInvite[]> {
+  try {
+    const result = await db.query(
+      `SELECT * FROM agency_invites WHERE agency_id = $1 ORDER BY created_at DESC`,
+      [agencyId]
+    );
+    return result.rows.map((invite: any) => ({
+      ...invite,
+      roles: typeof invite.roles === 'string' ? JSON.parse(invite.roles) : invite.roles,
+    }));
+  } catch (err) {
+    console.error('Failed to get agency invites:', err);
+    throw new Error(
+      `Failed to get agency invites: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+// User Role queries
+
+export async function assignUserRole(userId: string, agencyId: string, role: string): Promise<void> {
+  try {
+    await db.query(
+      `INSERT INTO user_roles (user_id, agency_id, role)
+       VALUES ($1, $2, $3)
+       ON CONFLICT DO NOTHING`,
+      [userId, agencyId, role]
+    );
+  } catch (err) {
+    console.error('Failed to assign user role:', err);
+    throw new Error(
+      `Failed to assign user role: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function getUserRolesInAgency(userId: string, agencyId: string): Promise<string[]> {
+  try {
+    const result = await db.query(
+      `SELECT role FROM user_roles WHERE user_id = $1 AND agency_id = $2`,
+      [userId, agencyId]
+    );
+    return result.rows.map((r: any) => r.role);
+  } catch (err) {
+    console.error('Failed to get user roles:', err);
+    throw new Error(
+      `Failed to get user roles: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function updateUserRoles(
+  userId: string,
+  agencyId: string,
+  roles: string[]
+): Promise<void> {
+  try {
+    await db.query('BEGIN');
+    try {
+      // Delete existing roles
+      await db.query(
+        `DELETE FROM user_roles WHERE user_id = $1 AND agency_id = $2`,
+        [userId, agencyId]
+      );
+      // Insert new roles
+      for (const role of roles) {
+        await db.query(
+          `INSERT INTO user_roles (user_id, agency_id, role) VALUES ($1, $2, $3)`,
+          [userId, agencyId, role]
+        );
+      }
+      await db.query('COMMIT');
+    } catch (err) {
+      await db.query('ROLLBACK');
+      throw err;
+    }
+  } catch (err) {
+    console.error('Failed to update user roles:', err);
+    throw new Error(
+      `Failed to update user roles: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function getAgencyTeamMembers(
+  agencyId: string
+): Promise<
+  Array<{
+    id: string;
+    name: string;
+    email: string;
+    roles: string[];
+    joinedAt: string;
+    isOwner: boolean;
+  }>
+> {
+  try {
+    const result = await db.query(
+      `SELECT DISTINCT
+         u.id,
+         u.name,
+         u.email,
+         u.created_at as "joinedAt",
+         (u.agency_id = $1 AND u.role = 'owner') as "isOwner"
+       FROM users u
+       LEFT JOIN user_roles ur ON u.id = ur.user_id AND ur.agency_id = $1
+       WHERE u.agency_id = $1 OR ur.agency_id = $1
+       ORDER BY u.created_at ASC`,
+      [agencyId]
+    );
+
+    const membersMap = new Map();
+    for (const row of result.rows) {
+      if (!membersMap.has(row.id)) {
+        membersMap.set(row.id, {
+          id: row.id,
+          name: row.name,
+          email: row.email,
+          roles: [],
+          joinedAt: row.joinedAt,
+          isOwner: row.isOwner,
+        });
+      }
+      // Find the role for this row (from JOIN)
+      const roleResult = await db.query(
+        `SELECT role FROM user_roles WHERE user_id = $1 AND agency_id = $2`,
+        [row.id, agencyId]
+      );
+      for (const roleRow of roleResult.rows) {
+        const member = membersMap.get(row.id);
+        if (!member.roles.includes(roleRow.role)) {
+          member.roles.push(roleRow.role);
+        }
+      }
+    }
+    return Array.from(membersMap.values());
+  } catch (err) {
+    console.error('Failed to get team members:', err);
+    throw new Error(
+      `Failed to get team members: ${err instanceof Error ? err.message : 'Unknown error'}`
+    );
+  }
+}
+
+export async function removeUserFromAgency(userId: string, agencyId: string): Promise<void> {
+  try {
+    // Delete user roles
+    await db.query(
+      `DELETE FROM user_roles WHERE user_id = $1 AND agency_id = $2`,
+      [userId, agencyId]
+    );
+  } catch (err) {
+    console.error('Failed to remove user from agency:', err);
+    throw new Error(
+      `Failed to remove user from agency: ${err instanceof Error ? err.message : 'Unknown error'}`
     );
   }
 }
