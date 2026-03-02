@@ -56,10 +56,10 @@ export interface Client {
   address: string | null;
   billing_address: string | null;
   token: string | null;
-  password_hash?: string | null;
-  invite_token?: string | null;
-  invite_expires_at?: Date | null;
-  invite_accepted?: boolean;
+  password_hash: string | null;
+  invite_token: string | null;
+  invite_expires_at: Date | null;
+  invite_accepted: boolean;
   created_at: string;
 }
 
@@ -1539,16 +1539,12 @@ export interface ClientPasswordResetToken {
   created_at: Date;
 }
 
-export async function getClientByEmail(email: string, agencyId?: string): Promise<Client | null> {
+export async function getClientByEmail(email: string, agencyId: string): Promise<Client | null> {
   try {
-    if (agencyId) {
-      const result = await db.query(
-        'SELECT * FROM clients WHERE email = $1 AND agency_id = $2',
-        [email, agencyId]
-      );
-      return result.rows[0] || null;
-    }
-    const result = await db.query('SELECT * FROM clients WHERE email = $1', [email]);
+    const result = await db.query(
+      'SELECT * FROM clients WHERE email = $1 AND agency_id = $2',
+      [email, agencyId]
+    );
     return result.rows[0] || null;
   } catch (err) {
     console.error('Failed to get client by email:', err);
@@ -1606,6 +1602,23 @@ export async function acceptClientInvite(clientId: string): Promise<void> {
   }
 }
 
+export async function acceptClientInviteAndSetPassword(
+  clientId: string,
+  passwordHash: string
+): Promise<void> {
+  try {
+    await db.query(
+      'UPDATE clients SET password_hash = $1, invite_accepted = true, invite_token = NULL, invite_expires_at = NULL WHERE id = $2',
+      [passwordHash, clientId]
+    );
+  } catch (error) {
+    console.error(`Failed to accept invite for client ${clientId}:`, error);
+    throw new Error(
+      `Failed to accept invite and set password: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
 export async function createClientPasswordResetToken(
   clientId: string,
   token: string,
@@ -1640,9 +1653,21 @@ export async function getClientPasswordResetToken(
   }
 }
 
-export async function consumeClientPasswordResetToken(token: string): Promise<void> {
+export async function consumeClientPasswordResetToken(token: string): Promise<boolean> {
   try {
+    // First verify the token exists, is not expired, and is not already used
+    const checkResult = await db.query(
+      'SELECT id FROM client_password_reset_tokens WHERE token = $1 AND expires_at > NOW() AND used = false',
+      [token]
+    );
+
+    if (!checkResult.rows.length) {
+      return false; // Token is invalid, expired, or already used
+    }
+
+    // Only mark as used if it's valid
     await db.query('UPDATE client_password_reset_tokens SET used = true WHERE token = $1', [token]);
+    return true;
   } catch (err) {
     console.error('Failed to consume client password reset token:', err);
     throw new Error(
