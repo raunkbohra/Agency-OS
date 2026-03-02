@@ -12,6 +12,7 @@ import {
   addInvoiceItem,
   Plan,
 } from '@/lib/db-queries';
+import { generateDeliverablesForClientPlan } from '@/lib/generate-deliverables';
 import { SimpleClientForm } from '@/components/SimpleClientForm';
 import { redirect } from 'next/navigation';
 import { PageTransition } from '@/components/motion/page-transition';
@@ -53,13 +54,26 @@ async function handleCreateClient(formData: FormData) {
     );
 
     // Assign plan to client
-    await createClientPlan(client.id, planId, new Date());
+    const startDate = new Date();
+    await createClientPlan(client.id, planId, startDate);
 
-    // Get the plan to use its price for the invoice
+    // Get the plan (needed for invoice + immediate deliverable generation)
     const plan = await getPlanById(planId, agencyId);
     if (!plan) {
       throw new Error('Plan not found');
     }
+
+    // Immediately generate deliverables for the current billing period
+    // so a mid-month/mid-quarter join doesn't miss their first period
+    await generateDeliverablesForClientPlan({
+      client_id: client.id,
+      plan_id: plan.id,
+      agency_id: agencyId,
+      start_date: startDate,
+      billing_cycle: plan.billing_cycle,
+    }).catch((err) =>
+      console.error('Failed to generate initial deliverables:', err)
+    );
 
     // Auto-generate first invoice
     const dueDate = new Date();

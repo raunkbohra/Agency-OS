@@ -1,10 +1,9 @@
 import { db } from '@/lib/db';
-import { getPlanItems, createDeliverable } from '@/lib/db-queries';
+import { generateDeliverablesForClientPlan } from '@/lib/generate-deliverables';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
-  // Verify Vercel Cron secret
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret || request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -12,53 +11,49 @@ export async function GET(request: Request) {
 
   try {
     const now = new Date();
-    const monthYear = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-    // Get all active client plans
+    // Join plans so we have billing_cycle and start_date together
     const result = await db.query(
-      `SELECT cp.*, c.id as client_id, c.agency_id, p.id as plan_id
+      `SELECT cp.id, cp.client_id, cp.start_date,
+              c.agency_id,
+              p.id as plan_id, p.billing_cycle
        FROM client_plans cp
        JOIN clients c ON cp.client_id = c.id
        JOIN plans p ON cp.plan_id = p.id
        WHERE cp.status = 'active'`
     );
 
-    const clientPlans = result.rows;
     let created = 0;
+    let skipped = 0;
+    const errors: string[] = [];
 
-    for (const clientPlan of clientPlans) {
+    for (const row of result.rows) {
       try {
-        // Check if deliverables already exist for this month
-        const existing = await db.query(
-          `SELECT id FROM deliverables WHERE client_id = $1 AND month_year = $2`,
-          [clientPlan.client_id, monthYear]
+        const count = await generateDeliverablesForClientPlan(
+          {
+            client_id: row.client_id,
+            plan_id: row.plan_id,
+            agency_id: row.agency_id,
+            start_date: row.start_date,
+            billing_cycle: row.billing_cycle,
+          },
+          now
         );
-
-        if (existing.rows.length === 0) {
-          const planItems = await getPlanItems(clientPlan.plan_id);
-          const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-          for (const item of planItems) {
-            await createDeliverable({
-              agencyId: clientPlan.agency_id,
-              clientId: clientPlan.client_id,
-              planId: clientPlan.plan_id,
-              title: item.deliverable_type,
-              monthYear,
-              dueDate,
-            });
-            created++;
-          }
-        }
-      } catch (planError) {
-        console.error(`Failed to generate deliverables for client ${clientPlan.client_id}:`, planError);
-        // Continue with next client plan
+        if (count > 0) created += count;
+        else skipped++;
+      } catch (err) {
+        const msg = `client ${row.client_id}: ${err instanceof Error ? err.message : 'unknown error'}`;
+        console.error('Failed to generate deliverables for', msg);
+        errors.push(msg);
       }
     }
 
     return Response.json({
       success: true,
-      message: `Created ${created} deliverables for ${monthYear}`,
+      month: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
+      created,
+      skipped,
+      errors: errors.length ? errors : undefined,
     });
   } catch (error) {
     console.error('Cron error:', error);
