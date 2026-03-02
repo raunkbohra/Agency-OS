@@ -294,6 +294,15 @@ export async function getUsersByAgency(agencyId: string): Promise<User[]> {
   }
 }
 
+export async function setUserPassword(userId: string, passwordHash: string): Promise<void> {
+  try {
+    await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [passwordHash, userId]);
+  } catch (err) {
+    console.error('Failed to set user password:', err);
+    throw new Error(`Failed to set user password: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 // Plan queries
 export async function createPlan(
   agencyId: string,
