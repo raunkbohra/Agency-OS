@@ -992,6 +992,36 @@ export async function updateDeliverableStatus(
   return result.rows[0];
 }
 
+export async function updateDeliverablesBulk(
+  deliverableIds: string[],
+  newStatus: string,
+  agencyId: string
+): Promise<number> {
+  try {
+    // First, verify ALL deliverables belong to the given agency
+    const verifyResult = await db.query(
+      `SELECT COUNT(*) as count FROM deliverables WHERE agency_id = $1 AND id = ANY($2)`,
+      [agencyId, deliverableIds]
+    );
+
+    const count = parseInt(verifyResult.rows[0].count, 10);
+    if (count !== deliverableIds.length) {
+      throw new Error('Some deliverables do not belong to this agency');
+    }
+
+    // Update all deliverables in a single transaction
+    const updateResult = await db.query(
+      `UPDATE deliverables SET status = $1, updated_at = NOW() WHERE id = ANY($2) AND agency_id = $3 RETURNING id`,
+      [newStatus, deliverableIds, agencyId]
+    );
+
+    return updateResult.rowCount || 0;
+  } catch (err) {
+    console.error('Failed to update deliverables in bulk:', err);
+    throw new Error(`Failed to update deliverables: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 export async function addDeliverableFile(data: {
   deliverableId: string;
   fileName: string;
