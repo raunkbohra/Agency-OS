@@ -120,7 +120,7 @@ export default async function ClientsPage() {
                   </thead>
                   <tbody className="divide-y divide-border-default">
                     {clients.map((client) => (
-                      <tr key={client.id} className="hover:bg-bg-hover transition-colors duration-fast cursor-pointer" onClick={() => {}}>
+                      <tr key={client.id} className="hover:bg-bg-hover transition-colors duration-fast">
                         <td className="px-6 py-4 text-sm font-medium text-text-primary">
                           <Link href={`/dashboard/clients/${client.id}`} className="hover:text-accent-blue transition-colors">{client.name}</Link>
                         </td>
