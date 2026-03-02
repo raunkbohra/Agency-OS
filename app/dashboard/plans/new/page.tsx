@@ -2,6 +2,8 @@ import { auth } from '@/lib/auth';
 import { createPlan, getAgenciesByOwnerId, createAgency } from '@/lib/db-queries';
 import { PlanForm } from '@/components/PlanForm';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
 import { PageTransition } from '@/components/motion/page-transition';
 import { PageHeader } from '@/components/layout/page-header';
 
@@ -48,11 +50,21 @@ export default async function NewPlanPage() {
   }
 
   return (
-    <PageTransition className="max-w-lg">
-      <PageHeader title="Create New Plan" description="Add a new service plan to your offerings" />
+    <PageTransition>
+      <Link
+        href="/dashboard/plans"
+        className="inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors mb-4"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Back to Plans
+      </Link>
 
-      <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
-        <PlanForm onSubmit={handleCreatePlan} />
+      <div className="max-w-xl mx-auto">
+        <PageHeader title="Create New Plan" description="Add a new service plan to your offerings" />
+
+        <div className="bg-bg-secondary border border-border-default rounded-xl p-5 sm:p-6">
+          <PlanForm onSubmit={handleCreatePlan} />
+        </div>
       </div>
     </PageTransition>
   );
