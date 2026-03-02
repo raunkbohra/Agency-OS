@@ -64,26 +64,81 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+    // Client-side validation
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    const MAX_WIDTH = 2000;
+    const MAX_HEIGHT = 500;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error('Failed to upload logo');
-
-      const data = await res.json();
-      setLogoUrl(data.fileUrl);
-      setLogoPreview(data.fileUrl);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to upload logo');
-    } finally {
-      setUploading(false);
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds 2MB limit`);
+      return;
     }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError('Only JPG, PNG, and WebP images are supported');
+      return;
+    }
+
+    // Check image dimensions
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+      img.onload = async () => {
+        if (img.width > MAX_WIDTH) {
+          setError(`Image width (${img.width}px) exceeds 2000px limit`);
+          return;
+        }
+
+        if (img.height > MAX_HEIGHT) {
+          setError(`Image height (${img.height}px) exceeds 500px limit`);
+          return;
+        }
+
+        // Dimensions are valid, proceed with upload
+        setUploading(true);
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('directory', 'logos');
+
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || 'Failed to upload logo');
+          }
+
+          const data = await res.json();
+          setLogoUrl(data.fileUrl);
+          setLogoPreview(data.fileUrl);
+          setError(null);
+
+          // Show compression info if applicable
+          if (data.compressed) {
+            console.log(
+              `✓ Logo compressed: ${(data.originalSize / 1024).toFixed(1)}KB → ${(data.uploadedSize / 1024).toFixed(1)}KB`
+            );
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Failed to upload logo');
+        } finally {
+          setUploading(false);
+        }
+      };
+
+      img.onerror = () => {
+        setError('Invalid image file');
+      };
+
+      img.src = e.target?.result as string;
+    };
+
+    reader.readAsDataURL(file);
   }
 
   function handleRemoveLogo() {
@@ -164,25 +219,29 @@ export default function SettingsPage() {
             <div className="space-y-3">
               {logoPreview && (
                 <div className="flex items-center justify-between p-3 bg-bg-primary rounded-lg border border-border-default">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={logoPreview}
-                      alt="Agency Logo"
-                      className="h-12 w-12 object-contain rounded"
-                      onError={(e) => {
-                        console.error('Logo image failed to load:', logoPreview);
-                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"%3E%3Crect fill="%23f3f4f6" width="48" height="48"/%3E%3Ctext x="24" y="24" font-size="12" fill="%236b7280" text-anchor="middle" dominant-baseline="middle"%3EIMG%3C/text%3E%3C/svg%3E';
-                      }}
-                    />
-                    <div className="flex-1">
-                      <p className="text-xs text-text-secondary">Logo uploaded</p>
-                      <p className="text-xs text-text-secondary truncate">{logoPreview.split('/').pop()}</p>
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="h-12 w-12 bg-gray-200 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      <img
+                        src={logoPreview}
+                        alt="Agency Logo"
+                        className="h-12 w-12 object-contain"
+                        onLoad={() => {
+                          console.log('✓ Logo loaded:', logoPreview);
+                        }}
+                        onError={() => {
+                          console.warn('⚠ Logo failed to load from:', logoPreview);
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-text-secondary font-medium">Logo uploaded</p>
+                      <p className="text-xs text-text-secondary truncate font-mono text-[10px] break-all">{logoPreview.split('/').pop() || 'image'}</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleRemoveLogo}
-                    className="text-sm text-red-600 hover:text-red-700 font-medium whitespace-nowrap ml-2"
+                    className="text-sm text-red-600 hover:text-red-700 font-medium whitespace-nowrap ml-2 flex-shrink-0"
                   >
                     Remove
                   </button>
@@ -202,13 +261,13 @@ export default function SettingsPage() {
                 <input
                   id="logo"
                   type="file"
-                  accept="image/png,image/jpeg,image/svg+xml"
+                  accept="image/png,image/jpeg,image/webp"
                   onChange={handleLogoUpload}
                   disabled={uploading}
                   className="mt-1 w-full px-3 py-2 border border-border-default rounded-lg text-sm disabled:opacity-50"
                 />
                 <p className="text-xs text-text-secondary mt-1">
-                  PNG, JPG, or SVG (max 2MB)
+                  JPG, PNG, or WebP (max 2MB, max 2000x500px). Images are auto-compressed to WebP.
                 </p>
               </div>
             </div>
