@@ -9,7 +9,7 @@ import { PageTransition } from '@/components/motion/page-transition';
 export default async function DeliverableDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await auth();
 
@@ -17,7 +17,8 @@ export default async function DeliverableDetailPage({
     redirect('/auth/signin');
   }
 
-  const deliverable = await getDeliverableById(params.id, session.user.agencyId);
+  const { id } = await params;
+  const deliverable = await getDeliverableById(id, session.user.agencyId);
 
   if (!deliverable) {
     return (
@@ -36,7 +37,7 @@ export default async function DeliverableDetailPage({
         <ChevronLeft className="h-4 w-4" />
         Back to Deliverables
       </Link>
-      <DeliverableDetail deliverable={deliverable} deliverableId={params.id} />
+      <DeliverableDetail deliverable={deliverable} deliverableId={id} />
     </PageTransition>
   );
 }
