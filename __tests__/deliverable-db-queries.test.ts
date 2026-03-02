@@ -60,19 +60,19 @@ describe('Deliverable DB Queries', () => {
   describe('getDeliverablesByClient', () => {
     it('returns all client deliverables', async () => {
       const mockDeliverables = [
-        { id: 'del-1', client_id: testClientId, agency_id: testAgencyId, title: 'Video 1', status: 'draft', month_year: '2026-03' },
-        { id: 'del-2', client_id: testClientId, agency_id: testAgencyId, title: 'Video 2', status: 'in_review', month_year: '2026-03' },
+        { id: 'del-1', title: 'Video 1', status: 'draft', month_year: '2026-03', due_date: null },
+        { id: 'del-2', title: 'Video 2', status: 'in_review', month_year: '2026-03', due_date: null },
       ];
 
       (db.query as jest.Mock).mockResolvedValueOnce({ rows: mockDeliverables });
 
-      const results = await getDeliverablesByClient(testClientId, testAgencyId);
+      const results = await getDeliverablesByClient(testClientId);
 
       expect(Array.isArray(results)).toBe(true);
       expect(results).toHaveLength(2);
       expect(db.query).toHaveBeenCalledWith(
         expect.stringContaining('client_id'),
-        [testClientId, testAgencyId]
+        [testClientId]
       );
     });
   });
