@@ -15,6 +15,8 @@ import {
 import { generateDeliverablesForClientPlan, calcFirstInvoice } from '@/lib/generate-deliverables';
 import { SimpleClientForm } from '@/components/SimpleClientForm';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { PageTransition } from '@/components/motion/page-transition';
 import { PageHeader } from '@/components/layout/page-header';
 
@@ -121,30 +123,41 @@ export default async function NewClientPage() {
   }
 
   return (
-    <PageTransition className="max-w-lg">
-      <PageHeader title="Add New Client" description="Create a new client and assign a plan" />
+    <PageTransition>
+      {/* Back button */}
+      <Link
+        href="/dashboard/clients"
+        className="inline-flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors mb-4"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Clients
+      </Link>
 
-      {error && (
-        <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded-lg text-sm mb-5">
-          {error}
-        </div>
-      )}
+      <div className="max-w-xl mx-auto">
+        <PageHeader title="Add New Client" description="Create a new client and assign a plan" />
 
-      {plans.length === 0 ? (
-        <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
-          <p className="text-sm text-text-secondary mb-4">You need to create at least one plan before adding a client.</p>
-          <a
-            href="/dashboard/plans/new"
-            className="inline-flex items-center px-4 py-2 bg-accent-blue text-white text-sm rounded-lg font-medium hover:bg-accent-blue/90 transition-colors"
-          >
-            Create a Plan
-          </a>
-        </div>
-      ) : (
-        <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
-          <SimpleClientForm action={handleCreateClient} plans={plans} />
-        </div>
-      )}
+        {error && (
+          <div className="bg-accent-red/10 border border-accent-red/20 text-accent-red px-4 py-3 rounded-lg text-sm mb-5">
+            {error}
+          </div>
+        )}
+
+        {plans.length === 0 ? (
+          <div className="bg-bg-secondary border border-border-default rounded-xl p-5">
+            <p className="text-sm text-text-secondary mb-4">You need to create at least one plan before adding a client.</p>
+            <Link
+              href="/dashboard/plans/new"
+              className="inline-flex items-center px-4 py-2 bg-accent-blue text-white text-sm rounded-lg font-medium hover:bg-accent-blue/90 transition-colors"
+            >
+              Create a Plan
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-bg-secondary border border-border-default rounded-xl p-5 sm:p-6">
+            <SimpleClientForm action={handleCreateClient} plans={plans} />
+          </div>
+        )}
+      </div>
     </PageTransition>
   );
 }
