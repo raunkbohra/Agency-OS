@@ -90,7 +90,13 @@ export async function GET(req: NextRequest) {
     // Convert stream to buffer for NextResponse
     const chunks: Buffer[] = [];
     for await (const chunk of pdfStream) {
-      chunks.push(chunk as Buffer);
+      if (Buffer.isBuffer(chunk)) {
+        chunks.push(chunk);
+      } else if (typeof chunk === 'string') {
+        chunks.push(Buffer.from(chunk, 'binary'));
+      } else {
+        chunks.push(Buffer.from(chunk as any));
+      }
     }
     const pdfBuffer = Buffer.concat(chunks);
 

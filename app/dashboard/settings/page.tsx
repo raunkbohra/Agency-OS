@@ -77,8 +77,8 @@ export default function SettingsPage() {
       if (!res.ok) throw new Error('Failed to upload logo');
 
       const data = await res.json();
-      setLogoUrl(data.url);
-      setLogoPreview(data.url);
+      setLogoUrl(data.fileUrl);
+      setLogoPreview(data.fileUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload logo');
     } finally {
@@ -164,18 +164,34 @@ export default function SettingsPage() {
             <div className="space-y-3">
               {logoPreview && (
                 <div className="flex items-center justify-between p-3 bg-bg-primary rounded-lg border border-border-default">
-                  <img
-                    src={logoPreview}
-                    alt="Agency Logo"
-                    className="h-12 w-12 object-contain"
-                  />
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={logoPreview}
+                      alt="Agency Logo"
+                      className="h-12 w-12 object-contain rounded"
+                      onError={(e) => {
+                        console.error('Logo image failed to load:', logoPreview);
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"%3E%3Crect fill="%23f3f4f6" width="48" height="48"/%3E%3Ctext x="24" y="24" font-size="12" fill="%236b7280" text-anchor="middle" dominant-baseline="middle"%3EIMG%3C/text%3E%3C/svg%3E';
+                      }}
+                    />
+                    <div className="flex-1">
+                      <p className="text-xs text-text-secondary">Logo uploaded</p>
+                      <p className="text-xs text-text-secondary truncate">{logoPreview.split('/').pop()}</p>
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={handleRemoveLogo}
-                    className="text-sm text-red-600 hover:text-red-700 font-medium"
+                    className="text-sm text-red-600 hover:text-red-700 font-medium whitespace-nowrap ml-2"
                   >
                     Remove
                   </button>
+                </div>
+              )}
+
+              {uploading && (
+                <div className="p-3 bg-bg-primary rounded-lg border border-border-default">
+                  <p className="text-sm text-text-secondary">Uploading logo...</p>
                 </div>
               )}
 
