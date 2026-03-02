@@ -7,7 +7,7 @@ CREATE TABLE agency_invites (
   email TEXT NOT NULL,
   roles TEXT[] NOT NULL,
   token TEXT NOT NULL UNIQUE,
-  accepted BOOLEAN NOT NULL DEFAULT false,
+  accepted BOOLEAN DEFAULT false,
   accepted_by_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
   UNIQUE(agency_id, email)
