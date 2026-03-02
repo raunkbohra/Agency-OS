@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
-import { Menu, X, LogOut, LayoutDashboard, FileText, FileCheck, User } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, FileText, FileCheck, User, Package } from 'lucide-react';
 
 interface ClientPortalNavProps {
   clientName: string;
@@ -15,21 +15,28 @@ export default function ClientPortalNav({ clientName }: ClientPortalNavProps) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [error, setError] = useState('');
 
   const isActive = (href: string) => pathname === href;
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
+    setError('');
     try {
       const res = await fetch('/api/client-portal/auth/logout', {
         method: 'POST',
       });
 
       if (res.ok) {
+        setIsLoggingOut(false);
         router.push('/client-portal/login');
+      } else {
+        setError('Failed to log out. Please try again.');
+        setIsLoggingOut(false);
       }
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (err) {
+      console.error('Logout error:', err);
+      setError('Failed to log out. Please try again.');
       setIsLoggingOut(false);
     }
   };
@@ -38,6 +45,7 @@ export default function ClientPortalNav({ clientName }: ClientPortalNavProps) {
     { href: '/client-portal', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/client-portal/invoices', label: 'Invoices', icon: FileText },
     { href: '/client-portal/contracts', label: 'Contracts', icon: FileCheck },
+    { href: '/client-portal/deliverables', label: 'Deliverables', icon: Package },
     { href: '/client-portal/profile', label: 'Profile', icon: User },
   ];
 
@@ -82,13 +90,16 @@ export default function ClientPortalNav({ clientName }: ClientPortalNavProps) {
 
         {/* Right: Client Name & Logout */}
         <div className="flex items-center gap-4">
-          <div>
-            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-              {clientName}
-            </p>
-            <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-              Client
-            </p>
+          <div className="flex flex-col items-end">
+            {error && <p className="text-xs mb-1" style={{ color: 'var(--accent-red)' }}>{error}</p>}
+            <div>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                {clientName}
+              </p>
+              <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                Client
+              </p>
+            </div>
           </div>
           <button
             onClick={handleLogout}

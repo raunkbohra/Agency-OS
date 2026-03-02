@@ -8,6 +8,7 @@ interface Contract {
   fileName: string;
   fileUrl: string;
   signed: boolean;
+  signingUrl: string | null;
   createdAt: string;
 }
 
@@ -177,17 +178,26 @@ export default function ClientPortalContracts() {
             {!contract.signed && (
               <button
                 onClick={() => {
-                  window.location.href = `/client-portal/contracts/${contract.id}/sign`;
+                  if (contract.signingUrl) {
+                    window.open(contract.signingUrl, '_blank');
+                  }
                 }}
+                disabled={!contract.signingUrl}
                 className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 text-white"
                 style={{
-                  background: 'var(--accent-blue)',
+                  background: contract.signingUrl ? 'var(--accent-blue)' : 'rgba(107, 126, 147, 0.3)',
+                  cursor: contract.signingUrl ? 'pointer' : 'not-allowed',
+                  opacity: contract.signingUrl ? 1 : 0.5,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.filter = 'brightness(1.1)';
+                  if (contract.signingUrl) {
+                    e.currentTarget.style.filter = 'brightness(1.1)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.filter = 'brightness(1)';
+                  if (contract.signingUrl) {
+                    e.currentTarget.style.filter = 'brightness(1)';
+                  }
                 }}
               >
                 <PenTool size={14} />

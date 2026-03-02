@@ -167,23 +167,18 @@ export default function ClientPortalInvoices() {
               </td>
               <td className="px-4 py-3">
                 <button
-                  onClick={() => {
-                    window.open(`/api/invoices/${invoice.id}/pdf`, '_blank');
-                  }}
+                  disabled
+                  title="PDF download coming soon"
                   className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-sm font-medium transition-all"
                   style={{
                     color: 'var(--accent-blue)',
                     background: 'rgba(107, 126, 147, 0.1)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(107, 126, 147, 0.2)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(107, 126, 147, 0.1)';
+                    opacity: 0.5,
+                    cursor: 'not-allowed',
                   }}
                 >
                   <Download size={14} />
-                  PDF
+                  Download PDF (Coming Soon)
                 </button>
               </td>
             </tr>

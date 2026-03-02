@@ -1249,6 +1249,14 @@ export async function submitSignature(
   }
 }
 
+export async function getSigningTokenByContractId(contractId: string): Promise<string | null> {
+  const result = await db.query(
+    `SELECT token FROM contract_signing_tokens WHERE contract_id = $1 AND (expires_at IS NULL OR expires_at > NOW()) LIMIT 1`,
+    [contractId]
+  );
+  return result.rows[0]?.token || null;
+}
+
 // ============================================================
 // Payment Transaction queries
 // ============================================================
