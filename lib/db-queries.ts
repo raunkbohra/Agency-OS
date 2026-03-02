@@ -992,6 +992,28 @@ export async function updateDeliverableStatus(
   return result.rows[0];
 }
 
+export async function updateDeliverablesBulk(
+  ids: string[],
+  agencyId: string,
+  status: string
+): Promise<{ updated: number; total: number }> {
+  try {
+    const result = await db.query(
+      `UPDATE deliverables
+       SET status = $1, updated_at = NOW()
+       WHERE id = ANY($2) AND agency_id = $3`,
+      [status, ids, agencyId]
+    );
+    return {
+      updated: result.rowCount ?? 0,
+      total: ids.length,
+    };
+  } catch (err) {
+    console.error('Failed to bulk update deliverables:', err);
+    throw new Error(`Failed to bulk update deliverables: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+}
+
 export async function addDeliverableFile(data: {
   deliverableId: string;
   fileName: string;
