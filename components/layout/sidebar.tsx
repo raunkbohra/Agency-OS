@@ -28,7 +28,7 @@ const navItems = [
 ];
 
 const bottomItems = [
-  { href: '/dashboard/settings/payments', icon: Settings, label: 'Settings', color: '#8fa0b0' },
+  { href: '/dashboard/settings', icon: Settings, label: 'Settings', color: '#8fa0b0' },
 ];
 
 export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
