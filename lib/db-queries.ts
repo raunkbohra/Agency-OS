@@ -7,6 +7,7 @@ export interface Agency {
   owner_id: string;
   currency: string;
   email?: string;
+  billing_start_policy: 'next_month' | 'prorated';
   created_at: string;
 }
 
@@ -134,6 +135,17 @@ export async function getAgenciesByOwnerId(ownerId: string): Promise<Agency[]> {
     console.error('Failed to get agencies by owner ID:', err);
     throw new Error(`Failed to fetch agencies: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
+}
+
+export async function updateAgencyBillingPolicy(
+  agencyId: string,
+  policy: 'next_month' | 'prorated'
+): Promise<Agency> {
+  const result = await db.query(
+    'UPDATE agencies SET billing_start_policy = $1 WHERE id = $2 RETURNING *',
+    [policy, agencyId]
+  );
+  return result.rows[0];
 }
 
 // User queries

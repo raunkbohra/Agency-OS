@@ -1,10 +1,13 @@
 import { db } from '@/lib/db';
 import { createClient, createClientPlan, getPlansByAgency } from '@/lib/db-queries';
-import { generateDeliverablesForClientPlan } from '@/lib/generate-deliverables';
+import { generateDeliverablesForClientPlan, calcFirstInvoice } from '@/lib/generate-deliverables';
 
 export async function GET(req: Request, { params }: { params: Promise<{ agencyId: string }> }) {
   const { agencyId } = await params;
-  const agencyResult = await db.query('SELECT id, name FROM agencies WHERE id = $1', [agencyId]);
+  const agencyResult = await db.query(
+    'SELECT id, name, billing_start_policy FROM agencies WHERE id = $1',
+    [agencyId]
+  );
   if (!agencyResult.rows[0]) return Response.json({ error: 'Agency not found' }, { status: 404 });
 
   const plans = await getPlansByAgency(agencyId);
@@ -12,6 +15,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ agencyId
   return Response.json({
     id: agencyResult.rows[0].id,
     name: agencyResult.rows[0].name,
+    billing_start_policy: agencyResult.rows[0].billing_start_policy ?? 'next_month',
     plans: plans.map(p => ({
       id: p.id,
       name: p.name,
@@ -25,8 +29,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ agencyId
 export async function POST(req: Request, { params }: { params: Promise<{ agencyId: string }> }) {
   const { agencyId } = await params;
 
-  const agencyResult = await db.query('SELECT id, name FROM agencies WHERE id = $1', [agencyId]);
+  const agencyResult = await db.query(
+    'SELECT id, name, billing_start_policy FROM agencies WHERE id = $1',
+    [agencyId]
+  );
   if (!agencyResult.rows[0]) return Response.json({ error: 'Agency not found' }, { status: 404 });
+  const billingPolicy: 'next_month' | 'prorated' =
+    agencyResult.rows[0].billing_start_policy ?? 'next_month';
 
   const body = await req.json();
   const { name, email, companyName, phone, planId } = body;
@@ -71,8 +80,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ agencyI
           agency_id: agencyId,
           start_date: startDate,
           billing_cycle: plan.billing_cycle,
+          billing_start_policy: billingPolicy,
         }).catch(err =>
           console.error('Failed to generate initial deliverables for onboarded client:', err)
+        );
+
+        // First invoice based on billing start policy
+        const { amount, dueDate } = calcFirstInvoice(Number(plan.price), startDate, billingPolicy);
+        await db.query(
+          `INSERT INTO invoices (agency_id, client_id, amount, status, due_date)
+           VALUES ($1, $2, $3, 'draft', $4)`,
+          [agencyId, client.id, amount, dueDate.toISOString()]
         );
       }
     }

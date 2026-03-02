@@ -12,7 +12,7 @@ import {
   addInvoiceItem,
   Plan,
 } from '@/lib/db-queries';
-import { generateDeliverablesForClientPlan } from '@/lib/generate-deliverables';
+import { generateDeliverablesForClientPlan, calcFirstInvoice } from '@/lib/generate-deliverables';
 import { SimpleClientForm } from '@/components/SimpleClientForm';
 import { redirect } from 'next/navigation';
 import { PageTransition } from '@/components/motion/page-transition';
@@ -53,46 +53,37 @@ async function handleCreateClient(formData: FormData) {
       companyName
     );
 
-    // Assign plan to client
-    const startDate = new Date();
-    await createClientPlan(client.id, planId, startDate);
+    // Get agency billing start policy
+    const billingPolicy = (agencies[0]?.billing_start_policy ?? 'next_month') as 'next_month' | 'prorated';
 
     // Get the plan (needed for invoice + immediate deliverable generation)
     const plan = await getPlanById(planId, agencyId);
-    if (!plan) {
-      throw new Error('Plan not found');
-    }
+    if (!plan) throw new Error('Plan not found');
 
-    // Immediately generate deliverables for the current billing period
-    // so a mid-month/mid-quarter join doesn't miss their first period
+    const startDate = new Date();
+    await createClientPlan(client.id, planId, startDate);
+
+    // Generate deliverables respecting the agency's billing start policy
     await generateDeliverablesForClientPlan({
       client_id: client.id,
       plan_id: plan.id,
       agency_id: agencyId,
       start_date: startDate,
       billing_cycle: plan.billing_cycle,
+      billing_start_policy: billingPolicy,
     }).catch((err) =>
       console.error('Failed to generate initial deliverables:', err)
     );
 
-    // Auto-generate first invoice
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 15); // Due in 15 days
+    // First invoice: amount + due date based on billing start policy
+    const { amount, dueDate } = calcFirstInvoice(Number(plan.price), startDate, billingPolicy);
+    const invoiceLabel =
+      billingPolicy === 'prorated'
+        ? `${plan.name} — Pro-rated (${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}–${dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`
+        : `${plan.name} — ${dueDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
 
-    const invoice = await createInvoice(
-      agencyId,
-      client.id,
-      Number(plan.price),
-      dueDate.toISOString()
-    );
-
-    // Add invoice item
-    await addInvoiceItem(
-      invoice.id,
-      `${plan.name} - Monthly Retainer`,
-      1,
-      Number(plan.price)
-    );
+    const invoice = await createInvoice(agencyId, client.id, amount, dueDate.toISOString());
+    await addInvoiceItem(invoice.id, invoiceLabel, 1, amount);
   } catch (error) {
     console.error('Failed to create client:', error);
     throw new Error(error instanceof Error ? error.message : 'Failed to create client');
