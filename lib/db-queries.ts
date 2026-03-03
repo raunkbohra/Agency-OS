@@ -1109,7 +1109,7 @@ export async function getDeliverableFiles(deliverableId: string): Promise<Delive
 
 export async function addDeliverableComment(data: {
   deliverableId: string;
-  userId: string;
+  userId: string | null;
   comment: string;
   isRevisionRequest?: boolean;
 }): Promise<DeliverableComment> {
@@ -1117,7 +1117,7 @@ export async function addDeliverableComment(data: {
     `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request)
      VALUES ($1, $2, $3, $4)
      RETURNING *`,
-    [data.deliverableId, data.userId, data.comment, data.isRevisionRequest ?? false]
+    [data.deliverableId, data.userId || null, data.comment, data.isRevisionRequest ?? false]
   );
   return result.rows[0];
 }

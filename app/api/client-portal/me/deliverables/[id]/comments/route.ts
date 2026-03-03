@@ -39,12 +39,12 @@ export async function POST(
 
     const clientName = clientResult.rows[0]?.name || 'Unknown Client';
 
-    // Add comment directly to database
+    // Add comment directly to database (clients don't have user_id entries)
     const result = await pool.query(
       `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request, created_at)
        VALUES ($1, $2, $3, $4, NOW())
        RETURNING id, user_id, comment, is_revision_request, created_at`,
-      [id, session.clientId, comment, false]
+      [id, null, comment, false]
     );
 
     const newComment = result.rows[0];

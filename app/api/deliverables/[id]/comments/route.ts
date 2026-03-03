@@ -23,7 +23,7 @@ export async function POST(
 
     const result = await addDeliverableComment({
       deliverableId: id,
-      userId: session.user.id,
+      userId: null as any,
       comment,
       isRevisionRequest,
     });
