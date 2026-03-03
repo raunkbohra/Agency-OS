@@ -139,13 +139,8 @@ export default function CareersPage() {
             Don't see your role? We're always looking for talented people. Send us a note at{' '}
             <a
               href="mailto:careers@agencyos.dev"
+              className="hover:underline"
               style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: '500' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.textDecoration = 'underline';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.textDecoration = 'none';
-              }}
             >
               careers@agencyos.dev
             </a>

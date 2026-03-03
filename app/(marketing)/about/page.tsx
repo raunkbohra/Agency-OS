@@ -140,19 +140,11 @@ export default function AboutPage() {
           </p>
           <a
             href="/auth/signup"
-            className="inline-block px-8 py-3 rounded-lg font-medium transition-all duration-200"
+            className="inline-block px-8 py-3 rounded-lg font-medium transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
             style={{
               background: 'var(--accent-blue)',
               color: 'white',
               textDecoration: 'none',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '0.9';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '1';
-              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             Get Started
