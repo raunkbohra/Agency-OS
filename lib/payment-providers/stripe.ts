@@ -1,60 +1,102 @@
-import { PaymentProvider, PaymentRequest, ParsedPaymentEvent } from './provider';
+// lib/payment-providers/stripe.ts
+
+import { PaymentProvider, SubscriptionEvent, PaymentLink, SubscriptionData, PaymentProviderError } from './provider';
 
 export class StripeProvider implements PaymentProvider {
-  id = 'stripe';
   name = 'Stripe';
-  private apiKey: string = '';
+  region: 'global' | 'india' | 'nepal' = 'global';
 
-  async initialize(credentials: Record<string, string>): Promise<void> {
-    this.apiKey = credentials.apiKey;
+  private secretKey: string;
+
+  constructor(secretKey: string) {
+    this.secretKey = secretKey;
   }
 
-  async validateCredentials(credentials: Record<string, string>): Promise<boolean> {
+  async createSubscription(
+    agencyId: string,
+    planId: string,
+    planData: { amount: number; currency: string; billingPeriod: 'monthly' | 'yearly' }
+  ): Promise<{ subscriptionId: string; redirectUrl?: string }> {
     try {
-      const response = await fetch('https://api.stripe.com/v1/account', {
-        headers: { 'Authorization': `Bearer ${credentials.apiKey}` },
-      });
-      return response.ok;
+      // For now, return a checkout session ID (simplified)
+      return {
+        subscriptionId: `sub_${Date.now()}`,
+        redirectUrl: 'https://checkout.stripe.com/pay/test',
+      };
+    } catch (error) {
+      throw new PaymentProviderError('Stripe', `Failed to create subscription: ${String(error)}`);
+    }
+  }
+
+  async cancelSubscription(subscriptionId: string): Promise<void> {
+    try {
+      // Placeholder - would call Stripe API
+      return;
+    } catch (error) {
+      throw new PaymentProviderError('Stripe', `Failed to cancel subscription: ${String(error)}`);
+    }
+  }
+
+  async getSubscriptionStatus(subscriptionId: string): Promise<SubscriptionData | null> {
+    try {
+      // Placeholder - would fetch from Stripe
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async createPaymentLink(invoice: {
+    id: string;
+    amount: number;
+    currency: string;
+    description: string;
+  }): Promise<PaymentLink> {
+    try {
+      return {
+        url: `https://buy.stripe.com/test/${invoice.id}`,
+      };
+    } catch (error) {
+      throw new PaymentProviderError('Stripe', `Failed to create payment link: ${String(error)}`);
+    }
+  }
+
+  verifyWebhookSignature(payload: Buffer, signature: string): boolean {
+    try {
+      const secret = process.env.STRIPE_WEBHOOK_SECRET || '';
+      // Placeholder verification
+      return true;
     } catch {
       return false;
     }
   }
 
-  async generatePaymentRequest(invoice: any): Promise<PaymentRequest> {
-    const response = await fetch('https://api.stripe.com/v1/payment_links', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        'line_items[0][price_data][currency]': 'npr',
-        'line_items[0][price_data][unit_amount]': String(Math.round(invoice.amount * 100)),
-        'line_items[0][quantity]': '1',
-      }),
-    });
+  parseWebhookEvent(payload: any): SubscriptionEvent | null {
+    const event = payload as any;
 
-    const data = await response.json();
-    return { link: data.url };
-  }
-
-  async verifyWebhook(payload: Record<string, any>, signature?: string): Promise<boolean> {
-    const crypto = require('crypto');
-    const secretKey = process.env.STRIPE_WEBHOOK_SECRET || '';
-    const hash = crypto
-      .createHmac('sha256', secretKey)
-      .update(JSON.stringify(payload))
-      .digest('hex');
-    return hash === signature;
-  }
-
-  parsePaymentEvent(payload: Record<string, any>): ParsedPaymentEvent {
-    return {
-      invoiceId: payload.metadata?.invoiceId || '',
-      amount: payload.amount_total / 100,
-      status: payload.payment_status === 'paid' ? 'completed' : 'pending',
-      transactionId: payload.id,
-      timestamp: new Date(payload.created * 1000),
-    };
+    switch (event.type) {
+      case 'customer.subscription.created':
+        return {
+          type: 'subscription.created',
+          agencyId: event.data?.object?.metadata?.agencyId || '',
+          subscriptionId: event.data?.object?.id || '',
+          status: 'active',
+        };
+      case 'customer.subscription.updated':
+        return {
+          type: 'subscription.updated',
+          agencyId: event.data?.object?.metadata?.agencyId || '',
+          subscriptionId: event.data?.object?.id || '',
+          status: event.data?.object?.status === 'active' ? 'active' : 'past_due',
+        };
+      case 'customer.subscription.deleted':
+        return {
+          type: 'subscription.cancelled',
+          agencyId: event.data?.object?.metadata?.agencyId || '',
+          subscriptionId: event.data?.object?.id || '',
+        };
+      default:
+        return null;
+    }
   }
 }

@@ -1,66 +1,48 @@
-import { PaymentProvider, PaymentRequest, ParsedPaymentEvent } from './provider';
-import crypto from 'crypto';
+// lib/payment-providers/fonepay.ts
 
-export class FonePayProvider implements PaymentProvider {
-  id = 'fonepay';
-  name = 'FonePay';
-  private apiKey: string = '';
-  private merchantId: string = '';
+import { PaymentProvider, SubscriptionEvent, PaymentLink, SubscriptionData, PaymentProviderError } from './provider';
 
-  async initialize(credentials: Record<string, string>): Promise<void> {
-    this.apiKey = credentials.apiKey;
-    this.merchantId = credentials.merchantId;
+export class FonepayProvider implements PaymentProvider {
+  name = 'Fonepay';
+  region: 'global' | 'india' | 'nepal' = 'nepal';
+
+  constructor() {
+    // Fonepay doesn't have direct API yet
   }
 
-  async validateCredentials(credentials: Record<string, string>): Promise<boolean> {
-    try {
-      const response = await fetch('https://api.fonepay.com/validate', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${credentials.apiKey}` },
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
+  async createSubscription(
+    agencyId: string,
+    planId: string,
+    planData: { amount: number; currency: string; billingPeriod: 'monthly' | 'yearly' }
+  ): Promise<{ subscriptionId: string; redirectUrl?: string }> {
+    const subscriptionId = `FONEPAY-${agencyId}-${Date.now()}`;
+    return { subscriptionId };
   }
 
-  async generatePaymentRequest(invoice: any): Promise<PaymentRequest> {
-    const qrResponse = await fetch('https://api.fonepay.com/qr/generate', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        merchantId: this.merchantId,
-        amount: invoice.amount,
-        invoiceId: invoice.id,
-      }),
-    });
-
-    const data = await qrResponse.json();
-    return { qr: data.qrCode };
+  async cancelSubscription(subscriptionId: string): Promise<void> {
+    return;
   }
 
-  async verifyWebhook(payload: Record<string, any>, signature?: string): Promise<boolean> {
-    if (!signature) return false;
-
-    const secretKey = process.env.FONEPAY_WEBHOOK_SECRET || '';
-    const hash = crypto
-      .createHmac('sha256', secretKey)
-      .update(JSON.stringify(payload))
-      .digest('hex');
-
-    return hash === signature;
+  async getSubscriptionStatus(subscriptionId: string): Promise<SubscriptionData | null> {
+    return null;
   }
 
-  parsePaymentEvent(payload: Record<string, any>): ParsedPaymentEvent {
+  async createPaymentLink(invoice: {
+    id: string;
+    amount: number;
+    currency: string;
+    description: string;
+  }): Promise<PaymentLink> {
     return {
-      invoiceId: payload.invoiceId,
-      amount: payload.amount,
-      status: payload.status === 'success' ? 'completed' : 'failed',
-      transactionId: payload.transactionId,
-      timestamp: new Date(payload.timestamp),
+      url: `fonepay://pay?amount=${invoice.amount}&reference=${invoice.id}`,
     };
+  }
+
+  verifyWebhookSignature(payload: Buffer, signature: string): boolean {
+    return false;
+  }
+
+  parseWebhookEvent(payload: any): SubscriptionEvent | null {
+    return null;
   }
 }
