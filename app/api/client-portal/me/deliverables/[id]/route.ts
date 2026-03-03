@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientSession } from '@/lib/client-auth';
-import { getDeliverableById, getDeliverableFiles, getDeliverableComments } from '@/lib/db-queries';
+import { getDeliverableFiles, getDeliverableComments } from '@/lib/db-queries';
+import { getPool } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -16,7 +17,7 @@ export async function GET(
 
     // Fetch deliverable - verify it belongs to this client
     // Using a direct query since getDeliverableById checks agency, not client
-    const pool = (await import('@/lib/db')).getPool();
+    const pool = getPool();
     const result = await pool.query(
       `SELECT * FROM deliverables WHERE id = $1 AND client_id = $2 LIMIT 1`,
       [id, session.clientId]

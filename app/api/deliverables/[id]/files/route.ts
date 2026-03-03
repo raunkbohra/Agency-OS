@@ -73,6 +73,7 @@ export async function POST(
     return Response.json({ error: 'Invalid content type' }, { status: 400 });
   } catch (error) {
     console.error('Error adding file:', error);
-    return Response.json({ error: 'Failed to add file' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: 'Failed to add file', details: errorMessage }, { status: 500 });
   }
 }
