@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
-import { addDeliverableComment, getDeliverableById, getClientById, getPool } from '@/lib/db-queries';
+import { addDeliverableComment, getDeliverableById, getClientById } from '@/lib/db-queries';
+import { getPool } from '@/lib/db';
 import { sendRevisionRequestNotification } from '@/lib/send-deliverable-notification';
 
 export async function POST(

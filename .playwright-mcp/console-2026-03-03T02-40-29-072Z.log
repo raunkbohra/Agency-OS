@@ -47,3 +47,9 @@
 [ 2258820ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
 [ 2263804ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
 [ 2263804ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2267348ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2267348ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2270696ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2270697ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2291673ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2291674ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
