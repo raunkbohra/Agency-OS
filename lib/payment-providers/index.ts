@@ -1,15 +1,18 @@
 import { PaymentProvider } from './provider';
 import { BankTransferProvider } from './bank-transfer';
-import { FonePayProvider } from './fonepay';
+import { FonepayProvider } from './fonepay';
 import { StripeProvider } from './stripe';
 import { RazorpayProvider } from './razorpay';
 import { EsewaProvider } from './esewa';
 
 const providers: Record<string, PaymentProvider> = {
   bank_transfer: new BankTransferProvider(),
-  fonepay: new FonePayProvider(),
-  stripe: new StripeProvider(),
-  razorpay: new RazorpayProvider(),
+  fonepay: new FonepayProvider(),
+  stripe: new StripeProvider(process.env.STRIPE_SECRET_KEY || ''),
+  razorpay: new RazorpayProvider(
+    process.env.RAZORPAY_KEY_ID || '',
+    process.env.RAZORPAY_KEY_SECRET || ''
+  ),
   esewa: new EsewaProvider(),
 };
 

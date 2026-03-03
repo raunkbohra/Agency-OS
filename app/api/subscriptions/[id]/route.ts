@@ -28,7 +28,7 @@ export async function DELETE(
                           subscription.razorpay_subscription_id ||
                           subscription.fonepay_order_id;
 
-    if (subscriptionId) {
+    if (subscriptionId && provider.cancelSubscription) {
       await provider.cancelSubscription(subscriptionId);
     }
 

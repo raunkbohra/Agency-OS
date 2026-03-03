@@ -16,6 +16,18 @@ export interface PaymentLink {
   expiresAt?: Date;
 }
 
+export interface PaymentRequest {
+  link: string;
+}
+
+export interface ParsedPaymentEvent {
+  invoiceId: string;
+  amount: number;
+  status: string;
+  transactionId: string;
+  timestamp: Date;
+}
+
 export interface SubscriptionData {
   id: string;
   agencyId: string;
@@ -28,31 +40,42 @@ export interface SubscriptionData {
 
 export interface PaymentProvider {
   name: string;
-  region: 'global' | 'india' | 'nepal';
+  id?: string;
+  region?: 'global' | 'india' | 'nepal';
 
-  // Subscriptions
-  createSubscription(
+  // Subscriptions (optional - for subscription-based providers)
+  createSubscription?(
     agencyId: string,
     planId: string,
     planData: { amount: number; currency: string; billingPeriod: 'monthly' | 'yearly' }
   ): Promise<{ subscriptionId: string; redirectUrl?: string }>;
 
-  cancelSubscription(subscriptionId: string): Promise<void>;
+  cancelSubscription?(subscriptionId: string): Promise<void>;
 
-  getSubscriptionStatus(subscriptionId: string): Promise<SubscriptionData | null>;
+  getSubscriptionStatus?(subscriptionId: string): Promise<SubscriptionData | null>;
 
-  // Client invoices
-  createPaymentLink(invoice: {
+  // Client invoices / Payment Requests
+  createPaymentLink?(invoice: {
     id: string;
     amount: number;
     currency: string;
     description: string;
   }): Promise<PaymentLink>;
 
-  // Webhooks
-  verifyWebhookSignature(payload: Buffer, signature: string): boolean;
+  generatePaymentRequest?(invoice: any): Promise<PaymentRequest>;
 
-  parseWebhookEvent(payload: any): SubscriptionEvent | null;
+  // Webhooks / Credentials
+  verifyWebhookSignature?(payload: Buffer, signature: string): boolean;
+
+  parseWebhookEvent?(payload: any): SubscriptionEvent | null;
+
+  verifyWebhook?(payload: Record<string, any>, signature?: string): Promise<boolean>;
+
+  parsePaymentEvent?(payload: Record<string, any>): ParsedPaymentEvent;
+
+  initialize?(credentials: Record<string, string>): Promise<void>;
+
+  validateCredentials?(credentials: Record<string, string>): Promise<boolean>;
 }
 
 export class PaymentProviderError extends Error {

@@ -3,6 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { detectRegionByIP } from '@/lib/geolocation';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||

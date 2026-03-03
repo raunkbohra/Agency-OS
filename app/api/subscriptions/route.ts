@@ -48,6 +48,10 @@ export async function POST(request: NextRequest) {
     const provider = getPaymentProvider(region);
 
     // Create subscription with provider
+    if (!provider.createSubscription) {
+      return NextResponse.json({ error: 'Provider does not support subscriptions' }, { status: 400 });
+    }
+
     const { subscriptionId, redirectUrl } = await provider.createSubscription(
       session.user.agencyId,
       plan.id,

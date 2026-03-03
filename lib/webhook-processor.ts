@@ -22,12 +22,17 @@ export async function processPaymentWebhook(
     }
 
     // Verify webhook signature
-    const verified = await provider.verifyWebhook(payload, signature);
-    if (!verified) {
-      return { success: false, message: 'Signature verification failed' };
+    if (provider.verifyWebhook) {
+      const verified = await provider.verifyWebhook(payload, signature);
+      if (!verified) {
+        return { success: false, message: 'Signature verification failed' };
+      }
     }
 
     // Parse payment event
+    if (!provider.parsePaymentEvent) {
+      return { success: false, message: 'Provider does not support payment events' };
+    }
     const event = provider.parsePaymentEvent(payload);
 
     // Find payment transaction
