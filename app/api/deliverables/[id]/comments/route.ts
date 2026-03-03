@@ -51,6 +51,7 @@ export async function POST(
     }
 
     // Get user name from database
+    const pool = getPool();
     const userResult = await pool.query(
       `SELECT name FROM users WHERE id = $1`,
       [session.user.id]

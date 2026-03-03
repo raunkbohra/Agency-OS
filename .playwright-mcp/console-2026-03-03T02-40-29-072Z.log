@@ -53,3 +53,12 @@
 [ 2270697ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
 [ 2291673ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
 [ 2291674ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2292066ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2292066ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2296407ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2296408ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2300160ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=hZSUCS5ZiTU0_u1aN3TDx' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/43abd_next_dist_client_a244959c._.js:10878
+[ 2306317ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2306318ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2314627ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2314628ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
