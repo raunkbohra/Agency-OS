@@ -1,0 +1,2 @@
+[      -1ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://example.com/test.pdf:0
+[      26ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://example.com/favicon.ico:0

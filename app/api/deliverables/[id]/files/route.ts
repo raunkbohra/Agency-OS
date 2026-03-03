@@ -15,8 +15,14 @@ export async function POST(
     const { id } = await params;
     const contentType = request.headers.get('content-type');
 
+    // Log session data for debugging
+    console.log('Session user ID:', session.user.id);
+    console.log('Session user agencyId:', session.user.agencyId);
+    console.log('Deliverable ID:', id);
+
     // Handle JSON body (URL input)
     if (contentType?.includes('application/json')) {
+      console.log('Processing JSON request for file upload');
       const body = await request.json();
       const { fileUrl, fileName } = body;
 
@@ -24,12 +30,15 @@ export async function POST(
         return Response.json({ error: 'fileUrl and fileName required' }, { status: 400 });
       }
 
+      console.log('Validating deliverable access');
       // Verify deliverable exists and user has access
       const deliverable = await getDeliverableById(id, session.user.agencyId);
       if (!deliverable) {
+        console.log('Deliverable not found or no access');
         return Response.json({ error: 'Deliverable not found' }, { status: 404 });
       }
 
+      console.log('Adding file to deliverable');
       const result = await addDeliverableFile({
         deliverableId: id,
         fileName,
@@ -37,6 +46,7 @@ export async function POST(
         uploadedBy: session.user.id,
       });
 
+      console.log('File added successfully');
       return Response.json(result);
     }
 
