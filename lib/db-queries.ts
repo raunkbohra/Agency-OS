@@ -2070,3 +2070,118 @@ export async function canUserEditDeliverable(
     return false;
   }
 }
+
+// ============================================================================
+// Subscription Database Queries
+// ============================================================================
+
+export async function getSubscriptionPlan(planId: string) {
+  const result = await db.query(
+    'SELECT * FROM subscription_plans WHERE id = $1',
+    [planId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function getSubscriptionPlanByTierAndRegion(
+  tier: 'free' | 'basic' | 'pro',
+  region: 'global' | 'india' | 'nepal',
+  billingPeriod: 'monthly' | 'yearly'
+) {
+  const result = await db.query(
+    'SELECT * FROM subscription_plans WHERE tier = $1 AND region = $2 AND billing_period = $3',
+    [tier, region, billingPeriod]
+  );
+  return result.rows[0] || null;
+}
+
+export async function getAllSubscriptionPlans(region: 'global' | 'india' | 'nepal') {
+  const result = await db.query(
+    'SELECT * FROM subscription_plans WHERE region = $1 ORDER BY tier, billing_period',
+    [region]
+  );
+  return result.rows;
+}
+
+export async function createAgencySubscription(
+  agencyId: string,
+  subscriptionPlanId: string,
+  provider: 'stripe' | 'razorpay' | 'fonepay',
+  providerId: string
+) {
+  const providerIdField =
+    provider === 'stripe'
+      ? 'stripe_subscription_id'
+      : provider === 'razorpay'
+      ? 'razorpay_subscription_id'
+      : 'fonepay_order_id';
+
+  const result = await db.query(
+    `INSERT INTO agency_subscriptions (agency_id, subscription_plan_id, provider, ${providerIdField}, status)
+     VALUES ($1, $2, $3, $4, 'active')
+     ON CONFLICT (agency_id) DO UPDATE SET
+       subscription_plan_id = $2, provider = $3, ${providerIdField} = $4, status = 'active'
+     RETURNING *`,
+    [agencyId, subscriptionPlanId, provider, providerId]
+  );
+  return result.rows[0];
+}
+
+export async function getAgencySubscription(agencyId: string) {
+  const result = await db.query(
+    `SELECT s.*, p.tier, p.region, p.billing_period, p.currency, p.amount_cents,
+            p.max_clients, p.max_plans, p.max_team_members, p.features
+     FROM agency_subscriptions s
+     JOIN subscription_plans p ON s.subscription_plan_id = p.id
+     WHERE s.agency_id = $1`,
+    [agencyId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function updateSubscriptionStatus(
+  agencyId: string,
+  status: 'active' | 'past_due' | 'paused' | 'cancelled'
+) {
+  const result = await db.query(
+    'UPDATE agency_subscriptions SET status = $1, updated_at = NOW() WHERE agency_id = $2 RETURNING *',
+    [status, agencyId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function recordSubscriptionChange(
+  agencyId: string,
+  fromTier: string | null,
+  toTier: string,
+  changeType: 'upgrade' | 'downgrade' | 'renewal' | 'cancellation'
+) {
+  return db.query(
+    'INSERT INTO subscription_change_history (agency_id, from_tier, to_tier, change_type, effective_date) VALUES ($1, $2, $3, $4, NOW())',
+    [agencyId, fromTier, toTier, changeType]
+  );
+}
+
+export async function countAgencyClients(agencyId: string) {
+  const result = await db.query(
+    'SELECT COUNT(*) as count FROM clients WHERE agency_id = $1',
+    [agencyId]
+  );
+  return parseInt(result.rows[0].count, 10);
+}
+
+export async function countAgencyPlans(agencyId: string) {
+  const result = await db.query(
+    'SELECT COUNT(*) as count FROM plans WHERE agency_id = $1',
+    [agencyId]
+  );
+  return parseInt(result.rows[0].count, 10);
+}
+
+export async function countAgencyTeamMembers(agencyId: string) {
+  const result = await db.query(
+    'SELECT COUNT(DISTINCT user_id) as count FROM user_roles WHERE agency_id = $1',
+    [agencyId]
+  );
+  return parseInt(result.rows[0].count, 10);
+}
