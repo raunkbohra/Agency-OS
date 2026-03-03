@@ -71,10 +71,17 @@ function CellValue({ value }: { value: string | boolean }) {
   return <X size={16} style={{ color: 'var(--text-quaternary)' }} />;
 }
 
-// Mobile: card-per-tier view
-function MobileCards() {
-  const { pricing, loading, billing, setBilling, prices, symbol } = usePricing();
+interface PricingState {
+  pricing: import('@/hooks/use-pricing').PricingData | null;
+  loading: boolean;
+  billing: import('@/hooks/use-pricing').BillingPeriod;
+  setBilling: (period: import('@/hooks/use-pricing').BillingPeriod) => void;
+  prices: import('@/hooks/use-pricing').TierPrices;
+  symbol: string;
+}
 
+// Mobile: card-per-tier view
+function MobileCards({ pricing, loading, billing, setBilling, prices, symbol }: PricingState) {
   if (loading) return null;
 
   return (
@@ -161,9 +168,7 @@ function MobileCards() {
 }
 
 // Desktop: full comparison table
-function DesktopTable() {
-  const { pricing, loading, billing, setBilling, prices, symbol } = usePricing();
-
+function DesktopTable({ pricing, loading, billing, setBilling, prices, symbol }: PricingState) {
   if (loading) return null;
 
   return (
@@ -178,7 +183,7 @@ function DesktopTable() {
           backdropFilter: 'blur(10px)',
         }}
       >
-        {/* Sticky header with tier names + prices + CTAs */}
+        {/* Sticky header — top-16 (64px) matches navbar height in navbar.tsx */}
         <div
           className="sticky top-16 z-20 grid grid-cols-4 gap-0"
           style={{
@@ -279,7 +284,7 @@ function DesktopTable() {
                 className="grid grid-cols-4 gap-0 items-center"
                 style={{
                   borderBottom: '1px solid var(--landing-card-border)',
-                  background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
+                  background: idx % 2 === 0 ? 'transparent' : 'rgba(107, 126, 147, 0.02)',
                 }}
               >
                 <div className="p-4">
@@ -309,10 +314,12 @@ function DesktopTable() {
 }
 
 export function PricingTable() {
+  const pricingState = usePricing();
+
   return (
     <>
-      <MobileCards />
-      <DesktopTable />
+      <MobileCards {...pricingState} />
+      <DesktopTable {...pricingState} />
     </>
   );
 }

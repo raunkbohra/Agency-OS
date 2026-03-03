@@ -49,17 +49,21 @@ export function usePricing() {
   useEffect(() => {
     async function fetchLocation() {
       try {
+        const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
         const cached = localStorage.getItem('userLocation');
         if (cached) {
-          setPricing(JSON.parse(cached));
-          setLoading(false);
-          return;
+          const parsed = JSON.parse(cached);
+          if (parsed.timestamp && Date.now() - parsed.timestamp < CACHE_TTL_MS) {
+            setPricing(parsed.data);
+            setLoading(false);
+            return;
+          }
         }
 
         const response = await fetch('/api/user-location');
         const data = await response.json();
         setPricing(data);
-        localStorage.setItem('userLocation', JSON.stringify(data));
+        localStorage.setItem('userLocation', JSON.stringify({ data, timestamp: Date.now() }));
       } catch (error) {
         console.error('Failed to detect location:', error);
         setPricing({ country: 'Unknown', region: 'global', currency: 'USD' });
