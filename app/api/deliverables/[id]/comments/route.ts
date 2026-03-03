@@ -14,7 +14,7 @@ export async function POST(
   }
 
   try {
-    const { comment, isRevisionRequest } = await request.json();
+    const { comment, isRevisionRequest, itemId } = await request.json();
     const { id } = await params;
 
     if (!comment || !comment.trim()) {
@@ -26,6 +26,7 @@ export async function POST(
       userId: null as any,
       comment,
       isRevisionRequest,
+      itemId: itemId || undefined,
     });
 
     // Send email notification if this is a revision request
@@ -65,6 +66,7 @@ export async function POST(
       user_name: userName,
       comment: result.comment,
       is_revision_request: result.is_revision_request,
+      item_id: result.item_id || null,
       created_at: result.created_at,
     });
   } catch (error) {

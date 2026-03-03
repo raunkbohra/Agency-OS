@@ -14,7 +14,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const { comment } = await request.json();
+    const { comment, itemId } = await request.json();
 
     if (!comment || !comment.trim()) {
       return NextResponse.json({ error: 'Comment is required' }, { status: 400 });
@@ -41,10 +41,10 @@ export async function POST(
 
     // Add comment directly to database (clients don't have user_id entries)
     const result = await pool.query(
-      `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request, created_at)
-       VALUES ($1, $2, $3, $4, NOW())
-       RETURNING id, user_id, comment, is_revision_request, created_at`,
-      [id, null, comment, false]
+      `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request, item_id, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())
+       RETURNING id, user_id, comment, is_revision_request, item_id, created_at`,
+      [id, null, comment, false, itemId || null]
     );
 
     const newComment = result.rows[0];
@@ -55,6 +55,7 @@ export async function POST(
       author_name: clientName,
       comment_text: newComment.comment,
       is_revision_request: newComment.is_revision_request,
+      item_id: newComment.item_id || null,
       created_at: newComment.created_at,
     });
   } catch (error) {

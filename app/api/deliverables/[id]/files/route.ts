@@ -91,6 +91,7 @@ export async function POST(
 
       const file = formData.get('file') as File;
       const fileName = formData.get('fileName') as string;
+      const itemId = formData.get('itemId') as string | null;
 
       if (!file) {
         return Response.json({ error: 'No file provided' }, { status: 400 });
@@ -117,6 +118,7 @@ export async function POST(
           fileName: fileName || file.name,
           fileUrl,
           uploadedBy: null as any,
+          itemId: itemId || undefined,
         });
       } catch (insertErr) {
         console.error('Database error in addDeliverableFile:', insertErr);

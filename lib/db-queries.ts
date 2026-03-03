@@ -969,6 +969,7 @@ export interface DeliverableComment {
   user_name?: string;
   comment: string;
   is_revision_request: boolean;
+  item_id?: string;
   created_at: Date;
 }
 
@@ -1145,12 +1146,13 @@ export async function addDeliverableComment(data: {
   userId: string | null;
   comment: string;
   isRevisionRequest?: boolean;
+  itemId?: string;
 }): Promise<DeliverableComment> {
   const result = await db.query(
-    `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO deliverable_comments (deliverable_id, user_id, comment, is_revision_request, item_id)
+     VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
-    [data.deliverableId, data.userId || null, data.comment, data.isRevisionRequest ?? false]
+    [data.deliverableId, data.userId || null, data.comment, data.isRevisionRequest ?? false, data.itemId ?? null]
   );
   return result.rows[0];
 }
