@@ -1,6 +1,13 @@
 import { auth } from '@/lib/auth';
 import { addDeliverableFile, getDeliverableById } from '@/lib/db-queries';
 
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  return Response.json({ message: 'Files endpoint is working' });
+}
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -19,6 +26,7 @@ export async function POST(
     console.log('Session user ID:', session.user.id);
     console.log('Session user agencyId:', session.user.agencyId);
     console.log('Deliverable ID:', id);
+    console.log('Content-Type:', contentType);
 
     // Handle JSON body (URL input)
     if (contentType?.includes('application/json')) {
