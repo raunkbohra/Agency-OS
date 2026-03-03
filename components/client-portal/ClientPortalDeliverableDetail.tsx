@@ -424,8 +424,8 @@ export default function ClientPortalDeliverableDetail({
                 >
                   {/* Item row */}
                   <div
-                    className="px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-colors"
-                    style={{ background: !isExpanded && !isDone ? 'transparent' : isDone ? 'rgba(0,0,0,0.02)' : 'transparent' }}
+                    className="px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.03)]"
+                    style={{ background: isDone ? 'rgba(0,0,0,0.02)' : 'transparent' }}
                     onClick={() => toggleItemExpanded(item.id)}
                   >
                     {/* Top line: chevron + checkbox + title */}

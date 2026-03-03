@@ -582,23 +582,23 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
                     isExpanded ? 'bg-bg-tertiary/30 ring-1 ring-border-default mb-2' : ''
                   }`}
                 >
-                  {/* Item row — wraps to two lines on mobile */}
-                  <div className={`px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg transition-colors group ${
+                  {/* Item row */}
+                  <div className={`px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg transition-colors group cursor-pointer ${
                     !isExpanded ? 'hover:bg-bg-hover' : ''
-                  }`}>
-                    {/* Top line: chevron + checkbox + title */}
-                    <div className="flex items-center gap-2 sm:gap-2.5">
-                      <button
-                        onClick={() => toggleItemExpanded(item.id)}
-                        className="p-1 sm:p-0.5 rounded flex-shrink-0 text-text-quaternary hover:text-text-secondary transition-colors"
-                      >
-                        <ChevronRight className={`h-4 w-4 sm:h-3.5 sm:w-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
-                      </button>
+                  }`}
+                    onClick={() => toggleItemExpanded(item.id)}
+                  >
+                    {/* Single line: chevron + checkbox + title + controls */}
+                    <div className="flex items-center gap-1.5 sm:gap-2.5">
+                      <span className="flex-shrink-0 text-text-quaternary">
+                        <ChevronRight className={`h-3.5 w-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                      </span>
 
                       <input
                         type="checkbox"
                         checked={isDone}
                         onChange={() => handleItemStatusChange(item.id, isDone ? 'draft' : 'done')}
+                        onClick={(e) => e.stopPropagation()}
                         className="rounded flex-shrink-0 border-border-hover h-4 w-4"
                       />
 
@@ -612,22 +612,24 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
                             if (e.key === 'Escape') setEditingItemId(null);
                           }}
                           onBlur={() => handleRenameItem(item.id)}
+                          onClick={(e) => e.stopPropagation()}
                           autoFocus
                           className="flex-1 text-sm px-2 py-0.5 rounded bg-bg-tertiary border border-border-active text-text-primary focus:outline-none min-w-0"
                         />
                       ) : (
                         <span
-                          onDoubleClick={() => { setEditingItemId(item.id); setEditingItemTitle(item.title); }}
+                          onDoubleClick={(e) => { e.stopPropagation(); setEditingItemId(item.id); setEditingItemTitle(item.title); }}
                           className={`flex-1 text-sm cursor-default select-none truncate min-w-0 ${isDone ? 'text-text-tertiary line-through' : 'text-text-primary'}`}
                         >
                           {item.title}
                         </span>
                       )}
 
-                      {/* Desktop-only inline controls */}
-                      <div className="hidden sm:flex items-center gap-1.5">
+                      {/* Inline controls — always visible */}
+                      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                        {/* Indicators — hidden on mobile to save space */}
                         {(fileCount > 0 || commentCount > 0) && (
-                          <div className="flex items-center gap-1.5 mr-1">
+                          <div className="hidden sm:flex items-center gap-1.5 mr-0.5">
                             {fileCount > 0 && (
                               <span className="flex items-center gap-0.5 text-[10px] text-text-quaternary">
                                 <Paperclip className="h-2.5 w-2.5" />{fileCount}
@@ -644,7 +646,7 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
                         {editingItemId !== item.id && (
                           <button
                             onClick={() => { setEditingItemId(item.id); setEditingItemTitle(item.title); }}
-                            className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-bg-hover text-text-tertiary transition-all"
+                            className="p-1 rounded sm:opacity-0 sm:group-hover:opacity-100 hover:bg-bg-hover text-text-tertiary transition-all"
                           >
                             <Pencil className="h-3 w-3" />
                           </button>
@@ -653,90 +655,26 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
                         <select
                           value={item.status}
                           onChange={(e) => handleItemStatusChange(item.id, e.target.value)}
-                          className={`text-[10px] font-semibold px-2 py-0.5 rounded border-0 cursor-pointer ${ITEM_STATUS_STYLES[item.status] || 'bg-bg-hover text-text-primary'}`}
+                          className={`text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded border-0 cursor-pointer ${ITEM_STATUS_STYLES[item.status] || 'bg-bg-hover text-text-primary'}`}
                         >
                           <option value="draft">Draft</option>
-                          <option value="in_review">In Review</option>
+                          <option value="in_review">Review</option>
                           <option value="approved">Approved</option>
-                          <option value="changes_requested">Changes Requested</option>
+                          <option value="changes_requested">Changes</option>
                           <option value="done">Done</option>
                         </select>
 
                         {confirmDeleteItemId === item.id ? (
-                          <div className="flex items-center gap-1 opacity-100">
-                            <button
-                              onClick={() => handleDeleteItem(item.id)}
-                              className="text-[10px] font-medium px-2 py-0.5 rounded bg-accent-red/15 text-accent-red hover:bg-accent-red/25 transition-colors"
-                            >
-                              Delete
-                            </button>
-                            <button
-                              onClick={() => setConfirmDeleteItemId(null)}
-                              className="text-[10px] font-medium px-2 py-0.5 rounded bg-bg-hover text-text-tertiary hover:text-text-secondary transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => handleDeleteItem(item.id)}
-                            className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-accent-red/10 text-text-tertiary hover:text-accent-red transition-all"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Mobile-only second line: indicators + status + actions */}
-                    <div className="flex sm:hidden items-center gap-2 mt-1.5 ml-[calc(1rem+0.5rem+1rem+0.5rem)]">
-                      {(fileCount > 0 || commentCount > 0) && (
-                        <div className="flex items-center gap-1.5">
-                          {fileCount > 0 && (
-                            <span className="flex items-center gap-0.5 text-[10px] text-text-quaternary">
-                              <Paperclip className="h-2.5 w-2.5" />{fileCount}
-                            </span>
-                          )}
-                          {commentCount > 0 && (
-                            <span className="flex items-center gap-0.5 text-[10px] text-text-quaternary">
-                              <MessageSquare className="h-2.5 w-2.5" />{commentCount}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      <select
-                        value={item.status}
-                        onChange={(e) => handleItemStatusChange(item.id, e.target.value)}
-                        className={`text-[10px] font-semibold px-2 py-0.5 rounded border-0 cursor-pointer ${ITEM_STATUS_STYLES[item.status] || 'bg-bg-hover text-text-primary'}`}
-                      >
-                        <option value="draft">Draft</option>
-                        <option value="in_review">In Review</option>
-                        <option value="approved">Approved</option>
-                        <option value="changes_requested">Changes Requested</option>
-                        <option value="done">Done</option>
-                      </select>
-
-                      <div className="flex items-center gap-0.5 ml-auto">
-                        {editingItemId !== item.id && (
-                          <button
-                            onClick={() => { setEditingItemId(item.id); setEditingItemTitle(item.title); }}
-                            className="p-1.5 rounded hover:bg-bg-hover text-text-tertiary transition-all"
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </button>
-                        )}
-                        {confirmDeleteItemId === item.id ? (
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleDeleteItem(item.id)}
-                              className="text-[10px] font-medium px-2 py-0.5 rounded bg-accent-red/15 text-accent-red hover:bg-accent-red/25 transition-colors"
+                              className="text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded bg-accent-red/15 text-accent-red hover:bg-accent-red/25 transition-colors"
                             >
                               Delete
                             </button>
                             <button
                               onClick={() => setConfirmDeleteItemId(null)}
-                              className="text-[10px] font-medium px-2 py-0.5 rounded bg-bg-hover text-text-tertiary hover:text-text-secondary transition-colors"
+                              className="text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded bg-bg-hover text-text-tertiary hover:text-text-secondary transition-colors"
                             >
                               Cancel
                             </button>
@@ -744,7 +682,7 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
                         ) : (
                           <button
                             onClick={() => handleDeleteItem(item.id)}
-                            className="p-1.5 rounded hover:bg-accent-red/10 text-text-tertiary hover:text-accent-red transition-all"
+                            className="p-1 rounded sm:opacity-0 sm:group-hover:opacity-100 hover:bg-accent-red/10 text-text-tertiary hover:text-accent-red transition-all"
                           >
                             <Trash2 className="h-3 w-3" />
                           </button>
