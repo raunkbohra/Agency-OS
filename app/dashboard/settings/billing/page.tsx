@@ -83,7 +83,7 @@ export default function BillingPage() {
               </p>
               <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem' }}>
                 <li>Clients: {subscription.max_clients || '∞'}</li>
-                <li>Projects: {subscription.max_plans || '∞'}</li>
+                <li>Plans: {subscription.max_plans || '∞'}</li>
                 <li>Team Members: {subscription.max_team_members || '∞'}</li>
               </ul>
             </>
@@ -131,7 +131,7 @@ export default function BillingPage() {
             Upgrade Your Plan
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-            Unlock more clients, projects, and team members with a paid plan.
+            Unlock more clients, plans, and team members with a paid plan.
           </p>
           <a
             href="/pricing"

@@ -67,13 +67,13 @@ export function Pricing() {
       tier: 'basic',
       monthlyPrice: prices.basic.monthly,
       yearlyPrice: prices.basic.yearly,
-      features: ['15 clients', '50 projects', '5 team members', 'Invoicing', 'Basic reporting'],
+      features: ['15 clients', '50 plans', '5 team members', 'Invoicing', 'Basic reporting'],
     },
     {
       tier: 'pro',
       monthlyPrice: prices.pro.monthly,
       yearlyPrice: prices.pro.yearly,
-      features: ['Unlimited clients', 'Unlimited projects', 'Unlimited team members', 'Contracts', 'Advanced reporting', 'API access', 'Priority support'],
+      features: ['Unlimited clients', 'Unlimited plans', 'Unlimited team members', 'Contracts', 'Advanced reporting', 'API access', 'Priority support'],
     },
   ];
 
