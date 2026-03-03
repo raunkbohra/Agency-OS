@@ -13,7 +13,7 @@ interface TeamMember {
   isOwner: boolean;
 }
 
-const AVAILABLE_ROLES = ['manager', 'analyst', 'admin', 'member'];
+const AVAILABLE_ROLES = ['Designer', 'Developer', 'Project Manager', 'Account Manager'];
 
 export default function TeamManagement() {
   const router = useRouter();
@@ -24,7 +24,7 @@ export default function TeamManagement() {
 
   // Invite form state
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRoles, setInviteRoles] = useState<string[]>(['member']);
+  const [inviteRoles, setInviteRoles] = useState<string[]>([]);
   const [inviting, setInviting] = useState(false);
 
   // Edit modal state
@@ -83,7 +83,7 @@ export default function TeamManagement() {
 
       setSuccess(`Invite sent to ${inviteEmail}`);
       setInviteEmail('');
-      setInviteRoles(['member']);
+      setInviteRoles([]);
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);

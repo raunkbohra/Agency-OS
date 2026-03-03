@@ -1737,12 +1737,12 @@ export async function createAgencyInvite(
        ON CONFLICT (agency_id, email) DO UPDATE
        SET roles = $3, token = $4, accepted = false, expires_at = NOW() + INTERVAL '7 days'
        RETURNING *`,
-      [agencyId, email, JSON.stringify(roles), token]
+      [agencyId, email, roles, token]
     );
     const invite = result.rows[0];
     return {
       ...invite,
-      roles: typeof invite.roles === 'string' ? JSON.parse(invite.roles) : invite.roles,
+      roles: Array.isArray(invite.roles) ? invite.roles : [],
     };
   } catch (err) {
     console.error('Failed to create agency invite:', err);
@@ -1763,7 +1763,7 @@ export async function getAgencyInviteByToken(token: string): Promise<AgencyInvit
     const invite = result.rows[0];
     return {
       ...invite,
-      roles: typeof invite.roles === 'string' ? JSON.parse(invite.roles) : invite.roles,
+      roles: Array.isArray(invite.roles) ? invite.roles : [],
     };
   } catch (err) {
     console.error('Failed to get agency invite:', err);
@@ -1797,7 +1797,7 @@ export async function getAgencyInvites(agencyId: string): Promise<AgencyInvite[]
     );
     return result.rows.map((invite: any) => ({
       ...invite,
-      roles: typeof invite.roles === 'string' ? JSON.parse(invite.roles) : invite.roles,
+      roles: Array.isArray(invite.roles) ? invite.roles : [],
     }));
   } catch (err) {
     console.error('Failed to get agency invites:', err);
