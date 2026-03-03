@@ -73,8 +73,12 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
       });
 
       if (res.ok) {
-        router.refresh();
+        const newFile = await res.json();
+        setFiles([newFile, ...files]);
         e.target.value = '';
+      } else {
+        const errorData = await res.json();
+        console.error('File upload failed:', errorData);
       }
     } catch (error) {
       console.error('File upload failed:', error);
@@ -99,8 +103,8 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
       const data = await res.json();
 
       if (res.ok) {
+        setFiles([data, ...files]);
         setMediaUrl('');
-        router.refresh();
       } else {
         console.error('API Error:', {
           status: res.status,
@@ -154,9 +158,13 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
         <div className="space-y-3 mb-5 pb-5 border-b border-border-default">
           {/* File Upload */}
           <div className="flex items-center gap-2">
-            <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent-blue/10 text-accent-blue cursor-pointer hover:bg-accent-blue/20 transition-colors text-sm font-medium">
+            <label className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors text-sm font-medium ${
+              uploadingFile
+                ? 'bg-accent-blue/5 text-text-tertiary cursor-not-allowed'
+                : 'bg-accent-blue/10 text-accent-blue hover:bg-accent-blue/20'
+            }`}>
               <Upload className="h-4 w-4" />
-              Upload File
+              {uploadingFile ? 'Uploading...' : 'Upload File'}
               <input
                 type="file"
                 onChange={handleFileUpload}
@@ -164,7 +172,6 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
                 className="hidden"
               />
             </label>
-            {uploadingFile && <span className="text-xs text-text-tertiary">Uploading...</span>}
           </div>
 
           {/* Media URL Input */}
