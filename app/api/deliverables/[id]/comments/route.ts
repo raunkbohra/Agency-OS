@@ -16,6 +16,10 @@ export async function POST(
     const { comment, isRevisionRequest } = await request.json();
     const { id } = await params;
 
+    if (!comment || !comment.trim()) {
+      return Response.json({ error: 'Comment is required' }, { status: 400 });
+    }
+
     const result = await addDeliverableComment({
       deliverableId: id,
       userId: session.user.id,
@@ -45,7 +49,15 @@ export async function POST(
       }
     }
 
-    return Response.json(result);
+    // Return formatted response with user_name
+    return Response.json({
+      id: result.id,
+      user_id: result.user_id,
+      user_name: session.user?.name || 'Unknown User',
+      comment: result.comment,
+      is_revision_request: result.is_revision_request,
+      created_at: result.created_at,
+    });
   } catch (error) {
     console.error('Error adding comment:', error);
     return Response.json({ error: 'Failed to add comment' }, { status: 500 });

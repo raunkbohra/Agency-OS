@@ -48,6 +48,8 @@ export default function ClientPortalDeliverableDetail({
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [newComment, setNewComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,6 +100,34 @@ export default function ClientPortalDeliverableDetail({
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    setSubmittingComment(true);
+    try {
+      const res = await fetch(`/api/client-portal/me/deliverables/${deliverableId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment: newComment }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setComments([data, ...comments]);
+        setNewComment('');
+      } else {
+        console.error('Failed to add comment:', data);
+        alert('Failed to add comment. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Error adding comment. Please try again.');
+    } finally {
+      setSubmittingComment(false);
+    }
   };
 
   if (loading) {
@@ -308,6 +338,46 @@ export default function ClientPortalDeliverableDetail({
           </h2>
         </div>
 
+        {/* Add Comment Form */}
+        <div className="mb-6 pb-4 border-b" style={{ borderColor: 'var(--border-default)' }}>
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              marginBottom: '0.75rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '0.5rem',
+              color: 'var(--text-primary)',
+              fontSize: '0.875rem',
+              resize: 'vertical',
+              fontFamily: 'inherit',
+            }}
+            rows={3}
+          />
+          <button
+            onClick={handleAddComment}
+            disabled={submittingComment || !newComment.trim()}
+            style={{
+              padding: '0.5rem 1rem',
+              background: newComment.trim() ? 'var(--accent-blue)' : 'var(--text-tertiary)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: newComment.trim() ? 'pointer' : 'not-allowed',
+              opacity: submittingComment ? 0.7 : 1,
+            }}
+          >
+            {submittingComment ? 'Posting...' : 'Post Comment'}
+          </button>
+        </div>
+
+        {/* Display Comments */}
         {comments.length === 0 ? (
           <p style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
             No comments yet

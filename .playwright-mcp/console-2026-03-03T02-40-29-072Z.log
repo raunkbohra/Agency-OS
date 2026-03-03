@@ -17,3 +17,23 @@
 [  250292ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/1899bf44-8273-4c49-9008-df463dfc515c/files:0
 [  539787ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/files:0
 [  541800ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/files:0
+[ 2053931ms] [WARNING] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:2297
+[ 2120203ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2162136ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2162137ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2187459ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2187460ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2188331ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2188331ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2192791ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2192792ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2193216ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2193216ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2201666ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2201666ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2204970ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2204971ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2207912ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2207913ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2218034ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2218035ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127

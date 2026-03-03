@@ -45,16 +45,26 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
   };
 
   const handleAddComment = async () => {
-    const res = await fetch(`/api/deliverables/${deliverableId}/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ comment: newComment, isRevisionRequest }),
-    });
+    if (!newComment.trim()) return;
 
-    if (res.ok) {
-      setNewComment('');
-      setIsRevisionRequest(false);
-      router.refresh();
+    try {
+      const res = await fetch(`/api/deliverables/${deliverableId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment: newComment, isRevisionRequest }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setComments([data, ...comments]);
+        setNewComment('');
+        setIsRevisionRequest(false);
+      } else {
+        console.error('Failed to add comment:', data);
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
     }
   };
 
