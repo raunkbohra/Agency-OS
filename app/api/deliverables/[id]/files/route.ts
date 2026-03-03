@@ -22,12 +22,23 @@ export async function POST(
     const { id } = await params;
     const contentType = request.headers.get('content-type');
 
+    // Log session info for debugging
+    console.log('[FILES API] Session info:', {
+      userId: session.user.id,
+      userAgencyId: session.user.agencyId,
+      deliverableId: id,
+      contentType
+    });
+
     // Handle JSON body (URL input)
     if (contentType?.includes('application/json')) {
+      console.log('[FILES API] Processing JSON request');
       let body: any;
       try {
         body = await request.json();
+        console.log('[FILES API] Body parsed:', { fileUrl: body.fileUrl, fileName: body.fileName });
       } catch (parseErr) {
+        console.error('[FILES API] JSON parse error:', parseErr);
         return Response.json({ error: 'Invalid JSON in request body' }, { status: 400 });
       }
 
@@ -39,10 +50,12 @@ export async function POST(
 
       let deliverable: any;
       try {
+        console.log('[FILES API] Calling getDeliverableById with:', { id, agencyId: session.user.agencyId });
         // Verify deliverable exists and user has access
         deliverable = await getDeliverableById(id, session.user.agencyId);
+        console.log('[FILES API] Got deliverable:', !!deliverable);
       } catch (dbErr) {
-        console.error('Database error in getDeliverableById:', dbErr);
+        console.error('[FILES API] Database error in getDeliverableById:', dbErr);
         return Response.json({ error: 'Database error', details: String(dbErr) }, { status: 500 });
       }
 
