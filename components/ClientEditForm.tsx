@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Client } from '@/lib/db-queries';
 import { Edit2, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ClientEditFormProps {
   client: Client;
@@ -12,6 +14,7 @@ interface ClientEditFormProps {
 
 export default function ClientEditForm({ client, agencyId }: ClientEditFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,13 +52,16 @@ export default function ClientEditForm({ client, agencyId }: ClientEditFormProps
       }
 
       setSuccess(true);
+      toast({ title: 'Client updated!' });
       const t = setTimeout(() => {
         setIsOpen(false);
         router.refresh();
-      }, 1000);
+      }, 1500);
       return () => clearTimeout(t);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update client');
+      const message = err instanceof Error ? err.message : 'Failed to update client';
+      setError(message);
+      toast({ title: message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -183,13 +189,14 @@ export default function ClientEditForm({ client, agencyId }: ClientEditFormProps
                 >
                   Cancel
                 </button>
-                <button
+                <Button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-accent-blue rounded-lg hover:bg-accent-blue/90 transition-colors disabled:opacity-50"
+                  loading={isSubmitting}
+                  success={success}
+                  className="flex-1"
                 >
-                  {isSubmitting ? 'Saving...' : 'Save Changes'}
-                </button>
+                  Save Changes
+                </Button>
               </div>
             </form>
           </div>

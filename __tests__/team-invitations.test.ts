@@ -48,7 +48,7 @@ describe('Team Invitations Feature', () => {
       expect(db.query).toHaveBeenCalledTimes(1);
       expect(db.query).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO agency_invites'),
-        [testAgencyId, email, JSON.stringify(roles), inviteToken]
+        [testAgencyId, email, roles, inviteToken]
       );
     });
 

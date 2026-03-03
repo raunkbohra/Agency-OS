@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from 'react';
 import { Plan } from '@/lib/db-queries';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 const BILLING_OPTIONS = [
   {
@@ -22,8 +24,10 @@ interface SimpleClientFormProps {
 }
 
 export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [billingPolicy, setBillingPolicy] = useState<'next_month' | 'prorated'>('next_month');
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -34,8 +38,13 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
     try {
       const formData = new FormData(e.currentTarget);
       await action(formData);
+      setSuccess(true);
+      toast({ title: 'Client created!' });
+      setTimeout(() => setSuccess(false), 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const message = err instanceof Error ? err.message : 'An error occurred';
+      setError(message);
+      toast({ title: message, variant: 'destructive' });
       setIsSubmitting(false);
     }
   }
@@ -158,13 +167,15 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
         </div>
       </div>
 
-      <button
+      <Button
         type="submit"
-        disabled={isSubmitting || plans.length === 0}
-        className="w-full bg-accent-blue text-white py-2 px-4 rounded-md font-medium hover:bg-accent-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        disabled={plans.length === 0}
+        loading={isSubmitting}
+        success={success}
+        className="w-full"
       >
-        {isSubmitting ? 'Creating Client...' : 'Create Client'}
-      </button>
+        Create Client
+      </Button>
     </form>
   );
 }

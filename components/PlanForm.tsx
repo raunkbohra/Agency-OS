@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from 'react';
 import { Plan } from '@/lib/db-queries';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface PlanFormProps {
   onSubmit: (data: {
@@ -21,6 +23,8 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
   const [description, setDescription] = useState(initialData?.description || '');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const { toast } = useToast();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,8 +49,13 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
         billingCycle,
         description: description.trim() || undefined,
       });
+      setSuccess(true);
+      toast({ title: 'Plan saved!' });
+      setTimeout(() => setSuccess(false), 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const message = err instanceof Error ? err.message : 'An error occurred';
+      setError(message);
+      toast({ title: message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -124,13 +133,14 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
         />
       </div>
 
-      <button
+      <Button
         type="submit"
-        disabled={isSubmitting || isLoading}
-        className="w-full bg-accent-blue text-white py-2 px-4 rounded-md font-medium hover:bg-accent-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        loading={isSubmitting || isLoading}
+        success={success}
+        className="w-full"
       >
-        {isSubmitting || isLoading ? 'Saving...' : 'Save Plan'}
-      </button>
+        Save Plan
+      </Button>
     </form>
   );
 }

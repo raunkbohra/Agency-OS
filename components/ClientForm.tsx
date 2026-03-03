@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from 'react';
 import { Client, Plan } from '@/lib/db-queries';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ClientFormProps {
   onSubmit: (data: {
@@ -27,6 +29,8 @@ export function ClientForm({
   const [planId, setPlanId] = useState(initialData?.planId || '');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const { toast } = useToast();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -61,8 +65,13 @@ export function ClientForm({
         companyName: companyName.trim() || undefined,
         planId,
       });
+      setSuccess(true);
+      toast({ title: initialData ? 'Client updated!' : 'Client created!' });
+      setTimeout(() => setSuccess(false), 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const message = err instanceof Error ? err.message : 'An error occurred';
+      setError(message);
+      toast({ title: message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -144,13 +153,15 @@ export function ClientForm({
         </select>
       </div>
 
-      <button
+      <Button
         type="submit"
-        disabled={isSubmitting || isLoading || plans.length === 0}
-        className="w-full bg-accent-blue text-white py-2 px-4 rounded-md font-medium hover:bg-accent-blue/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        disabled={plans.length === 0}
+        loading={isSubmitting || isLoading}
+        success={success}
+        className="w-full"
       >
-        {isSubmitting || isLoading ? (initialData ? 'Saving...' : 'Creating Client...') : (initialData ? 'Save Client' : 'Create Client')}
-      </button>
+        {initialData ? 'Save Client' : 'Create Client'}
+      </Button>
     </form>
   );
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { SidebarNavItem } from './sidebar-nav-item';
 import { MagneticHover } from '@/components/motion/magnetic-hover';
+import { usePendingNav } from '@/hooks/use-pending-nav';
 import {
   LayoutDashboard,
   Users,
@@ -32,6 +33,13 @@ const bottomItems = [
 ];
 
 export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
+  const { pendingHref, setPendingHref } = usePendingNav();
+
+  const handleNavClick = (href: string) => {
+    setPendingHref(href);
+    onNavClick?.();
+  };
+
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-sidebar flex-col border-r border-border-default bg-bg-primary">
       {/* Logo */}
@@ -52,7 +60,12 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
           Workspace
         </p>
         {navItems.map((item) => (
-          <SidebarNavItem key={item.href} {...item} onClick={onNavClick} />
+          <SidebarNavItem
+            key={item.href}
+            {...item}
+            isPending={pendingHref === item.href}
+            onClick={() => handleNavClick(item.href)}
+          />
         ))}
       </nav>
 
@@ -63,7 +76,12 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void } = {}) {
           <ThemeToggle />
         </div>
         {bottomItems.map((item) => (
-          <SidebarNavItem key={item.href} {...item} onClick={onNavClick} />
+          <SidebarNavItem
+            key={item.href}
+            {...item}
+            isPending={pendingHref === item.href}
+            onClick={() => handleNavClick(item.href)}
+          />
         ))}
         <button
           onClick={() => signOut({ callbackUrl: '/auth/signin' })}
