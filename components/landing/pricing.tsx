@@ -1,207 +1,158 @@
+// components/landing/pricing.tsx
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Check, Minus } from 'lucide-react';
-import { ScrollStagger, ScrollStaggerItem } from '@/components/motion/scroll-stagger';
-import { SparkleButton } from '@/components/ui/sparkle-button';
 
-interface PlanFeature {
-  text: string;
-  included: boolean;
+interface PricingData {
+  country: string;
+  region: 'global' | 'india' | 'nepal';
+  currency: string;
 }
 
-interface PricingTier {
-  name: string;
-  price: string;
-  period: string;
-  description: string;
-  features: PlanFeature[];
-  cta: string;
-  ctaHref: string;
-  featured: boolean;
-  badge?: string;
+interface Plan {
+  tier: 'basic' | 'pro';
+  monthlyPrice: number;
+  yearlyPrice: number;
+  features: string[];
 }
-
-const tiers: PricingTier[] = [
-  {
-    name: 'Free',
-    price: '$0',
-    period: '/month',
-    description: 'For freelancers getting started.',
-    features: [
-      { text: 'Up to 3 clients', included: true },
-      { text: '1 service plan', included: true },
-      { text: 'Basic invoicing', included: true },
-      { text: 'Contracts', included: false },
-      { text: 'Deliverables tracking', included: false },
-      { text: 'Metrics dashboard', included: false },
-    ],
-    cta: 'Get Started Free',
-    ctaHref: '/auth/signin',
-    featured: false,
-  },
-  {
-    name: 'Pro',
-    price: '$29',
-    period: '/month',
-    description: 'For growing agencies that ship.',
-    features: [
-      { text: 'Unlimited clients', included: true },
-      { text: 'Unlimited plans', included: true },
-      { text: 'Advanced invoicing', included: true },
-      { text: 'Contracts', included: true },
-      { text: 'Deliverables tracking', included: true },
-      { text: 'Metrics dashboard', included: true },
-    ],
-    cta: 'Start Pro',
-    ctaHref: '/auth/signin',
-    featured: true,
-    badge: 'Most Popular',
-  },
-  {
-    name: 'Enterprise',
-    price: 'Custom',
-    period: '',
-    description: 'For established agencies at scale.',
-    features: [
-      { text: 'Everything in Pro', included: true },
-      { text: 'Priority support', included: true },
-      { text: 'Custom integrations', included: true },
-      { text: 'Dedicated account manager', included: true },
-      { text: 'SLA guarantee', included: true },
-      { text: 'Custom branding', included: true },
-    ],
-    cta: 'Contact Us',
-    ctaHref: '#',
-    featured: false,
-  },
-];
 
 export function Pricing() {
+  const [pricing, setPricing] = useState<PricingData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchLocation() {
+      try {
+        const cached = localStorage.getItem('userLocation');
+        if (cached) {
+          setPricing(JSON.parse(cached));
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch('/api/user-location');
+        const data = await response.json();
+        setPricing(data);
+        localStorage.setItem('userLocation', JSON.stringify(data));
+      } catch (error) {
+        console.error('Failed to detect location:', error);
+        setPricing({ country: 'Unknown', region: 'global', currency: 'USD' });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLocation();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-20">Loading pricing...</div>;
+  }
+
+  if (!pricing) {
+    return null;
+  }
+
+  const priceMap = {
+    global: { basic: { monthly: 9, yearly: 86 }, pro: { monthly: 39, yearly: 374 } },
+    india: { basic: { monthly: 199, yearly: 1910 }, pro: { monthly: 699, yearly: 6710 } },
+    nepal: { basic: { monthly: 399, yearly: 3830 }, pro: { monthly: 1299, yearly: 12470 } },
+  };
+
+  const prices = priceMap[pricing.region];
+
+  const plans: Plan[] = [
+    {
+      tier: 'basic',
+      monthlyPrice: prices.basic.monthly,
+      yearlyPrice: prices.basic.yearly,
+      features: ['15 clients', '50 projects', '5 team members', 'Invoicing', 'Basic reporting'],
+    },
+    {
+      tier: 'pro',
+      monthlyPrice: prices.pro.monthly,
+      yearlyPrice: prices.pro.yearly,
+      features: ['Unlimited clients', 'Unlimited projects', 'Unlimited team members', 'Contracts', 'Advanced reporting', 'API access', 'Priority support'],
+    },
+  ];
+
   return (
-    <section id="pricing" className="py-20 px-6" style={{ background: 'var(--bg-primary)' }}>
-      <div className="mx-auto max-w-6xl">
-        {/* Section header */}
-        <div className="text-center mb-16">
-          <div
-            className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest mb-5"
-            style={{ background: 'var(--landing-badge-bg)', border: '1px solid var(--landing-badge-border)', color: 'var(--text-secondary)' }}
-          >
-            Pricing
-          </div>
-          <h2
-            className="text-4xl md:text-5xl font-black tracking-[-0.03em]"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
-          >
-            Simple, honest pricing
-          </h2>
-          <p className="mt-4 text-lg" style={{ color: 'var(--text-secondary)' }}>
-            Start free. Upgrade when you need to. No surprises.
-          </p>
-        </div>
+    <section className="px-6 py-20">
+      <div className="mx-auto max-w-5xl">
+        <h2 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '2.25rem', fontWeight: 'bold', textAlign: 'center' }}>
+          Pricing for {pricing.country}
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '3rem', fontSize: '1.125rem' }}>
+          All prices in {pricing.currency}
+        </p>
 
-        <ScrollStagger className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {tiers.map((tier) => (
-            <ScrollStaggerItem key={tier.name}>
-              <div
-                className="relative flex flex-col h-full rounded-2xl p-7 transition-all duration-300"
-                style={{
-                  background: tier.featured ? 'rgba(107, 126, 147, 0.06)' : 'var(--landing-card-bg)',
-                  border: tier.featured
-                    ? '1px solid rgba(107, 126, 147, 0.35)'
-                    : '1px solid var(--landing-card-border)',
-                  boxShadow: tier.featured
-                    ? '0 0 60px rgba(107, 126, 147, 0.08), inset 0 1px 0 rgba(255,255,255,0.06)'
-                    : 'none',
-                }}
-              >
-                {/* Badge */}
-                {tier.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span
-                      className="px-3 py-1 text-[11px] font-semibold text-white rounded-full"
-                      style={{ background: 'linear-gradient(135deg, #6b7e93, #8fa0b0)' }}
-                    >
-                      {tier.badge}
-                    </span>
-                  </div>
-                )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {plans.map((plan) => (
+            <div
+              key={plan.tier}
+              className="rounded-xl p-8"
+              style={{
+                background: 'var(--landing-card-bg)',
+                border: '1px solid var(--landing-card-border)',
+              }}
+            >
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: '600', textTransform: 'capitalize' }}>
+                {plan.tier}
+              </h3>
 
-                {/* Plan name & description */}
-                <div className="mb-6">
-                  <h3
-                    className="text-base font-bold mb-1"
-                    style={{ color: tier.featured ? '#b0bec8' : '#9ca3af' }}
-                  >
-                    {tier.name}
-                  </h3>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{tier.description}</p>
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ color: 'var(--accent-blue)', fontSize: '2.25rem', fontWeight: 'bold' }}>
+                  {pricing.currency === 'USD' ? '$' : pricing.currency === 'INR' ? '₹' : 'Rs. '}
+                  {plan.monthlyPrice}
                 </div>
-
-                {/* Price */}
-                <div className="mb-7 flex items-end gap-1">
-                  <span
-                    className="text-5xl font-black tracking-tight"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--text-primary)' }}
-                  >
-                    {tier.price}
-                  </span>
-                  {tier.period && (
-                    <span className="text-sm mb-1.5" style={{ color: 'var(--text-secondary)' }}>{tier.period}</span>
-                  )}
+                <div style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
+                  /month or {pricing.currency === 'USD' ? '$' : pricing.currency === 'INR' ? '₹' : 'Rs. '}
+                  {plan.yearlyPrice}/year
                 </div>
+              </div>
 
-                {/* Features */}
-                <ul className="space-y-3 mb-8 flex-1">
-                  {tier.features.map((feature) => (
-                    <li key={feature.text} className="flex items-center gap-2.5">
-                      {feature.included ? (
-                        <div
-                          className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
-                          style={{ background: 'rgba(0, 200, 83, 0.15)', border: '1px solid rgba(0,200,83,0.3)' }}
-                        >
-                          <Check size={9} style={{ color: '#00c853' }} />
-                        </div>
-                      ) : (
-                        <div
-                          className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
-                          style={{ background: 'var(--landing-badge-bg)', border: '1px solid var(--landing-badge-border)' }}
-                        >
-                          <Minus size={9} style={{ color: 'var(--text-tertiary)' }} />
-                        </div>
-                      )}
-                      <span
-                        className="text-sm"
-                        style={{ color: feature.included ? 'var(--text-primary)' : 'var(--text-tertiary)' }}
-                      >
-                        {feature.text}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                {tier.featured ? (
-                  <SparkleButton href={tier.ctaHref} className="w-full justify-center">
-                    {tier.cta}
-                  </SparkleButton>
-                ) : (
-                  <Link
-                    href={tier.ctaHref}
-                    className="block text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5"
+              <ul style={{ marginBottom: '2rem' }}>
+                {plan.features.map((feature) => (
+                  <li
+                    key={feature}
                     style={{
-                      background: 'var(--landing-card-bg)',
-                      border: '1px solid var(--landing-card-border)',
-                      color: 'var(--landing-secondary-btn-color)',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '0.75rem',
+                      display: 'flex',
+                      gap: '0.5rem',
+                      alignItems: 'center',
                     }}
                   >
-                    {tier.cta}
-                  </Link>
-                )}
-              </div>
-            </ScrollStaggerItem>
+                    <span style={{ color: 'var(--accent-blue)' }}>✓</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                href={`/auth/signup?plan=${plan.tier}&region=${pricing.region}`}
+                className="block w-full py-3 px-4 rounded-lg font-medium text-center transition-all duration-200 hover:opacity-90"
+                style={{
+                  background: 'var(--accent-blue)',
+                  color: 'white',
+                  textDecoration: 'none',
+                }}
+              >
+                Get Started with {plan.tier === 'pro' ? 'Pro' : 'Basic'}
+              </Link>
+            </div>
           ))}
-        </ScrollStagger>
+        </div>
+
+        <div style={{ marginTop: '3rem', padding: '1.5rem', borderRadius: '0.75rem', background: 'var(--landing-card-bg)', border: '1px solid var(--landing-card-border)', textAlign: 'center' }}>
+          <div style={{ color: 'var(--text-primary)', marginBottom: '0.5rem', fontWeight: '500' }}>
+            All plans include:
+          </div>
+          <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+            Free tier for testing • Client portals • Invoicing • Payment processing • Email support
+          </div>
+        </div>
       </div>
     </section>
   );
