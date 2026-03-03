@@ -10,15 +10,15 @@ const footerLinks = {
     { label: 'Client Portal', href: '#' },
   ],
   Company: [
-    { label: 'About', href: '#' },
-    { label: 'Blog', href: '#' },
-    { label: 'Careers', href: '#' },
-    { label: 'Contact', href: '#' },
+    { label: 'About', href: '/about' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Careers', href: '/careers' },
+    { label: 'Contact', href: '/contact' },
   ],
   Legal: [
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Terms of Service', href: '#' },
-    { label: 'Cookie Policy', href: '#' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Cookie Policy', href: '/cookies' },
   ],
 };
 
