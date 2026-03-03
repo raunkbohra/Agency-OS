@@ -1,0 +1,10 @@
+[   47155ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/files:0
+[   47156ms] [ERROR] API Error: {status: 500, response: Object} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[   50364ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/files:0
+[   50365ms] [ERROR] API Error: {status: 500, response: Object} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[   50746ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/files:0
+[   50747ms] [ERROR] API Error: {status: 500, response: Object} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[   51509ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/files:0
+[   51509ms] [ERROR] API Error: {status: 500, response: Object} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[   56655ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/files:0
+[   56655ms] [ERROR] API Error: {status: 500, response: Object} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127

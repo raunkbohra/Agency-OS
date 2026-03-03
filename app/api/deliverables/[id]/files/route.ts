@@ -69,7 +69,7 @@ export async function POST(
           deliverableId: id,
           fileName,
           fileUrl,
-          uploadedBy: session.user.id,
+          uploadedBy: null as any,
         });
       } catch (insertErr) {
         console.error('Database error in addDeliverableFile:', insertErr);
@@ -115,7 +115,7 @@ export async function POST(
           deliverableId: id,
           fileName: fileName || file.name,
           fileUrl,
-          uploadedBy: session.user.id,
+          uploadedBy: null as any,
         });
       } catch (insertErr) {
         console.error('Database error in addDeliverableFile:', insertErr);

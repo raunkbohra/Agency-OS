@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS deliverable_files (
   file_size INT,
   file_type TEXT,
   file_url TEXT NOT NULL,
-  uploaded_by UUID NOT NULL REFERENCES users(id),
+  uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
   version INT DEFAULT 1,
   created_at TIMESTAMP DEFAULT NOW()
 );
