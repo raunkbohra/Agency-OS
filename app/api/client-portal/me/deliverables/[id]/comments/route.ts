@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientSession } from '@/lib/client-auth';
-import { addDeliverableComment, getDeliverableById, getPool } from '@/lib/db-queries';
+import { addDeliverableComment } from '@/lib/db-queries';
+import { getPool } from '@/lib/db';
 
 export async function POST(
   request: NextRequest,
