@@ -50,12 +50,12 @@ export function PlanForm({ onSubmit, initialData, isLoading = false }: PlanFormP
         description: description.trim() || undefined,
       });
       setSuccess(true);
-      toast({ title: 'Plan saved!' });
+      toast({ id: 'plan-save-success', title: 'Plan saved!' });
       setTimeout(() => setSuccess(false), 1500);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
-      toast({ title: message, variant: 'destructive' });
+      toast({ id: 'plan-save-error', title: message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }

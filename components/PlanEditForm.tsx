@@ -69,7 +69,7 @@ export default function PlanEditForm({ clientPlan, currentPlan, clientId }: Plan
       }
 
       setSuccess(true);
-      toast({ title: 'Plan updated!' });
+      toast({ id: 'plan-update-success', title: 'Plan updated!' });
       const t = setTimeout(() => {
         setIsOpen(false);
         router.refresh();
@@ -78,7 +78,7 @@ export default function PlanEditForm({ clientPlan, currentPlan, clientId }: Plan
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to update plan';
       setError(message);
-      toast({ title: message, variant: 'destructive' });
+      toast({ id: 'plan-update-error', title: message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }

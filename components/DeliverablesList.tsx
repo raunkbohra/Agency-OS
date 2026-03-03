@@ -112,6 +112,7 @@ export default function DeliverablesList() {
     } catch (err) {
       console.error('Bulk update error:', err);
       toast({
+        id: 'bulk-update-error',
         variant: 'destructive' as const,
         title: 'Bulk update failed',
         description: 'Could not update the selected deliverables. Please try again.',

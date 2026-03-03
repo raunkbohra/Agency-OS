@@ -22,7 +22,7 @@ export function useAction<T>(
         const result = await fn(...args);
         setState('success');
         if (options?.successMessage) {
-          toast({ title: options.successMessage });
+          toast({ id: 'use-action-success', title: options.successMessage });
         }
         options?.onSuccess?.(result);
         setTimeout(() => setState('idle'), 1800);
@@ -32,7 +32,7 @@ export function useAction<T>(
         const message =
           options?.errorMessage ??
           (err instanceof Error ? err.message : 'Something went wrong');
-        toast({ title: message, variant: 'destructive' });
+        toast({ id: 'use-action-error', title: message, variant: 'destructive' });
         options?.onError?.(err as Error);
         setTimeout(() => setState('idle'), 3000);
         throw err;

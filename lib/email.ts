@@ -569,3 +569,46 @@ export async function sendTeamInviteEmail(options: {
 </html>`.trim(),
   });
 }
+
+export async function sendContactFormEmail({
+  name,
+  email,
+  subject,
+  message,
+}: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const escapedName = escapeHtml(name);
+  const escapedEmail = escapeHtml(email);
+  const escapedSubject = escapeHtml(subject);
+  const escapedMessage = escapeHtml(message).replace(/\n/g, '<br>');
+
+  const html = `
+    <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:#f6f7f9;padding:40px 0;">
+      <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+        <div style="padding:32px;">
+          <h1 style="font-size:20px;font-weight:600;color:#0d1117;margin:0 0 24px;">New Contact Form Submission</h1>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px 0;color:#6b7e93;font-size:14px;width:80px;">Name</td><td style="padding:8px 0;color:#0d1117;font-size:14px;">${escapedName}</td></tr>
+            <tr><td style="padding:8px 0;color:#6b7e93;font-size:14px;">Email</td><td style="padding:8px 0;color:#0d1117;font-size:14px;"><a href="mailto:${escapedEmail}" style="color:#4a6278;">${escapedEmail}</a></td></tr>
+            <tr><td style="padding:8px 0;color:#6b7e93;font-size:14px;">Subject</td><td style="padding:8px 0;color:#0d1117;font-size:14px;">${escapedSubject}</td></tr>
+          </table>
+          <div style="margin-top:20px;padding:16px;background:#f6f7f9;border-radius:8px;">
+            <p style="margin:0;color:#0d1117;font-size:14px;line-height:1.6;">${escapedMessage}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM ?? 'noreply@agencyos.dev',
+    to: process.env.CONTACT_EMAIL ?? process.env.SMTP_FROM ?? 'hello@agencyos.dev',
+    replyTo: email,
+    subject: `[Agency OS Contact] ${subject} — from ${name}`,
+    html,
+  });
+}

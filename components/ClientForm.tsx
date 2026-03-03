@@ -66,12 +66,12 @@ export function ClientForm({
         planId,
       });
       setSuccess(true);
-      toast({ title: initialData ? 'Client updated!' : 'Client created!' });
+      toast({ id: 'client-success', title: initialData ? 'Client updated!' : 'Client created!' });
       setTimeout(() => setSuccess(false), 1500);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
-      toast({ title: message, variant: 'destructive' });
+      toast({ id: 'client-error', title: message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }

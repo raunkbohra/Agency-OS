@@ -39,12 +39,12 @@ export function SimpleClientForm({ action, plans }: SimpleClientFormProps) {
       const formData = new FormData(e.currentTarget);
       await action(formData);
       setSuccess(true);
-      toast({ title: 'Client created!' });
+      toast({ id: 'client-create-success', title: 'Client created!' });
       setTimeout(() => setSuccess(false), 1500);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
-      toast({ title: message, variant: 'destructive' });
+      toast({ id: 'client-create-error', title: message, variant: 'destructive' });
       setIsSubmitting(false);
     }
   }

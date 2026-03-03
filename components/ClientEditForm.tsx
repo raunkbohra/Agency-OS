@@ -52,7 +52,7 @@ export default function ClientEditForm({ client, agencyId }: ClientEditFormProps
       }
 
       setSuccess(true);
-      toast({ title: 'Client updated!' });
+      toast({ id: 'update-success', title: 'Client updated!' });
       const t = setTimeout(() => {
         setIsOpen(false);
         router.refresh();
@@ -61,7 +61,7 @@ export default function ClientEditForm({ client, agencyId }: ClientEditFormProps
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to update client';
       setError(message);
-      toast({ title: message, variant: 'destructive' });
+      toast({ id: 'update-error', title: message, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
