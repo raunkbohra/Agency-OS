@@ -1,7 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Spline from '@splinetool/react-spline';
+import { useTheme } from 'next-themes';
 import {
   LayoutDashboard,
   Users,
@@ -14,6 +17,37 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { SparkleButton } from '@/components/ui/sparkle-button';
+
+function SplineBackground() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  const isLight = resolvedTheme === 'light';
+
+  return (
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        opacity: loaded ? (isLight ? 0.5 : 1) : 0,
+        transition: 'opacity 0.6s ease-out',
+        filter: isLight ? 'invert(1)' : 'none',
+        zIndex: 0,
+      }}
+    >
+      <Spline
+        scene="https://prod.spline.design/gdzDOdrCBCG8apuu/scene.splinecode"
+        onLoad={() => setLoaded(true)}
+        renderOnDemand={false}
+        style={{ width: '100%', height: '100%' }}
+      />
+    </div>
+  );
+}
 
 const sidebarNav = [
   { icon: LayoutDashboard, label: 'Dashboard', active: false },
@@ -454,11 +488,19 @@ function MobileMockup() {
 
 // ─── Hero ────────────────────────────────────────────────────────────
 export function Hero() {
+  const { resolvedTheme } = useTheme();
+  const [heroMounted, setHeroMounted] = useState(false);
+  useEffect(() => setHeroMounted(true), []);
+  const isLight = heroMounted && resolvedTheme === 'light';
+
   return (
     <section
       className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden"
       style={{ background: 'var(--bg-primary)' }}
     >
+      {/* Spline 3D background — inverted in light theme */}
+      <SplineBackground />
+
       {/* Background orbs */}
       <div
         className="absolute pointer-events-none"
@@ -508,13 +550,12 @@ export function Hero() {
             Run your agency
           </h1>
           <h1
-            className="text-4xl sm:text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em]"
+            className="text-4xl sm:text-5xl md:text-[76px] font-black leading-[1.0] tracking-[-0.04em] bg-clip-text text-transparent"
             style={{
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              background: 'linear-gradient(135deg, #8fa4b8 0%, #dde6ed 50%, #a8bbc8 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              backgroundImage: isLight
+                ? 'linear-gradient(135deg, #3d5a73 0%, #6b8ca8 50%, #4a6f8a 100%)'
+                : 'linear-gradient(135deg, #8fa4b8 0%, #dde6ed 50%, #a8bbc8 100%)',
             }}
           >
             from one system.

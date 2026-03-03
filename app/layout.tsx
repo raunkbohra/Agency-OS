@@ -15,6 +15,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link
+          rel="preload"
+          href="https://prod.spline.design/gdzDOdrCBCG8apuu/scene.splinecode"
+          as="fetch"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         <NextTopLoader color="var(--accent-blue)" height={2} showSpinner={false} />
         <Providers>{children}</Providers>

@@ -30,6 +30,8 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.15",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.61",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/geoip-lite": "^1.4.4",
     "@types/nodemailer": "^7.0.11",
