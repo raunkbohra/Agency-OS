@@ -64,3 +64,6 @@
 [ 2314628ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
 [ 2318930ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
 [ 2318931ms] [ERROR] Failed to add comment: {error: Failed to add comment} @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2492431ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/api/deliverables/664d8ddc-1a09-4227-ae83-8b5a599c64b1/comments:0
+[ 2492434ms] [ERROR] Error adding comment: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[ 2614958ms] [WARNING] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:2297
