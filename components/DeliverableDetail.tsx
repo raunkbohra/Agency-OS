@@ -96,9 +96,16 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         setMediaUrl('');
         router.refresh();
+      } else {
+        console.error('API Error:', {
+          status: res.status,
+          response: data
+        });
       }
     } catch (error) {
       console.error('Failed to add media URL:', error);
