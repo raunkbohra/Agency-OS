@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { addDeliverableComment, getDeliverableById, getClientById } from '@/lib/db-queries';
+import { addDeliverableComment, getDeliverableById, getClientById, getPool } from '@/lib/db-queries';
 import { sendRevisionRequestNotification } from '@/lib/send-deliverable-notification';
 
 export async function POST(
@@ -49,11 +49,18 @@ export async function POST(
       }
     }
 
+    // Get user name from database
+    const userResult = await pool.query(
+      `SELECT name FROM users WHERE id = $1`,
+      [session.user.id]
+    );
+    const userName = userResult.rows[0]?.name || session.user?.name || 'Unknown User';
+
     // Return formatted response with user_name
     return Response.json({
       id: result.id,
       user_id: result.user_id,
-      user_name: session.user?.name || 'Unknown User',
+      user_name: userName,
       comment: result.comment,
       is_revision_request: result.is_revision_request,
       created_at: result.created_at,

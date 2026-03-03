@@ -69,12 +69,16 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Don't allow multiple uploads
+    if (uploadingFile) return;
 
     setUploadingFile(true);
     const formData = new FormData();
-    formData.append('file', e.target.files[0]);
-    formData.append('fileName', e.target.files[0].name);
+    formData.append('file', file);
+    formData.append('fileName', file.name);
 
     try {
       const res = await fetch(`/api/deliverables/${deliverableId}/files`, {
@@ -85,13 +89,16 @@ export default function DeliverableDetail({ deliverable, deliverableId }: Delive
       if (res.ok) {
         const newFile = await res.json();
         setFiles([newFile, ...files]);
+        // Reset input
         e.target.value = '';
       } else {
         const errorData = await res.json();
         console.error('File upload failed:', errorData);
+        alert(`Upload failed: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('File upload failed:', error);
+      alert('File upload failed. Please try again.');
     } finally {
       setUploadingFile(false);
     }
