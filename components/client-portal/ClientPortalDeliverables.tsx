@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Package } from 'lucide-react';
 
 interface Deliverable {
@@ -20,9 +21,14 @@ const statusConfig: Record<string, { badge: string; color: string }> = {
 };
 
 export default function ClientPortalDeliverables() {
+  const router = useRouter();
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const handleDeliverableClick = (id: string) => {
+    router.push(`/client-portal/deliverables/${id}`);
+  };
 
   useEffect(() => {
     const fetchDeliverables = async () => {
@@ -124,9 +130,18 @@ export default function ClientPortalDeliverables() {
           {deliverables.map((deliverable, index) => (
             <tr
               key={deliverable.id}
+              onClick={() => handleDeliverableClick(deliverable.id)}
               style={{
                 borderBottom: '1px solid var(--border-default)',
                 background: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(74, 98, 120, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)';
               }}
             >
               <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>

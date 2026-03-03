@@ -1,0 +1,2 @@
+[     924ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:8025/api/v2/jim:0
+[     929ms] [WARNING] Deprecation warning: moment construction falls back to js Date. This is discouraged and will be removed in upcoming major release. Please refer to https://github.com/moment/moment/issues/1407 for more info. @ http://localhost:8025/js/moment-2.8.4.js:323
