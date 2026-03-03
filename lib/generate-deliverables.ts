@@ -1,5 +1,5 @@
 import { db } from './db';
-import { getPlanItems, createDeliverable } from './db-queries';
+import { getPlanItems } from './db-queries';
 
 // How many months between generations for each billing cycle
 const CYCLE_MONTHS: Record<string, number> = {
@@ -42,9 +42,6 @@ export function isDuePeriod(
 /**
  * For 'prorated' policy: how many of each deliverable to create for a partial first month.
  * Uses ceiling so clients always get at least 1 of each item they're paying for.
- *
- * Example: Photo×2, join March 21 (11 days left including the 21st, month has 31 days)
- *   ratio = 11/31 ≈ 0.355  →  ceil(2 × 0.355) = ceil(0.71) = 1
  */
 function proratedQty(qty: number, startDate: Date): number {
   const totalDays = daysInMonth(startDate.getFullYear(), startDate.getMonth());
@@ -53,15 +50,17 @@ function proratedQty(qty: number, startDate: Date): number {
   return Math.max(1, Math.ceil(qty * ratio));
 }
 
+/** Format a month name from a Date */
+function formatMonthYear(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
 /**
- * Generate deliverables for one client plan for the given reference month.
- *
- * billingStartPolicy:
- *   'next_month' — skip the partial join month entirely; cron will handle next full month
- *   'prorated'   — generate proportional deliverables for the remaining days in the join month
+ * Generate ONE deliverable bundle per client plan for the given reference month,
+ * with deliverable_items for each plan item × qty.
  *
  * Idempotent: skips if deliverables already exist for this client + plan + month_year.
- * Returns number of deliverables created (0 if skipped).
+ * Returns number of items created (0 if skipped).
  */
 export async function generateDeliverablesForClientPlan(
   clientPlan: {
@@ -111,16 +110,26 @@ export async function generateDeliverablesForClientPlan(
     0
   );
 
-  // Batch collect all deliverables to insert
-  const deliverablesToInsert: Array<{
-    agency_id: string;
-    client_id: string;
-    plan_id: string;
+  const bundleTitle = `${formatMonthYear(referenceDate)} Deliverables`;
+
+  // Create the single bundle deliverable
+  const bundleResult = await db.query(
+    `INSERT INTO deliverables
+     (agency_id, client_id, plan_id, title, month_year, due_date, status, is_period_bundle)
+     VALUES ($1, $2, $3, $4, $5, $6, 'draft', true)
+     RETURNING id`,
+    [clientPlan.agency_id, clientPlan.client_id, clientPlan.plan_id, bundleTitle, monthYear, dueDate.toISOString()]
+  );
+  const bundleId = bundleResult.rows[0].id;
+
+  // Build all items to insert
+  const itemsToInsert: Array<{
     title: string;
-    month_year: string;
-    due_date: Date;
+    plan_item_id: string;
+    sort_order: number;
   }> = [];
 
+  let sortOrder = 0;
   for (const item of planItems) {
     const qty =
       policy === 'prorated' && isFirstPartialMonth
@@ -133,37 +142,34 @@ export async function generateDeliverablesForClientPlan(
           ? `${item.deliverable_type} #${i + 1}`
           : item.deliverable_type;
 
-      deliverablesToInsert.push({
-        agency_id: clientPlan.agency_id,
-        client_id: clientPlan.client_id,
-        plan_id: clientPlan.plan_id,
+      itemsToInsert.push({
         title,
-        month_year: monthYear,
-        due_date: dueDate,
+        plan_item_id: item.id,
+        sort_order: sortOrder++,
       });
     }
   }
 
-  // Batch insert all deliverables at once
-  if (deliverablesToInsert.length > 0) {
+  // Batch insert all items
+  if (itemsToInsert.length > 0) {
     const values: string[] = [];
     const params: any[] = [];
     let paramCount = 1;
 
-    deliverablesToInsert.forEach((d) => {
-      values.push(`($${paramCount}, $${paramCount + 1}, $${paramCount + 2}, $${paramCount + 3}, $${paramCount + 4}, $${paramCount + 5})`);
-      params.push(d.agency_id, d.client_id, d.plan_id, d.title, d.month_year, d.due_date.toISOString());
-      paramCount += 6;
+    itemsToInsert.forEach((item) => {
+      values.push(`($${paramCount}, $${paramCount + 1}, $${paramCount + 2}, $${paramCount + 3})`);
+      params.push(bundleId, item.title, item.plan_item_id, item.sort_order);
+      paramCount += 4;
     });
 
     await db.query(
-      `INSERT INTO deliverables (agency_id, client_id, plan_id, title, month_year, due_date)
+      `INSERT INTO deliverable_items (deliverable_id, title, plan_item_id, sort_order)
        VALUES ${values.join(', ')}`,
       params
     );
   }
 
-  return deliverablesToInsert.length;
+  return itemsToInsert.length;
 }
 
 /**

@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { addDeliverableFile, getDeliverableById } from '@/lib/db-queries';
+import { addDeliverableFile, deleteDeliverableFile, getDeliverableById } from '@/lib/db-queries';
 
 export async function GET(
   request: Request,
@@ -42,7 +42,7 @@ export async function POST(
         return Response.json({ error: 'Invalid JSON in request body' }, { status: 400 });
       }
 
-      const { fileUrl, fileName } = body;
+      const { fileUrl, fileName, itemId } = body;
 
       if (!fileUrl || !fileName) {
         return Response.json({ error: 'fileUrl and fileName required' }, { status: 400 });
@@ -70,6 +70,7 @@ export async function POST(
           fileName,
           fileUrl,
           uploadedBy: null as any,
+          itemId: itemId || undefined,
         });
       } catch (insertErr) {
         console.error('Database error in addDeliverableFile:', insertErr);
@@ -130,5 +131,39 @@ export async function POST(
     console.error('Unhandled error in POST:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return Response.json({ error: 'Internal server error', details: errorMessage }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user?.agencyId) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id } = await params;
+    const { fileId } = await request.json();
+
+    if (!fileId) {
+      return Response.json({ error: 'fileId is required' }, { status: 400 });
+    }
+
+    const deliverable = await getDeliverableById(id, session.user.agencyId);
+    if (!deliverable) {
+      return Response.json({ error: 'Deliverable not found' }, { status: 404 });
+    }
+
+    const deleted = await deleteDeliverableFile(fileId, id);
+    if (!deleted) {
+      return Response.json({ error: 'File not found' }, { status: 404 });
+    }
+
+    return Response.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    return Response.json({ error: 'Failed to delete file' }, { status: 500 });
   }
 }

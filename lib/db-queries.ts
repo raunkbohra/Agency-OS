@@ -589,7 +589,9 @@ export async function getClientByPortalToken(token: string): Promise<Client | nu
 export async function getDeliverablesByClient(clientId: string): Promise<Array<any>> {
   try {
     const result = await db.query(
-      `SELECT d.id, d.title, d.status, d.month_year, d.due_date
+      `SELECT d.id, d.title, d.status, d.month_year, d.due_date, d.is_period_bundle,
+              (SELECT COUNT(*) FROM deliverable_items di WHERE di.deliverable_id = d.id) as item_count,
+              (SELECT COUNT(*) FROM deliverable_items di WHERE di.deliverable_id = d.id AND di.status IN ('done', 'approved')) as items_completed
        FROM deliverables d
        WHERE d.client_id = $1
        ORDER BY d.month_year DESC, d.due_date DESC`,
@@ -930,6 +932,19 @@ export interface Deliverable {
   status: 'draft' | 'in_review' | 'approved' | 'changes_requested' | 'done';
   month_year: string;
   due_date?: Date;
+  is_period_bundle: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DeliverableItem {
+  id: string;
+  deliverable_id: string;
+  title: string;
+  description?: string;
+  status: 'draft' | 'in_review' | 'approved' | 'changes_requested' | 'done';
+  plan_item_id?: string;
+  sort_order: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -937,6 +952,7 @@ export interface Deliverable {
 export interface DeliverableFile {
   id: string;
   deliverable_id: string;
+  item_id?: string;
   file_name: string;
   file_size?: number;
   file_type?: string;
@@ -968,20 +984,24 @@ export async function createDeliverable(data: {
   description?: string;
   monthYear: string;
   dueDate?: Date;
+  isPeriodBundle?: boolean;
 }): Promise<Deliverable> {
   const result = await db.query(
     `INSERT INTO deliverables
-     (agency_id, client_id, plan_id, title, description, month_year, due_date, status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
+     (agency_id, client_id, plan_id, title, description, month_year, due_date, status, is_period_bundle)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft', $8)
      RETURNING *`,
-    [data.agencyId, data.clientId, data.planId, data.title, data.description ?? null, data.monthYear, data.dueDate ?? null]
+    [data.agencyId, data.clientId, data.planId, data.title, data.description ?? null, data.monthYear, data.dueDate ?? null, data.isPeriodBundle ?? true]
   );
   return result.rows[0];
 }
 
-export async function getDeliverablesByAgency(agencyId: string): Promise<(Deliverable & { client_name?: string })[]> {
+export async function getDeliverablesByAgency(agencyId: string): Promise<(Deliverable & { client_name?: string; item_count?: number; items_completed?: number })[]> {
   const result = await db.query(
-    `SELECT d.*, c.name as client_name FROM deliverables d
+    `SELECT d.*, c.name as client_name,
+            (SELECT COUNT(*) FROM deliverable_items di WHERE di.deliverable_id = d.id) as item_count,
+            (SELECT COUNT(*) FROM deliverable_items di WHERE di.deliverable_id = d.id AND di.status IN ('done', 'approved')) as items_completed
+     FROM deliverables d
      JOIN clients c ON d.client_id = c.id
      WHERE d.agency_id = $1
      ORDER BY d.due_date ASC`,
@@ -1000,7 +1020,10 @@ export async function getDeliverablesFiltered(
 ): Promise<(Deliverable & { client_name?: string })[]> {
   const { statusFilter = 'all', urgent = false, sort = 'due_date' } = options;
 
-  let query = `SELECT d.*, c.name as client_name FROM deliverables d
+  let query = `SELECT d.*, c.name as client_name,
+               (SELECT COUNT(*) FROM deliverable_items di WHERE di.deliverable_id = d.id) as item_count,
+               (SELECT COUNT(*) FROM deliverable_items di WHERE di.deliverable_id = d.id AND di.status IN ('done', 'approved')) as items_completed
+               FROM deliverables d
                JOIN clients c ON d.client_id = c.id
                WHERE d.agency_id = $1`;
 
@@ -1089,19 +1112,29 @@ export async function addDeliverableFile(data: {
   fileType?: string;
   fileUrl: string;
   uploadedBy: string;
+  itemId?: string;
 }): Promise<DeliverableFile> {
   const result = await db.query(
-    `INSERT INTO deliverable_files (deliverable_id, file_name, file_size, file_type, file_url, uploaded_by)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO deliverable_files (deliverable_id, file_name, file_size, file_type, file_url, uploaded_by, item_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [data.deliverableId, data.fileName, data.fileSize ?? null, data.fileType ?? null, data.fileUrl, data.uploadedBy]
+    [data.deliverableId, data.fileName, data.fileSize ?? null, data.fileType ?? null, data.fileUrl, data.uploadedBy, data.itemId ?? null]
   );
   return result.rows[0];
 }
 
+export async function deleteDeliverableFile(fileId: string, deliverableId: string): Promise<boolean> {
+  const result = await db.query(
+    `DELETE FROM deliverable_files WHERE id = $1 AND deliverable_id = $2 RETURNING id`,
+    [fileId, deliverableId]
+  );
+  return result.rows.length > 0;
+}
+
 export async function getDeliverableFiles(deliverableId: string): Promise<DeliverableFile[]> {
   const result = await db.query(
-    `SELECT * FROM deliverable_files WHERE deliverable_id = $1 ORDER BY created_at DESC`,
+    `SELECT id, deliverable_id, item_id, file_name, file_size, file_type, file_url, uploaded_by, version, created_at
+     FROM deliverable_files WHERE deliverable_id = $1 ORDER BY created_at DESC`,
     [deliverableId]
   );
   return result.rows;
@@ -1130,6 +1163,72 @@ export async function getDeliverableComments(deliverableId: string): Promise<Del
     [deliverableId]
   );
   return result.rows;
+}
+
+// ============================================================
+// Deliverable Item queries
+// ============================================================
+
+export function computeBundleStatus(items: DeliverableItem[]): Deliverable['status'] {
+  if (items.length === 0) return 'draft';
+  if (items.every(i => i.status === 'done' || i.status === 'approved')) return 'done';
+  if (items.some(i => i.status === 'changes_requested')) return 'changes_requested';
+  if (items.some(i => i.status === 'in_review')) return 'in_review';
+  return 'draft';
+}
+
+export async function getDeliverableItems(deliverableId: string): Promise<DeliverableItem[]> {
+  const result = await db.query(
+    `SELECT * FROM deliverable_items WHERE deliverable_id = $1 ORDER BY sort_order ASC, created_at ASC`,
+    [deliverableId]
+  );
+  return result.rows;
+}
+
+export async function updateDeliverableItemStatus(
+  itemId: string,
+  deliverableId: string,
+  status: string
+): Promise<DeliverableItem> {
+  const result = await db.query(
+    `UPDATE deliverable_items SET status = $1, updated_at = NOW() WHERE id = $2 AND deliverable_id = $3 RETURNING *`,
+    [status, itemId, deliverableId]
+  );
+  if (!result.rows[0]) throw new Error('Item not found');
+
+  // Auto-recompute bundle status
+  const items = await getDeliverableItems(deliverableId);
+  const bundleStatus = computeBundleStatus(items);
+  await db.query(
+    `UPDATE deliverables SET status = $1, updated_at = NOW() WHERE id = $2`,
+    [bundleStatus, deliverableId]
+  );
+
+  return result.rows[0];
+}
+
+export async function addDeliverableItem(data: {
+  deliverableId: string;
+  title: string;
+  description?: string;
+  planItemId?: string;
+  sortOrder?: number;
+}): Promise<DeliverableItem> {
+  const result = await db.query(
+    `INSERT INTO deliverable_items (deliverable_id, title, description, plan_item_id, sort_order)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING *`,
+    [data.deliverableId, data.title, data.description ?? null, data.planItemId ?? null, data.sortOrder ?? 0]
+  );
+  return result.rows[0];
+}
+
+export async function deleteDeliverableItem(itemId: string, deliverableId: string): Promise<boolean> {
+  const result = await db.query(
+    `DELETE FROM deliverable_items WHERE id = $1 AND deliverable_id = $2 RETURNING id`,
+    [itemId, deliverableId]
+  );
+  return result.rows.length > 0;
 }
 
 export async function getPlanItems(planId: string): Promise<PlanItem[]> {

@@ -1,7 +1,6 @@
 import { db } from '@/lib/db';
 import {
   getPlanItems,
-  getDeliverablesByClient,
   createScopeAlert,
   getScopeAlertsByClient
 } from '@/lib/db-queries';
@@ -25,44 +24,50 @@ export async function checkForScopeCreep(
     const planId = planResult.rows[0].id;
     const planItems = await getPlanItems(planId);
 
-    // Get actual deliverables and existing alerts (in parallel)
-    const [deliverables, existingAlerts] = await Promise.all([
-      getDeliverablesByClient(clientId),
+    // Get deliverable item counts grouped by plan_item_id and existing alerts (in parallel)
+    const [itemCountsResult, existingAlerts] = await Promise.all([
+      db.query(
+        `SELECT di.plan_item_id, COUNT(*) as actual_count
+         FROM deliverable_items di
+         JOIN deliverables d ON di.deliverable_id = d.id
+         WHERE d.client_id = $1 AND d.agency_id = $2
+         AND di.plan_item_id IS NOT NULL
+         GROUP BY di.plan_item_id`,
+        [clientId, agencyId]
+      ),
       getScopeAlertsByClient(clientId, agencyId, false),
     ]);
 
-    // Pre-build map of deliverable counts by type for O(1) lookup instead of O(n) filtering
-    const deliverableCountByType = new Map<string, number>();
-    deliverables.forEach(d => {
-      const count = deliverableCountByType.get(d.title) || 0;
-      deliverableCountByType.set(d.title, count + 1);
+    // Build map of actual item counts by plan_item_id
+    const actualCountByPlanItem = new Map<string, number>();
+    itemCountsResult.rows.forEach((row: any) => {
+      actualCountByPlanItem.set(row.plan_item_id, parseInt(row.actual_count));
     });
 
-    // For each plan item, count actual deliverables
+    // For each plan item, compare actual vs planned qty
     for (const planItem of planItems) {
-      const planned = 1; // Each plan_item represents 1 planned deliverable
-      const actual = deliverableCountByType.get(planItem.deliverable_type) || 0;
+      const planned = planItem.qty ?? 1;
+      const actual = actualCountByPlanItem.get(planItem.id) || 0;
 
       // Check threshold: >50% overage
-      const overage = (actual - planned) / planned;
+      if (planned > 0) {
+        const overage = (actual - planned) / planned;
 
-      if (overage > 0.5) {
-        // Check if alert already exists
-        const alertExists = existingAlerts.some(
-          a => a.deliverable_id === planItem.id && a.status === 'active'
-        );
+        if (overage > 0.5) {
+          // Check if alert already exists
+          const alertExists = existingAlerts.some(
+            a => a.deliverable_id === planItem.id && a.status === 'active'
+          );
 
-        if (!alertExists) {
-          // Create alert
-          await createScopeAlert({
-            agencyId,
-            clientId,
-            deliverableId: planItem.id,
-            alertType: 'over_scope',
-            thresholdExceeded: overage
-          });
-
-          // TODO: Send email notification
+          if (!alertExists) {
+            await createScopeAlert({
+              agencyId,
+              clientId,
+              deliverableId: planItem.id,
+              alertType: 'over_scope',
+              thresholdExceeded: overage
+            });
+          }
         }
       }
     }

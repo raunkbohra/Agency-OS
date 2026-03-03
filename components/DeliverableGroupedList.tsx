@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useState, useCallback, useMemo } from 'react';
-import { Deliverable } from '@/lib/db-queries';
-import DeliverableStats from './DeliverableStats';
+import { DeliverableStatsBar } from './DeliverableStatsBar';
 
 // DeliverableItem reflects the API response shape: dates are strings, client_name is joined.
 interface DeliverableItem {
@@ -15,6 +14,8 @@ interface DeliverableItem {
   status: string;
   month_year: string;
   due_date: string | null;
+  item_count?: number;
+  items_completed?: number;
 }
 
 interface DeliverableGroupedListProps {
@@ -166,10 +167,8 @@ export function DeliverableGroupedList({
             {isExpanded && (
               <>
                 {/* Per-group stats using the shared DeliverableStats component */}
-                <div className="px-4 pt-3 pb-1 border-t border-border-default bg-bg-tertiary">
-                  <DeliverableStats
-                    deliverables={items as unknown as Deliverable[]}
-                  />
+                <div className="px-4 py-3 border-t border-border-default bg-bg-tertiary">
+                  <DeliverableStatsBar deliverables={items} />
                 </div>
 
                 {/* Individual items */}
@@ -199,6 +198,7 @@ export function DeliverableGroupedList({
                           <p className="font-medium text-text-primary truncate">{d.title}</p>
                           <p className="text-xs text-text-tertiary mt-0.5 truncate">
                             {d.month_year}
+                            {d.item_count ? ` · ${d.items_completed ?? 0}/${d.item_count} items` : ''}
                             {d.due_date &&
                               ` · Due ${new Date(d.due_date).toLocaleDateString('en-US', {
                                 month: 'short',

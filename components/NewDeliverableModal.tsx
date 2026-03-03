@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Plus, Trash2 } from 'lucide-react';
 
 interface Client {
   id: string;
@@ -35,6 +35,7 @@ export default function NewDeliverableModal({ isOpen, onClose, onCreated }: NewD
   const [title, setTitle] = useState('');
   const [monthYear, setMonthYear] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [itemTitles, setItemTitles] = useState<string[]>(['']);
 
   // Fetch clients when modal opens
   useEffect(() => {
@@ -81,6 +82,7 @@ export default function NewDeliverableModal({ isOpen, onClose, onCreated }: NewD
       setDueDate('');
       setClientPlans([]);
       setError(null);
+      setItemTitles(['']);
     }
   }, [isOpen]);
 
@@ -118,6 +120,17 @@ export default function NewDeliverableModal({ isOpen, onClose, onCreated }: NewD
       }
 
       const deliverable = await res.json();
+
+      // Create items for the bundle
+      const validItems = itemTitles.filter(t => t.trim());
+      for (const itemTitle of validItems) {
+        await fetch(`/api/deliverables/${deliverable.id}/items`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: itemTitle.trim() }),
+        });
+      }
+
       onCreated(deliverable);
       onClose();
     } catch (err) {
@@ -244,6 +257,44 @@ export default function NewDeliverableModal({ isOpen, onClose, onCreated }: NewD
               onChange={e => setDueDate(e.target.value)}
               className={inputClass}
             />
+          </div>
+
+          {/* Items */}
+          <div>
+            <label className={labelClass}>Items <span className="text-text-tertiary font-normal">(optional)</span></label>
+            <div className="space-y-2">
+              {itemTitles.map((itemTitle, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={itemTitle}
+                    onChange={e => {
+                      const updated = [...itemTitles];
+                      updated[idx] = e.target.value;
+                      setItemTitles(updated);
+                    }}
+                    placeholder={`Item ${idx + 1}`}
+                    className={inputClass}
+                  />
+                  {itemTitles.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setItemTitles(itemTitles.filter((_, i) => i !== idx))}
+                      className="p-2 rounded-lg text-text-tertiary hover:text-accent-red hover:bg-accent-red/10 transition-colors flex-shrink-0"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setItemTitles([...itemTitles, ''])}
+                className="flex items-center gap-1 text-xs text-accent-blue hover:text-accent-blue/80 font-medium transition-colors"
+              >
+                <Plus className="h-3 w-3" /> Add item
+              </button>
+            </div>
           </div>
 
           {/* Actions */}

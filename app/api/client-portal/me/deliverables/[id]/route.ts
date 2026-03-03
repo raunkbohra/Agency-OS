@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientSession } from '@/lib/client-auth';
-import { getDeliverableFiles, getDeliverableComments } from '@/lib/db-queries';
+import { getDeliverableFiles, getDeliverableComments, getDeliverableItems } from '@/lib/db-queries';
 import { getPool } from '@/lib/db';
 
 export async function GET(
@@ -29,16 +29,18 @@ export async function GET(
 
     const deliverable = result.rows[0];
 
-    // Fetch files and comments
-    const [files, comments] = await Promise.all([
+    // Fetch files, comments, and items
+    const [files, comments, items] = await Promise.all([
       getDeliverableFiles(id),
       getDeliverableComments(id),
+      getDeliverableItems(id),
     ]);
 
     return NextResponse.json({
       deliverable,
       files: files || [],
       comments: comments || [],
+      items: items || [],
     });
   } catch (error) {
     console.error('Error fetching client deliverable:', error);

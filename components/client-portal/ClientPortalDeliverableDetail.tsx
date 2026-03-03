@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FileText, MessageSquare, Calendar, CheckCircle2 } from 'lucide-react';
+import { FileText, MessageSquare, Calendar, CheckCircle2, ListChecks } from 'lucide-react';
 
 interface File {
   id: string;
@@ -16,6 +16,13 @@ interface Comment {
   comment_text: string;
   is_revision_request: boolean;
   created_at: string;
+}
+
+interface DeliverableItemType {
+  id: string;
+  title: string;
+  status: string;
+  sort_order: number;
 }
 
 interface Deliverable {
@@ -45,11 +52,13 @@ export default function ClientPortalDeliverableDetail({
 }: ClientPortalDeliverableDetailProps) {
   const [deliverable, setDeliverable] = useState<Deliverable | null>(null);
   const [files, setFiles] = useState<File[]>([]);
+  const [items, setItems] = useState<DeliverableItemType[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [requestChanges, setRequestChanges] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,6 +80,7 @@ export default function ClientPortalDeliverableDetail({
         const data = await res.json();
         setDeliverable(data.deliverable);
         setFiles(data.files || []);
+        setItems(data.items || []);
         setComments(data.comments || []);
       } catch (err) {
         console.error('Error fetching deliverable:', err);
@@ -110,7 +120,7 @@ export default function ClientPortalDeliverableDetail({
       const res = await fetch(`/api/client-portal/me/deliverables/${deliverableId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comment: newComment }),
+        body: JSON.stringify({ comment: newComment, isRevisionRequest: requestChanges }),
       });
 
       const data = await res.json();
@@ -118,6 +128,7 @@ export default function ClientPortalDeliverableDetail({
       if (res.ok) {
         setComments([data, ...comments]);
         setNewComment('');
+        setRequestChanges(false);
       } else {
         console.error('Failed to add comment:', data);
         alert('Failed to add comment. Please try again.');
@@ -274,6 +285,105 @@ export default function ClientPortalDeliverableDetail({
         </div>
       )}
 
+      {/* Items Checklist */}
+      {items.length > 0 && (
+        <div
+          className="p-4 rounded-lg border"
+          style={{
+            background: 'rgba(255, 255, 255, 0.01)',
+            border: '1px solid var(--border-default)',
+          }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <ListChecks size={18} style={{ color: 'var(--text-secondary)' }} />
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Items
+            </h2>
+            <span style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem', marginLeft: 'auto' }}>
+              {items.filter(i => i.status === 'done' || i.status === 'approved').length}/{items.length} complete
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div style={{ width: '100%', height: '6px', background: 'var(--bg-tertiary)', borderRadius: '9999px', marginBottom: '1rem', overflow: 'hidden' }}>
+            <div
+              style={{
+                height: '100%',
+                width: `${(items.filter(i => i.status === 'done' || i.status === 'approved').length / items.length) * 100}%`,
+                background: 'var(--accent-green)',
+                borderRadius: '9999px',
+                transition: 'width 0.3s ease',
+              }}
+            />
+          </div>
+
+          <div className="space-y-1">
+            {items.map((item) => {
+              const isDone = item.status === 'done' || item.status === 'approved';
+              const statusColors: Record<string, string> = {
+                draft: 'var(--text-tertiary)',
+                in_review: 'var(--accent-blue)',
+                approved: 'var(--accent-green)',
+                changes_requested: 'var(--accent-amber)',
+                done: 'var(--accent-purple)',
+              };
+              const color = statusColors[item.status] || 'var(--text-tertiary)';
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg"
+                  style={{ background: isDone ? 'rgba(0,0,0,0.02)' : 'transparent' }}
+                >
+                  <div
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '4px',
+                      border: `2px solid ${isDone ? 'var(--accent-green)' : 'var(--border-default)'}`,
+                      background: isDone ? 'var(--accent-green)' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {isDone && (
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    style={{
+                      flex: 1,
+                      fontSize: '0.875rem',
+                      color: isDone ? 'var(--text-tertiary)' : 'var(--text-primary)',
+                      textDecoration: isDone ? 'line-through' : 'none',
+                    }}
+                  >
+                    {item.title}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.625rem',
+                      fontWeight: 600,
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      background: `${color}15`,
+                      color: color,
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {item.status.replace(/_/g, ' ')}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Files */}
       <div
         className="p-4 rounded-lg border"
@@ -334,7 +444,7 @@ export default function ClientPortalDeliverableDetail({
         <div className="flex items-center gap-2 mb-4">
           <MessageSquare size={18} style={{ color: 'var(--text-secondary)' }} />
           <h2 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-            Comments & Updates
+            Feedback & Comments
           </h2>
         </div>
 
@@ -343,7 +453,7 @@ export default function ClientPortalDeliverableDetail({
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a comment..."
+            placeholder="Share your feedback or request changes..."
             style={{
               width: '100%',
               padding: '0.75rem',
@@ -358,23 +468,38 @@ export default function ClientPortalDeliverableDetail({
             }}
             rows={3}
           />
-          <button
-            onClick={handleAddComment}
-            disabled={submittingComment || !newComment.trim()}
-            style={{
-              padding: '0.5rem 1rem',
-              background: newComment.trim() ? 'var(--accent-blue)' : 'var(--text-tertiary)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              cursor: newComment.trim() ? 'pointer' : 'not-allowed',
-              opacity: submittingComment ? 0.7 : 1,
-            }}
-          >
-            {submittingComment ? 'Posting...' : 'Post Comment'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={requestChanges}
+                onChange={(e) => setRequestChanges(e.target.checked)}
+                style={{ borderRadius: '0.25rem' }}
+              />
+              <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                Request changes
+              </span>
+            </label>
+            <button
+              onClick={handleAddComment}
+              disabled={submittingComment || !newComment.trim()}
+              style={{
+                padding: '0.5rem 1rem',
+                background: newComment.trim()
+                  ? requestChanges ? 'var(--accent-amber)' : 'var(--accent-blue)'
+                  : 'var(--text-tertiary)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                cursor: newComment.trim() ? 'pointer' : 'not-allowed',
+                opacity: submittingComment ? 0.7 : 1,
+              }}
+            >
+              {submittingComment ? 'Sending...' : requestChanges ? 'Send Change Request' : 'Send Feedback'}
+            </button>
+          </div>
         </div>
 
         {/* Display Comments */}
@@ -412,7 +537,7 @@ export default function ClientPortalDeliverableDetail({
                         color: 'var(--accent-amber)',
                       }}
                     >
-                      Revision Request
+                      Changes Requested
                     </span>
                   )}
                 </div>

@@ -9,6 +9,8 @@ export interface DeliverableResponse {
   status: string;
   dueDate: string | null;
   createdAt: string;
+  itemCount: number;
+  itemsCompleted: number;
 }
 
 export async function GET(request: NextRequest) {
@@ -35,6 +37,8 @@ export async function GET(request: NextRequest) {
         status: d.status,
         dueDate: d.due_date ? new Date(d.due_date).toISOString() : null,
         createdAt,
+        itemCount: parseInt(d.item_count) || 0,
+        itemsCompleted: parseInt(d.items_completed) || 0,
       };
     });
 
