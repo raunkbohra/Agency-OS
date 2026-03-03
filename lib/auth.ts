@@ -45,11 +45,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const pool = getPool();
 
-          // Fetch user + agency in one query
+          // Fetch user + agency (owner or member)
           const result = await pool.query(
-            `SELECT u.id, u.name, u.password_hash, a.id AS agency_id
+            `SELECT u.id, u.name, u.password_hash, u.agency_id
              FROM users u
-             JOIN agencies a ON a.owner_id = u.id
              WHERE u.email = $1
              LIMIT 1`,
             [email]

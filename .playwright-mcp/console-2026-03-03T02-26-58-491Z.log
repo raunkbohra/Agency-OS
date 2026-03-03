@@ -1,0 +1,5 @@
+[     339ms] [ERROR] ClientFetchError: Failed to fetch. Read more at https://errors.authjs.dev#autherror
+    at fetchData (http://localhost:3000/_next/static/chunks/Desktop_Agency-OS_eab6d12c._.js:553:22)
+    at async getSession (http://localhost:3000/_next/static/chunks/Desktop_Agency-OS_eab6d12c._.js:720:21)
+    at async SessionProvider.useEffect [as _getSession] (http://localhost:3000/_next/static/chunks/Desktop_Agency-OS_eab6d12c._.js:863:51) @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:3127
+[   48732ms] [WARNING] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior @ http://localhost:3000/_next/static/chunks/43abd_next_dist_752abf95._.js:2297
